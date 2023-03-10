@@ -216,18 +216,19 @@ public:
 
     /**
      * Return true if target type is class member type. in other terms, if target is defined like this 'A B::*'
-     * \example void Class<gfloat>::*
+     * \example Enum<Character::Category>::name
      */
     CORE_FAST static gbool isMember() {
-        return core::Class::Member<NIVR>::V;
+        return core::Class::Member<NIV>::V;
     }
 
     /**
      * Return true if target type is non static class method type.
-     * \example decltype(&Object::toString)
+     * \example &Object::toString => String(Object::*)()
+     * \example &Collection<Integer>::add => gbool(Collection<Integer>::*)(Integer const& i)
      */
     CORE_FAST static gbool isFunctionMember() {
-        return core::Class::Member2<NIVR>::V;
+        return core::Class::Member2<NIV>::V;
     }
 
     /**
@@ -346,7 +347,7 @@ public:
      */
     template<class Of>
     CORE_FAST static gbool isSuper() {
-        return core::Class::SuperTest<NIVR, typename Class<Of>::NIVR>();
+        return core::Class::SuperTest<NIVR, typename Class<Of>::NIVR>(0);
     }
 
     /**
@@ -354,7 +355,7 @@ public:
      */
     template<class ...With>
     CORE_FAST static gbool isCallable() {
-        return core::Class::Return<NIVR, With...>::V;
+        return core::Class::Return<NIV, With...>::V;
     }
 
     /**
@@ -389,7 +390,7 @@ public:
      * Return is a return type of target type (if it callable with specified arguments type)
      */
     template<class ...Args>
-    using Return = core::Class::Return<NIVR, Args...>::Type;
+    using Return = core::Class::Return<NIV, Args...>::Type::Type;
 
     using Primitive = core::Class::Primitive<T>::Type;
     using Object = core::Class::Class<T>::Type;

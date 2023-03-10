@@ -6,6 +6,9 @@
 #include "String.h"
 #include "Enum.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 static String function() {
     Enum<Character::Category>::customAlias = [](Character::Category value) -> String {
         switch (value) {
@@ -501,3 +504,5 @@ static String function() {
 }
 
 String const Character::UCD05 = function();
+
+#pragma GCC diagnostic pop

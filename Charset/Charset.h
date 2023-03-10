@@ -20,16 +20,16 @@ protected:
     CORE_EXPLICIT Charset(const String &name);
 
     /**
-     * Replacement used by decode method. End With byte 0x00
+     * Replacement used by decode method. must End With byte 0x00
      * By default is 0x0
      */
-    gbyte encoderReplacement[5] = {0x0, 0x00, 0x00, 0x0, 0x0};
+    gbyte encoderReplacement[5] = {(gbyte) '?', 0x00, 0x00, 0x0, 0x0};
 
     /**
      * Replacement used by encode method. End With null character ('\u0000')
      * By default is "\u0000"
      */
-    gchar decoderReplacement[3] = {'\u0000', '\u0000', '\u0000'};
+    gchar decoderReplacement[3] = {(gchar) 0xFFFD, '\u0000', '\u0000'};
 
 public:
     /**
@@ -41,7 +41,6 @@ public:
      * A description of the result state of a coder.
      */
     enum class CoderResult : gbyte {
-        NONE,
         /**
          * Result object indicating underflow, meaning that either the input buffer
          * has been completely consumed or, if the input buffer is not yet empty,
@@ -56,7 +55,6 @@ public:
         OVERFLOW,
         MALFORMED,
         UNMAPPABLE,
-        ERROR_MIN = 2
     };
 
     enum class State : gbyte {
@@ -87,14 +85,14 @@ public:
      * \param in The input byte buffer
      * \param out The output character buffer
      */
-    virtual CoderResult decodeLoop(ByteBuffer &in, CharBuffer &out) = 0;
+    virtual CoderResult decodeLoop(ByteBuffer &src, CharBuffer &dst) = 0;
 
     /**
      * Encodes one or more characters into one or more bytes.
      * \param in The input character buffer
      * \param out The output byte buffer
      */
-    virtual CoderResult encodeLoop(CharBuffer &in, ByteBuffer &dst) = 0;
+    virtual CoderResult encodeLoop(CharBuffer &src, ByteBuffer &dst) = 0;
 
     /**
      * Number character per byte
@@ -122,7 +120,6 @@ public:
 
     String toString() const override;
 
-public:
     /**
      * Compares this charset to another.
      * \param obj The charset to which this charset is to be compared
@@ -156,6 +153,17 @@ public:
     virtual gbool contains(Charset const &cs) const = 0;
 
     virtual gbool canEncode(gchar c) const;
+
+    virtual Charset &onMalformed(ErrorAction action);
+
+    virtual Charset &onUnmapped(ErrorAction action);
+
+    /**
+     * Return instance of charset corresponding with specified charset name
+     * \param charset name of charset
+     * \throw KeyError if specified charset name not found
+     */
+    static Charset &forName(String const &charset);
 
 private:
     void set(const Object &obj) override;

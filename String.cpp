@@ -375,20 +375,6 @@ gint String::bytes(gbyte *dst, gint length, gint begin, gint end) const {
     return size << 1;
 }
 
-gint String::chars(gchar *dst, gint length, gint begin, gint end) const {
-    if (begin < 0)
-        throw IndexError(begin);
-    if (end < 0)
-        throw IndexError(end);
-    length = length << 1;
-    gint size = end - begin + 1;
-    size = size > length ? length : size;
-    size = size > len ? len : size;
-    size = size < 0 ? 0 : size;
-    arraycopy(value, begin, (gbyte *) dst, 0, size);
-    return size;
-}
-
 gbool String::equals(const Object &obj) const {
     if (this == &obj)
         return true;
@@ -715,6 +701,44 @@ String::~String() {
     value = 0;
 }
 
+CharArray String::chars() const {
+    CharArray array(len);
+    for (gint i = 0; i < len; ++i)
+        array.set(i, charAt(i));
+    return array;
+}
+
+String::String(const CharArray &chars) : String(chars, 0) {}
+
+String::String(const CharArray &chars, gint offset) : String() {
+    if (offset < 0)
+        throw ValueError("Negative array offset");
+    if (offset > chars.length())
+        offset = chars.length();
+    len = chars.length() - offset;
+    value = allocate(len);
+    gint i = 0;
+    gint j = 0;
+    for (i = 0; i < len; ++i, j = nextIndex)
+        put(value, j, chars[i]);
+}
+
+CharArray String::chars(gint begin, gint end) const {
+    if (begin < 0)
+        throw IndexError(begin);
+    if (end < 0)
+        throw IndexError(end);
+    if (end < begin || begin >= len)
+        return CharArray(0);
+    if (end >= len)
+        end = len - 1;
+    end = end + 1;
+    gint n = end - begin;
+    CharArray array(n);
+    for (gint i = 0; i < n; ++i)
+        array.set(i, charAt(i + begin));
+    return array;
+}
 
 String operator+(const String &lhs, const String &rhs) {
     return lhs.concat(rhs);

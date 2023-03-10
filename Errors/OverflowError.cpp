@@ -12,10 +12,8 @@ String OverflowError::message() const {
     return "Overflow Error";
 }
 
+OverflowError OverflowError::INSTANCE{};
+
 Object &OverflowError::clone() const {
-    try {
-        return *new OverflowError();
-    }catch(...) {
-        throw MemoryAllocationError();
-    }
+    return INSTANCE;
 }

@@ -95,6 +95,44 @@ public:
 
     static String toUnsignedString(glong i, gint base);
 
+    static String toHexString(glong i);
+
+    static String toOctalString(glong i);
+
+    static String toBinaryString(glong i);
+
+    static glong parseLong(String const& str);
+
+    static glong parseLong(String const& str, gint base);
+
+    static glong parseUnsignedLong(String const& str);
+
+    static glong parseUnsignedLong(String const& str, gint base);
+
+    static Long valueOf(String const& str);
+
+    static Long valueOf(String const& str, gint base);
+
+    /**
+     * Decodes a String into a Long.
+     * Accepts decimal, hexadecimal, octal and binary numbers given by the following grammar.
+     * \details
+     * [Sign]    DecimalDigits.
+     * [Sign] 0x HexDigits.
+     * [Sign] 0X HexDigits.
+     * [Sign] 0b BinaryDigits.
+     * [Sign] 0B BinaryDigits.
+     * [Sign] 0  OctalDigits.
+     * \example
+     *      "0x7f" -> 127.
+     *      "0177" -> 127.
+     *      "0b1111111" -> 127.
+     *      "0b01111111" -> 127.
+     *      "127" -> 127.
+     * \throw ValueError if specified string not respect grammar or value represented out of range [MIN;MAX]
+     */
+    static Long decode(String const& str);
+
 protected:
     /**
      * Set long value

@@ -50,7 +50,7 @@ public:
      *  This method has not effect if this buffer is read-only
      * \param src The source buffer from which chars are to be read; must not be this buffer
      */
-    virtual CharBuffer &put(CharBuffer const &src);
+    virtual CharBuffer &put(CharBuffer &src);
 
     gbool isReadOnly() const override;
 

@@ -105,6 +105,38 @@ public:
 
     static String toBinaryString(gint i);
 
+    static gint parseInt(String const& str);
+
+    static gint parseInt(String const& str, gint base);
+
+    static gint parseUnsignedInt(String const& str);
+
+    static gint parseUnsignedInt(String const& str, gint base);
+
+    static Integer valueOf(String const& str);
+
+    static Integer valueOf(String const& str, gint base);
+
+    /**
+     * Decodes a String into a Integer.
+     * Accepts decimal, hexadecimal, octal and binary numbers given by the following grammar.
+     * \details
+     * [Sign]    DecimalDigits.
+     * [Sign] 0x HexDigits.
+     * [Sign] 0X HexDigits.
+     * [Sign] 0b BinaryDigits.
+     * [Sign] 0B BinaryDigits.
+     * [Sign] 0  OctalDigits.
+     * \example
+     *      "0x7f" -> 127.
+     *      "0177" -> 127.
+     *      "0b1111111" -> 127.
+     *      "0b01111111" -> 127.
+     *      "127" -> 127.
+     * \throw ValueError if specified string not respect grammar or value represented out of range [MIN;MAX]
+     */
+    static Integer decode(String const& str);
+
 protected:
     /**
      * Set Integer value

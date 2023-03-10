@@ -199,11 +199,19 @@ public:
 
     static glong hash(gfloat f);
 
+    static gfloat parseFloat(String const& str);
+
+    static Float valueOf(String const& str);
+
 protected:
     void set(const Object &obj) override;
 
 private:
     f32 value;
+
+    static gfloat _x10(gfloat result, gint pow);
+
+    static gint signum(gfloat f);
 };
 
 

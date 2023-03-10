@@ -141,6 +141,34 @@ public:
 
     static glong hash(gshort i);
 
+    static gshort parseShort(String const& str);
+
+    static gshort parseShort(String const& str, gint base);
+
+    static Short valueOf(String const& str);
+
+    static Short valueOf(String const& str, gint base);
+
+    /**
+     * Decodes a String into a Short.
+     * Accepts decimal, hexadecimal, octal and binary numbers given by the following grammar.
+     * \details
+     * [Sign]    DecimalDigits.
+     * [Sign] 0x HexDigits.
+     * [Sign] 0X HexDigits.
+     * [Sign] 0b BinaryDigits.
+     * [Sign] 0B BinaryDigits.
+     * [Sign] 0  OctalDigits.
+     * \example
+     *      "0x7f" -> 127.
+     *      "0177" -> 127.
+     *      "0b1111111" -> 127.
+     *      "0b01111111" -> 127.
+     *      "127" -> 127.
+     * \throw ValueError if specified string not respect grammar or value represented out of range [MIN;MAX]
+     */
+    static Short decode(String const& str);
+
 private:
     glong hash() const override;
 

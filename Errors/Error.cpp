@@ -6,15 +6,37 @@
 #include "../String.h"
 #include "MemoryAllocationError.h"
 
-static gbyte CURRENT_MESSAGE[4096] = {};
+static char CURRENT_MESSAGE[4096] = {};
 
 const char *Error::what() const noexcept {
     String msg = message();
     if (msg.isBlank())
         return "";
-    gint i = msg.bytes(CURRENT_MESSAGE, 4096, 0, msg.length() - 1);
-    CURRENT_MESSAGE[i] = 0;
-    return (char *) CURRENT_MESSAGE;
+    CharArray chars = msg.chars();
+    if(msg.isAscii()){
+        int i;
+        for (i = 0; i < chars.length() && i < 4096; ++i) {
+            CURRENT_MESSAGE[i] = (char) chars.get(i);
+            if(CURRENT_MESSAGE[i] == 0)
+                CURRENT_MESSAGE[i] = '?';
+        }
+        CURRENT_MESSAGE[i] = 0;
+    }else {
+        CharBuffer buffer = (CharBuffer) chars;
+        ByteBuffer buffer1 = UTF8::INSTANCE
+        .onUnmapped(Charset::ErrorAction::IGNORE)
+        .onMalformed(Charset::ErrorAction::REPLACE)
+        .encode(buffer);
+        gint i = 0;
+        while(buffer1.hasRemaining() && i < 4096){
+            CURRENT_MESSAGE[i] = buffer1.get();
+            if(CURRENT_MESSAGE[i] == 0)
+                CURRENT_MESSAGE[i] = '?';
+            i = i + 1;
+        }
+        CURRENT_MESSAGE[i] = 0;
+    }
+    return CURRENT_MESSAGE;
 }
 
 gbool Error::equals(const Object &obj) const {

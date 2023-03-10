@@ -13,7 +13,6 @@ private:
     CORE_EXPLICIT MS1250();
 
 public:
-
     String name() const override;
 
     CoderResult decodeLoop(ByteBuffer &in, CharBuffer &out) override;
@@ -31,6 +30,12 @@ public:
     CharBuffer decode(ByteBuffer &in) override;
 
     ByteBuffer encode(CharBuffer &in) override;
+
+    ErrorAction malformedAction() const override;
+
+    ErrorAction unmappableAction() const override;
+
+    String toString() const override;
 
     static MS1250 INSTANCE;
 

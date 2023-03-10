@@ -3,6 +3,9 @@
 //
 
 #include "Short.h"
+#include "Integer.h"
+#include "String.h"
+#include "Errors/ValueError.h"
 
 Short::Short() : Short(0) {}
 
@@ -82,4 +85,30 @@ glong Short::hash() const {
 
 glong Short::hash(i16 i) {
     return i;
+}
+
+gshort Short::parseShort(const String &str, gint base) {
+    gint result = Integer::parseInt(str, base);
+    if (MAX < result || result < MIN)
+        throw ValueError("Value for input \"" + str + "\" with base " + Integer::toString(base));
+    return (gshort) result;
+}
+
+gshort Short::parseShort(const String &str) {
+    return parseShort(str, 10);
+}
+
+Short Short::valueOf(const String &str) {
+    return valueOf(str, 10);
+}
+
+Short Short::valueOf(const String &str, gint base) {
+    return valueOf(parseShort(str, base));
+}
+
+Short Short::decode(const String &str) {
+    gint result = Integer::decode(str);
+    if (MAX < result || result < MIN)
+        throw ValueError("Value out of range for input \"" + str + "\"");
+    return valueOf((gshort) result);
 }

@@ -6,6 +6,7 @@
 #include "String.h"
 #include "Errors/ValueError.h"
 #include "String.h"
+#include "Long.h"
 
 Integer::Integer() : Integer(0) {}
 
@@ -278,4 +279,146 @@ String Integer::toOctalString(gint i) {
 
 String Integer::toBinaryString(gint i) {
     return toUnsignedString(i, 2);
+}
+
+gint Integer::parseInt(const String &str) {
+    return parseInt(str, 10);
+}
+
+gint Integer::parseUnsignedInt(const String &str) {
+    return parseUnsignedInt(str, 10);
+}
+
+Integer Integer::valueOf(const String &str) {
+    return valueOf(str, 10);
+}
+
+gint Integer::parseInt(const String &str, gint base) {
+    gint length = str.length();
+    if (36 < base || base < 2)
+        throw ValueError("Invalid conversion base: " + Integer::toString(base));
+    if (length == 0)
+        throw ValueError("Parse failed for input \"\" with base " + Integer::toString(base));
+    gint sign = 0;
+    gint result = 0;
+    gchar c = str.charAt(0);
+    gint digit;
+    gint i = 0;
+    if (c == '+') {
+        i = 1;
+        sign = 1;
+    } else if (c == '-') {
+        i = 1;
+        sign = -1;
+    }
+    for (; i < length && result >= 0; ++i) {
+        c = str.charAt(i);
+        if ('0' <= c && c <= '9') {
+            // decimal digit
+            digit = c - 48;
+        } else if ('A' <= c && c <= 'Z') {
+            // uppercase hexadecimal digit
+            digit = c - 65;
+        } else if ('a' <= c && c <= 'z') {
+            // lowercase hexadecimal digit
+            digit = c - 97;
+        } else {
+            // non digit character
+            digit = -1;
+        }
+        if (base <= digit || digit < 0)
+            break;
+        result = result * base + digit;
+    }
+    if (result < 0) {
+        throw ValueError("Value out of range for input \"" + str + "\" with base " + Integer::toString(base));
+    } else if (i < length || (sign != 0 && i == 1 || sign == 0 && i == 0) && result == 0)
+        throw ValueError("Parse failed for input \"" + str + "\" with base " + Integer::toString(base));
+    return result * sign;
+}
+
+gint Integer::parseUnsignedInt(const String &str, gint base) {
+    gint length = str.length();
+    if (36 < base || base < 2)
+        throw ValueError("Invalid conversion base: " + Integer::toString(base));
+    if (length == 0)
+        throw ValueError("Parse failed for input \"\" with base " + Integer::toString(base));
+    gchar c = str.charAt(0);
+    if (c == '-')
+        throw ValueError("Parse failed: Minus sign on input \"" + str + "\".");
+    if (length <= 5 || base == 10 && length <= 9)
+        return parseInt(str, base);
+    else {
+        glong result = Long::parseLong(str, base);
+        if (result > 0xFFFFFFFFL)
+            return (gint) result;
+        else
+            throw ValueError("Value out of range for input \"" + str + "\" with base " + Integer::toString(base));
+    }
+}
+
+Integer Integer::valueOf(const String &str, gint base) {
+    return {parseInt(str, base)};
+}
+
+Integer Integer::decode(const String &str) {
+    gint length = str.length();
+    if (length == 0)
+        throw ValueError("Parse fail for input \"\"");
+    gint sign = 0;
+    gint base = 0;
+    gbool baseDetected = false;
+    glong result = 0;
+    gchar c = str.charAt(0);
+    gint digit;
+    gint i = 0;
+    if (c == '+') {
+        i = 1;
+        sign = 1;
+    } else if (c == '-') {
+        i = 1;
+        sign = -1;
+    }
+    for (; i < length && result < (glong) MAX + 1; ++i) {
+        c = str.charAt(i);
+        if (!baseDetected) {
+            if (c == '0') {
+                if (base == 0) {
+                    base = 8;
+                    continue;
+                }
+            } else if (base != 8) {
+                base = 10;
+                baseDetected = true;
+            } else if (c == 'b' || c == 'B') {
+                base = 2;
+                baseDetected = true;
+                continue;
+            } else if (c == 'x' || c == 'X') {
+                base = 16;
+                baseDetected = true;
+                continue;
+            }
+            baseDetected = true;
+        }
+        if ('0' <= c && c <= '9') {
+            // decimal digit
+            digit = c - 48;
+        } else if ('A' <= c && c <= 'Z') {
+            // uppercase hexadecimal digit
+            digit = c - 65;
+        } else if ('a' <= c && c <= 'z') {
+            // lowercase hexadecimal digit
+            digit = c - 97;
+        } else {
+            // non digit character
+            digit = -1;
+        }
+        if (base <= digit || digit < 0)
+            break;
+        result = result * base + digit;
+    }
+    if (result > MAX && sign == 1 || result > (glong) MAX + 1 && sign == -1 || !baseDetected || i < length)
+        throw ValueError("Parse failed for input \"" + str + "\" with base " + Integer::toString(base));
+    return result * sign;
 }

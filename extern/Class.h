@@ -38,14 +38,14 @@ namespace core {
          *  Indicate that test is ok
          */
         struct AlwaysTrue {
-            CORE_FAST static int V = true;
+            CORE_FAST static gbool V = true;
         };
 
         /**
          *  Indicate that test fail
          */
         struct AlwaysFalse {
-            CORE_FAST static int V = false;
+            CORE_FAST static gbool V = false;
         };
 
         template<class T>
@@ -63,11 +63,11 @@ namespace core {
         CORE_FAST decltype(_decl<T>(0)) decl();
 
         template<class T, class U>
-        struct Similar final : AlwaysFalse {
+        struct Similar  : AlwaysFalse {
         };
 
         template<class T>
-        struct Similar<T, T> final : AlwaysTrue {
+        struct Similar<T, T>  : AlwaysTrue {
         };
 
         template<class T>
@@ -118,15 +118,15 @@ namespace core {
 
         template<class Fn, class ...Args>
         struct Return final {
-            using Type = decltype(ReturnTest1<Fn, Args...>());
+            using Type = decltype(ReturnTest1<Fn, Args...>(0));
             CORE_FAST static gbool V = !Similar<Type, AlwaysFalse>::V;
         };
 
         template<class R, class Fn, class Obj, class ...Args>
         struct Return<R Fn::*, Obj, Args...> final {
             using O = typename NoReference<Obj>::Type;
-            using Type1 = decltype(ReturnTest2<R Fn::*, O, Args...>());
-            using Type2 = decltype(ReturnTest3<R Fn::*, O, Args...>());
+            using Type1 = decltype(ReturnTest2<R Fn::*, O, Args...>(0));
+            using Type2 = decltype(ReturnTest3<R Fn::*, O, Args...>(0));
             CORE_FAST static gbool V1 = !Similar<Type1, AlwaysFalse>::V;
             CORE_FAST static gbool V2 = !Similar<Type2, AlwaysFalse>::V;
             CORE_FAST static gbool V = V1 || V2;
@@ -232,13 +232,13 @@ namespace core {
         CORE_FAST gbool AbstractTest(i32) { return __is_abstract(T); }
 
         template<class ...>
-        CORE_FAST gbool AbstractTest(i32) { return false; }
+        CORE_FAST gbool AbstractTest(i64) { return false; }
 
         template<class T, class U, CORE_SIZE = sizeof(T), CORE_SIZE = sizeof(U)>
         CORE_FAST gbool SuperTest(i32) { return __is_base_of(T, U); }
 
         template<class ...>
-        CORE_FAST gbool SuperTest(i32) { return false; }
+        CORE_FAST gbool SuperTest(i64) { return false; }
 
         template<class T>
         struct Array : AlwaysFalse, Always<T> {
@@ -246,6 +246,10 @@ namespace core {
 
         template<class T, CORE_SIZE S>
         struct Array<T[S]> : AlwaysTrue, Always<T> {
+        };
+
+        template<class T>
+        struct Array<T[]> : AlwaysTrue, Always<T> {
         };
 
         template<class T>
@@ -381,7 +385,7 @@ namespace core {
         };
 
         template<class T, class U>
-        struct CVR<T U::*> final : AlwaysFalse, Always<T const volatile &> {
+        struct CVR<T U::*> final : AlwaysFalse, Always<T const volatile> {
             using Type2 = T;
         };
 

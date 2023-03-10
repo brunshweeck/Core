@@ -124,6 +124,35 @@ public:
 
     static glong hash(gbyte b);
 
+    static gbyte parseByte(String const& str);
+
+    static gbyte parseByte(String const& str, gint base);
+
+    static Byte valueOf(String const& str);
+
+    static Byte valueOf(String const& str, gint base);
+
+    /**
+     * Decodes a String into a Byte.
+     * Accepts decimal, hexadecimal, octal and binary numbers given by the following grammar.
+     * \details
+     * [Sign]    DecimalDigits.
+     * [Sign] 0x HexDigits.
+     * [Sign] 0X HexDigits.
+     * [Sign] 0b BinaryDigits.
+     * [Sign] 0B BinaryDigits.
+     * [Sign] 0  OctalDigits.
+     * \example
+     *      "0x7f" -> 127.
+     *      "0177" -> 127.
+     *      "0b1111111" -> 127.
+     *      "0b01111111" -> 127.
+     *      "127" -> 127.
+     * \throw ValueError if specified string not respect grammar or value represented out of range [MIN;MAX]
+     */
+    static Byte decode(String const& str);
+    static CORE_FAST auto a = 0177;
+
 protected:
     void set(const Object &obj) override;
 

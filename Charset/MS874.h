@@ -8,10 +8,11 @@
 
 #include "Charset.h"
 
-class MS874: public Charset {
-public:
+class MS874 : public Charset {
+private:
     CORE_EXPLICIT MS874();
 
+public:
     String name() const override;
 
     CoderResult decodeLoop(ByteBuffer &in, CharBuffer &out) override;
@@ -24,12 +25,23 @@ public:
 
     gbool contains(const Charset &cs) const override;
 
+    ErrorAction malformedAction() const override;
+
+    ErrorAction unmappableAction() const override;
+
+    CharBuffer decode(ByteBuffer &in) override;
+
+    ByteBuffer encode(CharBuffer &in) override;
+
+    String toString() const override;
+
     Object &clone() const override;
 
-
+    static MS874 INSTANCE;
 
 private:
     static gchar decode(gint b);
+
     static int encode(gchar ch);
 };
 

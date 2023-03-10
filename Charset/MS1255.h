@@ -8,10 +8,11 @@
 
 #include "Charset.h"
 
-class MS1255: public Charset {
-public:
+class MS1255 final : public Charset {
+private:
     CORE_EXPLICIT MS1255();
 
+public:
     String name() const override;
 
     CoderResult decodeLoop(ByteBuffer &in, CharBuffer &out) override;
@@ -24,12 +25,23 @@ public:
 
     gbool contains(const Charset &cs) const override;
 
+    ErrorAction malformedAction() const override;
+
+    ErrorAction unmappableAction() const override;
+
+    CharBuffer decode(ByteBuffer &in) override;
+
+    ByteBuffer encode(CharBuffer &in) override;
+
+    String toString() const override;
+
     Object &clone() const override;
 
-
+    static MS1255 INSTANCE;
 
 private:
     static gchar decode(gint b);
+
     static int encode(gchar ch);
 };
 

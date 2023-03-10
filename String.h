@@ -9,6 +9,7 @@
 #include "Comparable.h"
 #include "Character.h"
 #include "Integer.h"
+#include "Long.h"
 #include "Class.h"
 #include "Errors/Error.h"
 #include "Charset/Charset.h"
@@ -16,6 +17,7 @@
 #include "Charset/UTF16.h"
 #include "Charset/UTF8.h"
 #include "Hashable.h"
+#include "Collections/CharArray.h"
 
 /**
  * The class String includes methods for examining individual characters of the sequence, for
@@ -316,13 +318,29 @@ public:
     gint bytes(gbyte dst[], gint length, gint begin, gint end) const;
 
     /**
-     * Copies characters from this string into the destination character
-     * \param dst destination array
-     * \param begin index of first character in the string copy
-     * \param end index after the last character in the string copy
-     * \param length destination capacity
+     * Return array of all character contained from this string
      */
-    gint chars(gchar dst[], gint length, gint begin, gint end) const;
+    CharArray chars() const;
+
+    /**
+     * Return array of all character contained from delimited part of this string
+     * \param begin index of first character
+     * \param end index of last character
+     * \throw IndexError if one if two indexes out of range
+     */
+    CharArray chars(gint begin, gint end) const;
+
+    /**
+     * Construct new string with array of character
+     * \param chars character array
+     */
+    CORE_EXPLICIT String(CharArray const& chars);
+
+    /**
+     * Construct new string with array of character
+     * \param chars character array
+     */
+    CORE_EXPLICIT String(CharArray const& chars, gint offset);
 
     /**
      * Compares this string to the specified object.

@@ -45,9 +45,9 @@ static CORE_FAST gchar UNMAPPABLE_DECODING = 0xFFFD;
 static CORE_FAST gint UNMAPPABLE_ENCODING = 0xFFFD;
 
 static gint initC2B() {
-    for (char16_t & charToBytes_index : charToBytes_indexes)
+    for (char16_t &charToBytes_index: charToBytes_indexes)
         charToBytes_index = 0xFFFD;
-    for (char16_t & charToByte : charToBytes)
+    for (char16_t &charToByte: charToBytes)
         charToByte = 0xFFFD;
     gint off = 0;
     for (gint i = 0; i < sizeof(bytesToChar) / 2; i++) {
@@ -68,6 +68,8 @@ static gint initC2B() {
 static gint _ = initC2B();
 
 MS1254::MS1254() : Charset("Windows-1254") {}
+
+MS1254 MS1254::INSTANCE{};
 
 String MS1254::name() const {
     return "Windows-1254";
@@ -116,17 +118,17 @@ Charset::CoderResult MS1254::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                             gchar d = src.get();
                             if (Character::isLowSurrogate(c)) {
                                 uc = Character::joinSurrogates(c, d);
-                                cr = Charset::CoderResult::NONE;
-                            } else
+                                cr = Charset::CoderResult::UNDERFLOW;
+                            } else {
                                 uc = -1;
+                                errorLength = 1;
+                                cr = Charset::CoderResult::MALFORMED;
+                            }
                         }
                     } else if (Character::isLowSurrogate(c)) {
                         uc = -1;
                         errorLength = 1;
                         cr = Charset::CoderResult::MALFORMED;
-                    } else {
-                        uc = c;
-                        cr = Charset::CoderResult::NONE;
                     }
                     if (uc < 0)
                         return cr;
@@ -170,5 +172,25 @@ gint MS1254::encode(gchar ch) {
     if (index == UNMAPPABLE_ENCODING)
         return UNMAPPABLE_ENCODING;
     return charToBytes[index + (ch & 0xff)];
+}
+
+Charset::ErrorAction MS1254::malformedAction() const {
+    return Charset::malformedAction();
+}
+
+Charset::ErrorAction MS1254::unmappableAction() const {
+    return Charset::unmappableAction();
+}
+
+CharBuffer MS1254::decode(ByteBuffer &in) {
+    return Charset::decode(in);
+}
+
+ByteBuffer MS1254::encode(CharBuffer &in) {
+    return Charset::encode(in);
+}
+
+String MS1254::toString() const {
+    return Charset::toString();
 }
 

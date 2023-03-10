@@ -81,6 +81,8 @@ static void initC2B() {
 
 MS874::MS874() : Charset("Windows-874") {}
 
+MS874 MS874::INSTANCE{};
+
 String MS874::name() const {
     return "Windows-874";
 }
@@ -128,17 +130,17 @@ Charset::CoderResult MS874::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                             gchar d = src.get();
                             if (Character::isLowSurrogate(c)) {
                                 uc = Character::joinSurrogates(c, d);
-                                cr = Charset::CoderResult::NONE;
-                            } else
+                                cr = Charset::CoderResult::UNDERFLOW;
+                            } else {
                                 uc = -1;
+                                errorLength = 1;
+                                cr = Charset::CoderResult::MALFORMED;
+                            }
                         }
                     } else if (Character::isLowSurrogate(c)) {
                         uc = -1;
                         errorLength = 1;
                         cr = Charset::CoderResult::MALFORMED;
-                    } else {
-                        uc = c;
-                        cr = Charset::CoderResult::NONE;
                     }
                     if (uc < 0)
                         return cr;
@@ -182,5 +184,25 @@ gint MS874::encode(gchar ch) {
     if (index == UNMAPPABLE_ENCODING)
         return UNMAPPABLE_ENCODING;
     return charToBytes[index + (ch & 0xff)];
+}
+
+Charset::ErrorAction MS874::malformedAction() const {
+    return Charset::malformedAction();
+}
+
+Charset::ErrorAction MS874::unmappableAction() const {
+    return Charset::unmappableAction();
+}
+
+CharBuffer MS874::decode(ByteBuffer &in) {
+    return Charset::decode(in);
+}
+
+ByteBuffer MS874::encode(CharBuffer &in) {
+    return Charset::encode(in);
+}
+
+String MS874::toString() const {
+    return Charset::toString();
 }
 

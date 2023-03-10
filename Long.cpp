@@ -3,6 +3,8 @@
 //
 
 #include "Long.h"
+#include "String.h"
+#include "Errors/ValueError.h"
 
 Long::Long() : Long(0) {}
 
@@ -218,7 +220,7 @@ i64 Long::rotateRight(i64 i, gint distance) {
 i64 Long::shiftLeft(i64 i, gint distance) {
     if (distance < 0) {
         distance = -distance;
-        if(distance > 63)
+        if (distance > 63)
             return 0;
         return (i64) ((i & ~0ULL) >> distance);
     } else {
@@ -231,7 +233,7 @@ i64 Long::shiftLeft(i64 i, gint distance) {
 i64 Long::shiftRight(i64 i, gint distance) {
     if (distance < 0) {
         distance = -distance;
-        if(distance > 63)
+        if (distance > 63)
             return 0;
         return (i64) ((i & ~0ULL) << distance);
     } else {
@@ -295,4 +297,116 @@ glong Long::hash() const {
 
 glong Long::hash(glong i) {
     return i;
+}
+
+String Long::toBinaryString(glong i) {
+    return toUnsignedString(i, 2);
+}
+
+glong Long::parseLong(const String &str) {
+    return parseLong(str, 10);
+}
+
+glong Long::parseUnsignedLong(const String &str) {
+    return parseUnsignedLong(str, 10);
+}
+
+glong Long::parseLong(const String &str, gint base) {
+    gint length = str.length();
+    if (36 < base || base < 2)
+        throw ValueError("Invalid conversion base: " + Integer::toString(base));
+    if (length == 0)
+        throw ValueError("Parse failed for input \"\" with base " + Integer::toString(base));
+    gint sign = 0;
+    glong result = 0;
+    gchar c = str.charAt(0);
+    gint digit;
+    gint i = 0;
+    if (c == '+') {
+        i = 1;
+        sign = 1;
+    } else if (c == '-') {
+        i = 1;
+        sign = -1;
+    }
+    for (; i < length && result >= 0; ++i) {
+        c = str.charAt(i);
+        if ('0' <= c && c <= '9') {
+            // decimal digit
+            digit = c - 48;
+        } else if ('A' <= c && c <= 'Z') {
+            // uppercase hexadecimal digit
+            digit = c - 65;
+        } else if ('a' <= c && c <= 'z') {
+            // lowercase hexadecimal digit
+            digit = c - 97;
+        } else {
+            // non digit character
+            digit = -1;
+        }
+        if (base <= digit || digit < 0)
+            break;
+        result = result * base + digit;
+    }
+    if (result < 0) {
+        throw ValueError("Value out of range for input \"" + str + "\" with base " + Integer::toString(base));
+    } else if (i < length || (sign != 0 && i == 1 || sign == 0 && i == 0) && result == 0)
+        throw ValueError("Parse failed for input \"" + str + "\" with base " + Integer::toString(base));
+    return result * sign;
+}
+
+glong Long::parseUnsignedLong(const String &str, gint base) {
+    gint length = str.length();
+    if (36 < base || base < 2)
+        throw ValueError("Invalid conversion base: " + Integer::toString(base));
+    if (length == 0)
+        throw ValueError("Parse failed for input \"\" with base " + Integer::toString(base));
+    gchar c = str.charAt(0);
+    if (c == '-')
+        throw ValueError("Parse failed: Minus sign on input \"" + str + "\".");
+    if (length <= 12 || base == 10 && length <= 18)
+        return parseLong(str, base);
+    else {
+        glong result = 0;
+        gint digit;
+        for (gint i = c == '+' ? 1 : 0; i < length; ++i) {
+            c = str.charAt(i);
+            if ('0' <= c && c <= '9') {
+                // decimal digit
+                digit = c - 48;
+            } else if ('A' <= c && c <= 'Z') {
+                // uppercase hexadecimal digit
+                digit = c - 65;
+            } else if ('a' <= c && c <= 'z') {
+                // lowercase hexadecimal digit
+                digit = c - 97;
+            } else {
+                // non digit character
+                digit = -1;
+            }
+            if (base <= digit || digit < 0)
+                break;
+            glong old = result;
+            result = result * base + digit;
+            if (0 < result && result < old || old < result && result < 0 || 0 < result && old < 0)
+                throw ValueError("Value out of range for input \"" + str + "\" with base " + Integer::toString(base));
+        }
+        return result;
+    }
+}
+
+Long Long::valueOf(const String &str) {
+    return valueOf(str, 10);
+}
+
+Long Long::valueOf(const String &str, gint base) {
+    return valueOf(parseLong(str, base));
+}
+
+String Long::toHexString(glong i) {
+    return toString(i, 16);
+}
+
+String Long::toOctalString(glong i) {
+    return toString(i, 8);
 }

@@ -69,6 +69,8 @@ static gint _ = initC2B();
 
 MS1257::MS1257() : Charset("Windows-1257") {}
 
+MS1257 MS1257::INSTANCE{};
+
 String MS1257::name() const {
     return "Windows-1257";
 }
@@ -116,17 +118,17 @@ Charset::CoderResult MS1257::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                             gchar d = src.get();
                             if (Character::isLowSurrogate(c)) {
                                 uc = Character::joinSurrogates(c, d);
-                                cr = Charset::CoderResult::NONE;
-                            } else
+                                cr = Charset::CoderResult::UNDERFLOW;
+                            } else {
                                 uc = -1;
+                                errorLength = 1;
+                                cr = Charset::CoderResult::MALFORMED;
+                            }
                         }
-                    } else if (Character::isLowSurrogate(c)) {
+                    } else {
                         uc = -1;
                         errorLength = 1;
                         cr = Charset::CoderResult::MALFORMED;
-                    } else {
-                        uc = c;
-                        cr = Charset::CoderResult::NONE;
                     }
                     if (uc < 0)
                         return cr;
@@ -170,5 +172,25 @@ gint MS1257::encode(gchar ch) {
     if (index == UNMAPPABLE_ENCODING)
         return UNMAPPABLE_ENCODING;
     return charToBytes[index + (ch & 0xff)];
+}
+
+Charset::ErrorAction MS1257::malformedAction() const {
+    return Charset::malformedAction();
+}
+
+Charset::ErrorAction MS1257::unmappableAction() const {
+    return Charset::unmappableAction();
+}
+
+CharBuffer MS1257::decode(ByteBuffer &in) {
+    return Charset::decode(in);
+}
+
+ByteBuffer MS1257::encode(CharBuffer &in) {
+    return Charset::encode(in);
+}
+
+String MS1257::toString() const {
+    return Charset::toString();
 }
 

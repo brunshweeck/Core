@@ -112,11 +112,20 @@ public:
         return *e;
     }
 
-    static String (*customAlias)(E);
+    CORE_DEPRECATED static String (*customAlias)(E);
 
     String toString() const override {
-        return customAlias ? customAlias(value) : String("Enum@").concat(Integer::toString(ordinal()));
+        return toString(value);
     }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+    static String toString(E v) {
+        return customAlias ? customAlias(v) : Integer::toString(ordinal(v));
+    }
+
+#pragma GCC diagnostic pop
 
     glong hash() const override {
         return ordinal();

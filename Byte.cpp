@@ -3,6 +3,7 @@
 //
 
 #include "Byte.h"
+#include "Errors/ValueError.h"
 
 Byte::Byte() : Byte(0) {}
 
@@ -69,6 +70,32 @@ glong Byte::hash() const {
 
 glong Byte::hash(gbyte b) {
     return b;
+}
+
+gbyte Byte::parseByte(const String &str) {
+    return parseByte(str, 10);
+}
+
+gbyte Byte::parseByte(const String &str, gint base) {
+    gint result = Integer::parseInt(str, base);
+    if (MAX < result || result < MIN)
+        throw ValueError("Value for input \"" + str + "\" with base " + Integer::toString(base));
+    return (gbyte) result;
+}
+
+Byte Byte::valueOf(const String &str) {
+    return valueOf(str, 10);
+}
+
+Byte Byte::valueOf(const String &str, gint base) {
+    return valueOf(parseByte(str, base));
+}
+
+Byte Byte::decode(const String &str) {
+    gint result = Integer::decode(str);
+    if (MAX < result || result < MIN)
+        throw ValueError("Value out of range for input \"" + str + "\"");
+    return valueOf((gbyte) result);
 }
 
 

@@ -8,7 +8,7 @@
 
 #include "Unicode.h"
 
-class UTF16BE_BOM final : public Unicode {
+class UTF16BE_BOM final: public Unicode {
 private:
     CORE_EXPLICIT UTF16BE_BOM();
 
@@ -19,9 +19,9 @@ public:
 
     ErrorAction unmappableAction() const override;
 
-    CoderResult decodeLoop(ByteBuffer &in, CharBuffer &out) override;
+    CoderResult decodeLoop(ByteBuffer &src, CharBuffer &dst) override;
 
-    CoderResult encodeLoop(CharBuffer &in, ByteBuffer &dst) override;
+    CoderResult encodeLoop(CharBuffer &src, ByteBuffer &dst) override;
 
     gfloat averageCharsPerByte() const override;
 
@@ -38,6 +38,13 @@ public:
     Object &clone() const override;
 
     static UTF16BE_BOM INSTANCE;
+
+    CORE_FAST static gchar BYTE_ORDER_MASK = 0xfeff;
+
+private:
+    static gchar decode(int b1, int b2);
+
+    static void put(gchar c, ByteBuffer& dst);
 };
 
 

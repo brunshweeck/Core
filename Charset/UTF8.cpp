@@ -65,6 +65,8 @@ static Charset::CoderResult xflow(Buffer &src, gint mark, gint length) {
 static gint len = 0;
 gint &Charset::errorLength = len;
 
+
+
 static Charset::CoderResult malformedN(ByteBuffer &src, gint nb) {
     len = 0;
     switch (nb) {
@@ -186,8 +188,8 @@ Charset::CoderResult UTF8::decodeLoop(ByteBuffer &in, CharBuffer &out) {
             gint b3 = in.get();
             gint b4 = in.get();
             gint uc = ((b1 << 18) ^ (b2 << 12) ^ (b3 << 6) ^
-                      (b4 ^ (((gbyte) 0xF0 << 18) ^ ((gbyte) 0x80 << 12) ^
-                             ((gbyte) 0x80 << 6) ^ ((gbyte) 0x80 << 0))));
+                       (b4 ^ (((gbyte) 0xF0 << 18) ^ ((gbyte) 0x80 << 12) ^
+                              ((gbyte) 0x80 << 6) ^ ((gbyte) 0x80 << 0))));
             if (isMalformed4(b2, b3, b4) ||
                 // shortest form check
                 !Character::isSupplementary(uc)) {
@@ -208,7 +210,7 @@ static Charset::CoderResult overflow(CharBuffer &src, gint sp, ByteBuffer &dst, 
     return Charset::CoderResult::OVERFLOW;
 }
 
-static Charset::CoderResult overflow(CharBuffer& src, gint mark) {
+static Charset::CoderResult overflow(CharBuffer &src, gint mark) {
     src.position(mark);
     return Charset::CoderResult::OVERFLOW;
 }
@@ -232,28 +234,26 @@ Charset::CoderResult UTF8::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
             // Have a surrogate pair
             CoderResult cr = Charset::CoderResult::UNDERFLOW;
             gint uc = 0;
-            if(Character::isHighSurrogate(c)) {
-                if(!src.hasRemaining()){
+            if (Character::isHighSurrogate(c)) {
+                if (!src.hasRemaining()) {
                     cr = Charset::CoderResult::UNDERFLOW;
                     uc = -1;
-                }
-                else {
+                    errorLength = 1;
+                } else {
                     gchar d = src.get();
-                    if(Character::isLowSurrogate(c)){
+                    if (Character::isLowSurrogate(c)) {
                         uc = Character::joinSurrogates(c, d);
-                        cr = Charset::CoderResult::NONE;
-                    }else
+                        cr = Charset::CoderResult::UNDERFLOW;
+                    } else {
                         uc = -1;
+                        errorLength = 1;
+                        cr = Charset::CoderResult::MALFORMED;
+                    }
                 }
-            }
-            else if(Character::isLowSurrogate(c)){
+            } else {
                 uc = -1;
                 errorLength = 1;
                 cr = Charset::CoderResult::MALFORMED;
-            }
-            else {
-                uc = c;
-                cr = Charset::CoderResult::NONE;
             }
             if (uc < 0) {
                 src.position(mark);

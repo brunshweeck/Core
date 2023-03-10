@@ -92,7 +92,7 @@ ByteBuffer::ByteBuffer(gint capacity) : Buffer(capacity), _offset(0) {
     }
 }
 
-ByteBuffer &ByteBuffer::put(const ByteBuffer &src) {
+ByteBuffer &ByteBuffer::put(ByteBuffer &src) {
     if (isReadOnly())
         return *this;
     gint srcPos = src.position();
@@ -102,9 +102,11 @@ ByteBuffer &ByteBuffer::put(const ByteBuffer &src) {
     gint srcRem = srcPos < srcLim ? srcLim - srcPos : 0;
     gint dstRem = dstPos < dstLim ? dstLim - dstPos : 0;
     if (srcRem > dstRem)
-        throw OverflowError();
+        throw OverflowError::INSTANCE;
     for (gint i = srcPos, j = dstPos; i < srcLim; ++i, ++j)
         _buffer[j] = src._buffer[i];
+    position(dstPos + srcRem);
+    src.position(srcPos + srcRem);
     return *this;
 }
 

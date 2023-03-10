@@ -10,10 +10,10 @@
 
 class Unicode : public Charset {
 public:
-    enum Endian : gbyte {
-        NONE,
-        BIG,
-        LITTLE
+    enum Endian {
+        AUTO = 1,
+        BIG = 2,
+        LITTLE = 4
     };
     /**
      * Construct new Unicode charset

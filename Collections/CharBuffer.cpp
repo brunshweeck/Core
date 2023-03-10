@@ -87,7 +87,7 @@ CharBuffer::CharBuffer(gint capacity) : Buffer(capacity), _offset(0) {
     }
 }
 
-CharBuffer &CharBuffer::put(const CharBuffer &src) {
+CharBuffer &CharBuffer::put(CharBuffer &src) {
     if(isReadOnly())
         return *this;
     gint srcPos = src.position();
@@ -97,9 +97,11 @@ CharBuffer &CharBuffer::put(const CharBuffer &src) {
     gint dstLim = limit();
     gint dstRem = dstPos < dstLim ? dstLim - dstPos : 0;
     if (srcRem > dstRem)
-        throw OverflowError();
+        throw OverflowError::INSTANCE;
     for (int i = srcPos, j = dstPos; i < srcRem; ++i, j++)
         _buffer[j] = src._buffer[i];
+    position(dstPos + srcRem);
+    src.position(srcPos + srcRem);
     return *this;
 }
 

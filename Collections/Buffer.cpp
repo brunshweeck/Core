@@ -92,18 +92,18 @@ gbool Buffer::hasRemaining() const {
 }
 
 gint Buffer::nextPosition() const {
-    gint &p = (gint &) _position;
+    gint p = _position;
     if (p >= _limit)
-        throw OverflowError();
-    (gint &) _position = p + 1;
-    return p++;
+        throw OverflowError::INSTANCE;
+    (gint &) _position = _position + 1;
+    return p;
 }
 
 gint Buffer::nextPosition(gint n) const {
-    gint p = (gint &) _position;
+    gint p = _position;
     if (p >= _limit)
-        throw OverflowError();
-    (gint &) _position = p + n;
+        throw OverflowError::INSTANCE;
+    (gint &) _position = _position + n;
     return p;
 }
 

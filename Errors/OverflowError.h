@@ -8,13 +8,17 @@
 
 #include "Error.h"
 
-class OverflowError: public Error {
-public:
+class OverflowError : public Error {
+private:
     CORE_EXPLICIT OverflowError();
+
+public:
 
     String message() const override;
 
     Object &clone() const override;
+
+    static OverflowError INSTANCE;
 };
 
 

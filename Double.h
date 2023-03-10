@@ -10,7 +10,7 @@
 #include "Hashable.h"
 
 /**
- * The Double class wraps a value of the primitive type double (f64) in an object.
+ * The Double class wraps a value of the primitive type double (gdouble) in an object.
  * An object of type Double contains a single field whose type is double.
  * In addition, this class provides several methods for converting a double
  * to a String and a String to a double, as well as other constants and methods
@@ -26,10 +26,10 @@ public:
     CORE_IMPLICIT Double();
 
     /**
-     * Construct new instance of Double and initialize with f64
+     * Construct new instance of Double and initialize with gdouble
      * \param v 64 bits floating number
      */
-    CORE_IMPLICIT Double(f64 v);
+    CORE_IMPLICIT Double(gdouble v);
 
     /**
      * Return value of this instance as int after narrowing
@@ -70,19 +70,19 @@ public:
      * Return true if specified 64 bits float is infinitely magnetude
      * \param v 64 bits floating number
      */
-    static gbool isInfinite(f64 v);
+    static gbool isInfinite(gdouble v);
 
     /**
      * Return true if specified 64 bits float is finite value
      * \param v 64 bits floating number
      */
-    static gbool isFinite(f64 v);
+    static gbool isFinite(gdouble v);
 
     /**
      * Return true if specified 64 bits float is not a number
      * \param v 64 bits floating number
      */
-    static gbool isNaN(f64 v);
+    static gbool isNaN(gdouble v);
 
     /**
      * Return 64 bits IEEE 754 'double format' representation of specified floating number
@@ -94,7 +94,7 @@ public:
      * \example +0.0 = 0 00000000000 0000000000000000000000000000000000000000000000000000 = 0x0000000000000000
      * \example -0.0 = 1 00000000000 0000000000000000000000000000000000000000000000000000 = 0x8000000000000000
      */
-    static i64 toLongBits(f64 v);
+    static i64 toLongBits(gdouble v);
 
     /**
      * Return 64 bits floating value represented by specified IEEE 754 'double format'
@@ -109,7 +109,7 @@ public:
      * \example 0x0000000000000000 = 0 00000000000 0000000000000000000000000000000000000000000000000000 = +0.0
      * \example 0x8000000000000000 = 1 00000000000 0000000000000000000000000000000000000000000000000000 = -0.0
      */
-    static f64 fromLongBits(i64 v);
+    static gdouble fromLongBits(i64 v);
 
     /**
      * Compares this instance with specified object
@@ -150,12 +150,12 @@ public:
      * \param x left value to be comparing
      * \param y right value to be comparing
      */
-    static gint compare(f64 x, f64 y);
+    static gint compare(gdouble x, gdouble y);
 
     /**
      * Return new instance representing by specified literal value
      */
-    static Double valueOf(f64 f);
+    static Double valueOf(gdouble f);
 
     /**
      * Return copy of this instance
@@ -165,17 +165,17 @@ public:
     /**
      * Constant representing the max floating value represented in 64 bits
      */
-    CORE_FAST static f64 MAX = 0x1.fffffffffffffP+1023;
+    CORE_FAST static gdouble MAX = 0x1.fffffffffffffP+1023;
 
     /**
      * Constant representing the min floating value represented in 64 bits
      */
-    CORE_FAST static f64 MIN = 0x0.0000000000001P-1022;
+    CORE_FAST static gdouble MIN = 0x0.0000000000001P-1022;
 
     /**
      * Constant representing the min normal floating value represented in 64 bits
      */
-    CORE_FAST static f64 MIN_NORMAL = 0x1.0p-1022;
+    CORE_FAST static gdouble MIN_NORMAL = 0x1.0p-1022;
 
     /**
      * Constant representing the binary exponent bias.
@@ -186,14 +186,14 @@ public:
     /**
      * Constant representing infinitely large magnetude represented in 64 bits
      */
-    static f64 const INF;
+    static gdouble const INF;
 
     /**
      * Constant representing Not a Number
      */
-    static f64 const NAN;
+    static gdouble const NAN;
 
-    String toString() const;
+    String toString() const override;
 
     static String toString(gdouble d);
 
@@ -203,11 +203,19 @@ public:
 
     static glong hash(gdouble d);
 
+    static gdouble parseDouble(String const& str);
+
+    static Double valueOf(String const& str);
+
+    static gint signum(gdouble d);
+
 protected:
     void set(const Object &obj) override;
 
 private:
-    f64 value;
+    gdouble value;
+
+    static gdouble _x10(gdouble result, gint pow);
 };
 
 

@@ -69,6 +69,8 @@ static gint _ = initC2B();
 
 MS1251::MS1251() : Charset("Windows-1251") {}
 
+MS1251 MS1251::INSTANCE{};
+
 String MS1251::name() const {
     return "Windows-1251";
 }
@@ -106,8 +108,8 @@ Charset::CoderResult MS1251::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
             gint b = encode(c);
             if (b == UNMAPPABLE_ENCODING) {
                 if (Character::isSurrogate(c)) {
-                    CoderResult cr = Charset::CoderResult::UNDERFLOW;
-                    gint uc = 0;
+                    CoderResult cr;
+                    gint uc;
                     if (Character::isHighSurrogate(c)) {
                         if (!src.hasRemaining()) {
                             cr = Charset::CoderResult::UNDERFLOW;
@@ -116,17 +118,17 @@ Charset::CoderResult MS1251::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                             gchar d = src.get();
                             if (Character::isLowSurrogate(c)) {
                                 uc = Character::joinSurrogates(c, d);
-                                cr = Charset::CoderResult::NONE;
-                            } else
+                                cr = Charset::CoderResult::UNDERFLOW;
+                            } else {
                                 uc = -1;
+                                errorLength = 1;
+                                cr = Charset::CoderResult::MALFORMED;
+                            }
                         }
-                    } else if (Character::isLowSurrogate(c)) {
+                    } else {
                         uc = -1;
                         errorLength = 1;
                         cr = Charset::CoderResult::MALFORMED;
-                    } else {
-                        uc = c;
-                        cr = Charset::CoderResult::NONE;
                     }
                     if (uc < 0)
                         return cr;
@@ -170,5 +172,25 @@ gint MS1251::encode(gchar ch) {
     if (index == UNMAPPABLE_ENCODING)
         return UNMAPPABLE_ENCODING;
     return charToBytes[index + (ch & 0xff)];
+}
+
+Charset::ErrorAction MS1251::malformedAction() const {
+    return Charset::malformedAction();
+}
+
+Charset::ErrorAction MS1251::unmappableAction() const {
+    return Charset::unmappableAction();
+}
+
+CharBuffer MS1251::decode(ByteBuffer &in) {
+    return Charset::decode(in);
+}
+
+ByteBuffer MS1251::encode(CharBuffer &in) {
+    return Charset::encode(in);
+}
+
+String MS1251::toString() const {
+    return Charset::toString();
 }
 
