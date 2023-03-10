@@ -183,7 +183,7 @@ namespace core {
         };
 
         template<class T>
-        struct Pointer<T *> final : AlwaysTrue, Always<T *> {
+        struct Pointer<T *> final : AlwaysTrue, Always<T **> {
             using Type2 = T;
         };
 

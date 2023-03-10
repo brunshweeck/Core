@@ -740,6 +740,10 @@ CharArray String::chars(gint begin, gint end) const {
     return array;
 }
 
+String &String::operator+=(const String &str) {
+    return *this = concat(str);
+}
+
 String operator+(const String &lhs, const String &rhs) {
     return lhs.concat(rhs);
 }

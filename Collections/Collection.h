@@ -9,42 +9,25 @@
 #include "../Integer.h"
 #include "../Function/Consumer.h"
 #include "../Errors/Break.h"
+#include "../Function/Predicate.h"
 
 template<class E>
 class Collection : public Object {
 public:
+    CORE_TEMPLATE_REQUIREMENT(E)
 
     /**
-     * Append specified object from the end of this collection
+     * Add specified object from the this collection
      * \param obj object to be add from this collection
      */
     virtual gbool add(E const &obj) = 0;
 
     /**
-     * Append specified object from the end of this collection
-     * \param obj object to be add from this collection
-     */
-    template<class _E, Class<gbool>::Require<Class<E>::template isSuper<_E>()> = true>
-    gbool add(_E const &obj) {
-        return add((E const &) obj);
-    }
-
-    /**
-     * Append all of element of specified collection from the end of this collection
+     * Add all of element of specified collection from the this collection
      * \param c collection containing elements to add from this collection
      */
-    gbool addAll(Collection<E> const &c) {
-        c.forEach(Consumer<E>(&Collection::add, *this));
-        return !c.isEmpty();
-    }
-
-    /**
-     * Append all of element of specified collection from the end of this collection
-     * \param c collection containing elements to add from this collection
-     */
-    template<class _E, Class<gbool>::Require<Class<E>::template isSuper<_E>()> = true>
-    gbool addAll(Collection<_E> const &c) {
-        c.forEach(Consumer<E>(&Collection::add<_E>, *this));
+    virtual gbool addAll(Collection<E> const &c) {
+        c.forEach(Consumer<E const&>(&Collection::add, *this));
         return !c.isEmpty();
     }
 
@@ -55,19 +38,20 @@ public:
     virtual gbool remove(E const &obj) = 0;
 
     /**
-     * Remove first occurrence of specified object from this list
-     * \param obj object to be removed
-     */
-    template<class _E, Class<gbool>::Require<Class<E>::template isSuper<_E>()> = true>
-    gbool remove(_E const &obj) {
-        return remove((E const &) obj);
-    }
-
-    /**
      * Remove all of element of this collection that are contained in specified collection
      * \param c collection containing elements to remove from this collection
      */
-    virtual gbool removeAll(Collection<E> const &c) = 0;
+    virtual gbool removeAll(Collection<E> const &c) {
+        gint oldSize = size();
+        removeIf(Predicate<E const &>(&Collection<E>::contains, c));
+        return oldSize > size();
+    };
+
+    /**
+     * Remove all elements of this collection that satisfy the giving predicate
+     * \param p the predicate
+     */
+    virtual gbool removeIf(Predicate<E const &> const &p) = 0;
 
     /**
      * Remove all of element of this collection that are contained in specified collection
@@ -75,24 +59,22 @@ public:
      */
     template<class _E, Class<gbool>::Require<Class<E>::template isSuper<_E>()> = true>
     gbool removeAll(Collection<_E> const &c) {
-        if (isEmpty() || c.isEmpty())
-            return false;
-        c.forEach(Consumer<E>(&Collection::remove<_E>, *this));
+        gint oldSize = size();
+        removeIf(Predicate<E const &>(&Collection<_E>::contains, c));
+        return oldSize > size();
     }
 
     /**
      * Return true if this collection contains specified value
      * \param obj object to search
      */
-    virtual gbool contains(E const &obj) const = 0;
-
-    /**
-     * Return true if this collection contains specified value
-     * \param obj object to search
-     */
-    template<class _E, Class<gbool>::Require<Class<E>::template isSuper<_E>()> = true>
-    gbool contains(_E const &obj) const {
-        return contains((E const &) obj);
+    virtual gbool contains(E const &obj) const {
+        gbool b = false;
+        forEach([&obj, &b](E const &obj2) {
+            if ((b = obj.equals(obj2)))
+                throw Break();
+        });
+        return b;
     }
 
     /**
@@ -137,14 +119,7 @@ public:
      * \param c collection containing element to not remove
      */
     virtual gbool retainAll(Collection<E> const &c) {
-        if (this == &c)
-            return true;
-        gbool b = false;
-        forEach([&](E const &obj) {
-            if (!c.contains(obj))
-                b = b || remove(obj);
-        });
-        return b;
+        return removeIf(Predicate<E const &>(&Collection<E>::contains, c).logicalNot());
     };
 
     /**
@@ -153,12 +128,7 @@ public:
      */
     template<class _E, Class<gbool>::Require<Class<E>::template isSuper<_E>()> = true>
     gbool retainAll(Collection<_E> const &c) {
-        gbool b = false;
-        forEach([&](E const &obj) {
-            if (!c.contains(obj))
-                b = b || remove(obj);
-        });
-        return b;
+        return removeIf(Predicate<E const &>(&Collection<_E>::contains, c).logicalNot());
     }
 
     /**
@@ -182,15 +152,17 @@ public:
      * Performed action to each all of element of this collection
      * \param action performed action
      */
-    virtual void forEach(Consumer<E> &&action) const = 0;
+    virtual void forEach(Consumer<E const&> const &action) const = 0;
 
 private:
     void set(const Object &obj) override {
         if (this != &obj)
-            if (dynamic_cast<Collection<E>>(&obj)) {
-                setAll((Collection<E> const &) obj);
+            if (Class<Collection<E>>::hasInstance(obj)) {
+                clear();
+                addAll((Collection<E> const &) obj);
             }
     }
+
 };
 
 

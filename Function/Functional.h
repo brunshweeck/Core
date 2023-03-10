@@ -30,13 +30,9 @@ protected:
 
 #define CALL ()
 
-    static_assert(Class<Object>::isSuper<T>(),
+    static_assert(Class<Object>::isSuper<T>(), "Only type deriving from Object are supported");
 
-    "Only type deriving from Object are supported");
-
-    static_assert(Class<Object>::isSuper<R>(),
-
-    "Only type deriving from Object are supported");
+    static_assert(Class<Object>::isSuper<R>(), "Only type deriving from Object are supported");
 
 public:
     /**

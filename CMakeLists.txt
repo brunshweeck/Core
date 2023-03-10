@@ -111,7 +111,7 @@ add_library(Core SHARED
         Charset/IBM874.h Charset/IBM855.cpp Charset/IBM855.h Charset/GB18030.cpp Charset/GB18030.h
         Charset/GB18030_00.cpp Charset/GB18030_01.cpp Charset/GB18030_02.cpp Charset/GB18030_03.cpp
         Collections/Collection.cpp Collections/Collection.h Function/Consumer.cpp Function/Consumer.h
-        Function/Functional.h Void.h Void.cpp Errors/Break.cpp Errors/Break.h Function/Predicate.cpp Function/Predicate.h Collections/CharArray.cpp Collections/CharArray.h Errors/StateError.cpp Errors/StateError.h)
+        Function/Functional.h Void.h Void.cpp Errors/Break.cpp Errors/Break.h Function/Predicate.cpp Function/Predicate.h Collections/CharArray.cpp Collections/CharArray.h Errors/StateError.cpp Errors/StateError.h Collections/List.cpp Collections/List.h Collections/ArrayList.cpp Collections/ArrayList.h)
 
 add_executable(Main Test/Main.cpp)
 

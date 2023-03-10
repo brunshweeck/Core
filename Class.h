@@ -374,6 +374,14 @@ public:
         return __is_constructible(NIVR, With...);
     }
 
+    template<class U>
+    CORE_FAST static gbool hasInstance(U&& obj) {
+        CORE_REQUIRE(isClass(), "This Function require object type");
+        CORE_REQUIRE(Class<U>::isClass(), "This Function require object type");
+        using _T = Class<NIVR>::Immutable;
+        return dynamic_cast<_T*>(&obj);
+    }
+
     /**
      * Require is a first type if and only if condition is true. In otherwise it not exists
      */

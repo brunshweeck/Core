@@ -96,6 +96,8 @@ public:
 
     String &operator=(String &&str) CORE_NOTHROW;
 
+    String &operator+=(String const &str);
+
     /**
      * Concatenates the specified string to the end of this string.
      * If the length of the argument string is 0, then this
@@ -334,13 +336,13 @@ public:
      * Construct new string with array of character
      * \param chars character array
      */
-    CORE_EXPLICIT String(CharArray const& chars);
+    CORE_EXPLICIT String(CharArray const &chars);
 
     /**
      * Construct new string with array of character
      * \param chars character array
      */
-    CORE_EXPLICIT String(CharArray const& chars, gint offset);
+    CORE_EXPLICIT String(CharArray const &chars, gint offset);
 
     /**
      * Compares this string to the specified object.
