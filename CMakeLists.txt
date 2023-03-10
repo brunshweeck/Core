@@ -43,18 +43,18 @@ add_library(Core SHARED
         Charset/Unicode.cpp
         Charset/Unicode.h
         Charset/UTF8.h
-        Collections/Buffer.cpp
-        Collections/Buffer.h
+        IO/Buffer.cpp
+        IO/Buffer.h
         Errors/ValueError.cpp
         Errors/ValueError.h
-        Collections/ByteBuffer.cpp
-        Collections/ByteBuffer.h
+        IO/ByteBuffer.cpp
+        IO/ByteBuffer.h
         Errors/OverflowError.cpp
         Errors/OverflowError.h
         Errors/IndexError.cpp
         Errors/IndexError.h
-        Collections/CharBuffer.cpp
-        Collections/CharBuffer.h
+        IO/CharBuffer.cpp
+        IO/CharBuffer.h
         Charset/UTF8.cpp
         Charset/UTF16.cpp
         Charset/UTF16.h

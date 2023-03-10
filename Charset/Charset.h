@@ -7,8 +7,8 @@
 
 #include "../Object.h"
 #include "../Comparable.h"
-#include "../Collections/ByteBuffer.h"
-#include "../Collections/CharBuffer.h"
+#include "../IO/ByteBuffer.h"
+#include "../IO/CharBuffer.h"
 
 class Charset : public Object, public Comparable<Charset> {
 protected:

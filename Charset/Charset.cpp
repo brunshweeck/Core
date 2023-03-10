@@ -127,8 +127,10 @@ Charset::CoderResult Charset::decode(ByteBuffer &in, CharBuffer &out, gbool endO
         if (cr == CoderResult::OVERFLOW)
             return cr;
         if (cr == CoderResult::UNDERFLOW) {
-            if (endOfInput && in.hasRemaining())
+            if (endOfInput && in.hasRemaining()) {
+                errorLength = in.remaining();
                 cr = CoderResult::MALFORMED;
+            }
             else
                 return cr;
         }
@@ -208,8 +210,10 @@ Charset::CoderResult Charset::encode(CharBuffer &in, ByteBuffer &out, bool endOf
         if (cr == CoderResult::OVERFLOW)
             return cr;
         if (cr == CoderResult::UNDERFLOW) {
-            if (endOfInput && in.hasRemaining())
+            if (endOfInput && in.hasRemaining()) {
+                errorLength = in.remaining();
                 cr = CoderResult::MALFORMED;
+            }
             else
                 return cr;
         }

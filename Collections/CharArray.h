@@ -8,7 +8,7 @@
 
 #include "../Object.h"
 #include "../Comparable.h"
-#include "CharBuffer.h"
+#include "../IO/CharBuffer.h"
 
 class CharArray : public Object, public Comparable<CharArray> {
 public:

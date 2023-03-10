@@ -6,8 +6,8 @@
 #define CORE_UTF8_H
 
 #include "Unicode.h"
-#include "../Collections/ByteBuffer.h"
-#include "../Collections/CharBuffer.h"
+#include "../IO/ByteBuffer.h"
+#include "../IO/CharBuffer.h"
 
 /*
  * Legal UTF-8 Byte Sequences
