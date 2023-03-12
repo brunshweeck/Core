@@ -61,9 +61,8 @@ public:
      * \param v literal number
      */
     template<class T,
-            Class<gbool>::Require<!Class<T>::isNumber()> = true,
-            class S = Class<T>::NIVR,
-            class U = Class<S>::Object>
+            Class<gbool>::Require<Class<T>::isNumber()> = true,
+            class S = Class<T>::NIVR, class U = Class<S>::Object>
     gbool equals(T &&v) const {
         return equals(U((T &&) v));
     }

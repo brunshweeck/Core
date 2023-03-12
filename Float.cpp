@@ -4,7 +4,7 @@
 
 #include "Float.h"
 #include "String.h"
-#include "Errors/ValueError.h"
+#include "/ValueError.h"
 
 CORE_FAST static i32 S_MASK = (i32) 0b10000000000000000000000000000000;
 CORE_FAST static i32 E_MASK = (i32) 0b01111111100000000000000000000000;

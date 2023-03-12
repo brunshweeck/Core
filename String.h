@@ -11,7 +11,7 @@
 #include "Integer.h"
 #include "Long.h"
 #include "Class.h"
-#include "Errors/Error.h"
+#include "Error.h"
 #include "Charset/Charset.h"
 #include "Charset/UTF32.h"
 #include "Charset/UTF16.h"

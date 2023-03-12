@@ -7,7 +7,9 @@
 
 
 #include "List.h"
-#include "../Errors/IndexError.h"
+#include "../IndexError.h"
+#include "../MemoryError.h"
+#include "../Break.h"
 
 template<class E>
 class ArrayList : public List<E> {
@@ -15,12 +17,14 @@ private:
     using Element = Class<E>::Pointer;
 
     static Element EMPTY_DATA[0];
+    CORE_FAST static gint DEFAULT_CAPACITY = 10;
+    static Element UNINITIALIZED;
 
     Class<Element>::Pointer data = {};
 
     gint len = 0;
 
-    gint capacity = 10;
+    gint capacity = DEFAULT_CAPACITY;
 
     template<class U = E, gbool = Class<U>::isAbstract() || !Class<U>::template isConstruct<U const &>()>
     class ElementCreator;
@@ -40,7 +44,7 @@ private:
             try {
                 return *new U(obj);
             } catch (...) {
-                throw MemoryAllocationError();
+                throw MemoryError();
             }
         }
     };
@@ -49,9 +53,7 @@ public:
     /**
      *
      */
-    ArrayList() {
-        data = EMPTY_DATA;
-    }
+    ArrayList() : ArrayList(DEFAULT_CAPACITY) {}
     /**
      * Construct new empty list with specified initial capacity
      * \param initialCapacity
@@ -62,7 +64,8 @@ public:
             try {
                 data = new Element[initialCapacity];
                 capacity = initialCapacity;
-                fillNull(data, 0, capacity);
+                UNINITIALIZED = data[0];
+//                fillNull(data, 0, capacity);
             } catch (...) {}
         } else if (initialCapacity == 0) {
             data = EMPTY_DATA;
@@ -80,8 +83,9 @@ public:
         if ((capacity = c.size()) > 0) {
             try {
                 data = new Element[capacity];
+                UNINITIALIZED = data[0];
             } catch (...) {
-                throw MemoryAllocationError();
+                throw MemoryError();
             }
             if (Class<ArrayList>::hasInstance(c)) {
                 ArrayList<E> const &arrayList = (ArrayList<E> const &) c;
@@ -92,7 +96,7 @@ public:
                 c.forEach([this](E const &obj) -> void { add(obj); });
         } else {
             data = EMPTY_DATA;
-            capacity = 10;
+            capacity = 0;
         }
     }
 
@@ -178,7 +182,7 @@ public:
     }
 
     gbool removeAll(const Collection<E> &c) override {
-        if(isEmpty() || c.isEmpty())
+        if (isEmpty() || c.isEmpty())
             return false;
         if (this == &c) {
             clear();
@@ -195,7 +199,7 @@ public:
     }
 
     gbool removeIf(const Predicate<const E &> &p) override {
-        if(isEmpty())
+        if (isEmpty())
             return false;
         int i, j;
         for (i = j = 0; i < len; ++i) {
@@ -320,10 +324,11 @@ public:
     }
 
     Object &clone() const override {
-        try { return *new ArrayList(*this); } catch (...) { throw MemoryAllocationError(); }
+        try { return *new ArrayList(*this); } catch (...) { throw MemoryError(); }
     }
 
     ~ArrayList() override {
+        fillNull(data, 0, capacity);
         delete[] data;
         len = 0;
         data = EMPTY_DATA;
@@ -337,7 +342,7 @@ private:
         else {
             gint minLength = oldLength + minOffset;
             if (minLength < 0)
-                throw MemoryAllocationError();
+                throw MemoryError();
             else if (minLength < Integer::MAX - 8)
                 return minLength;
             else
@@ -346,11 +351,13 @@ private:
     }
 
     void resize(gint minCapacity) {
-        if (capacity >= 0 || data != EMPTY_DATA) {
+        if (capacity >= 0 && data != EMPTY_DATA) {
             gint newCapacity = newLength(capacity, minCapacity - capacity, capacity >> 1);
             Element *obj = new Element[newCapacity];
             arrayCopy(data, 0, obj, 0, len);
-            fillNull(obj, len, newCapacity);
+            fillNull(data, 0, len);
+            UNINITIALIZED = obj[0];
+//            fillNull(obj, len, newCapacity);
             delete[] data;
             data = obj;
             capacity = newCapacity;
@@ -358,6 +365,7 @@ private:
             gint newCapacity = minCapacity < 10 ? 10 : minCapacity;
             Element *obj = new Element[newCapacity];
             fillNull(data, 0, newCapacity);
+            UNINITIALIZED = obj[0];
             delete[] data;
             data = obj;
             capacity = newCapacity;
@@ -365,7 +373,7 @@ private:
     }
 
     void resize() {
-        resize(size() + 1);
+        resize(len + 1);
     }
 
     template<class U, class V>
@@ -377,7 +385,7 @@ private:
     template<class U>
     static void fillNull(U src[], gint srcBegin, gint length) {
         for (int i = 0; i < length; ++i)
-            src[i + srcBegin] = 0;
+            src[i + srcBegin] = UNINITIALIZED;
     }
 
     static void checkIndex(gint index, gint size) {
@@ -388,5 +396,8 @@ private:
 
 template<class E>
 ArrayList<E>::Element ArrayList<E>::EMPTY_DATA[0] = {};
+
+template<class E>
+ArrayList<E>::Element ArrayList<E>::UNINITIALIZED = {};
 
 #endif //CORE_ARRAYLIST_H

@@ -3,8 +3,8 @@
 //
 
 #include "Buffer.h"
-#include "../Errors/ValueError.h"
-#include "../Errors/OverflowError.h"
+#include "../ValueError.h"
+#include "../CodingError.h"
 
 Buffer::Buffer(gint mark, gint position, gint limit, gint capacity) :
         _mark(mark),
@@ -94,7 +94,7 @@ gbool Buffer::hasRemaining() const {
 gint Buffer::nextPosition() const {
     gint p = _position;
     if (p >= _limit)
-        throw OverflowError::INSTANCE;
+        throw CodingError::overflow();
     (gint &) _position = _position + 1;
     return p;
 }
@@ -102,7 +102,7 @@ gint Buffer::nextPosition() const {
 gint Buffer::nextPosition(gint n) const {
     gint p = _position;
     if (p >= _limit)
-        throw OverflowError::INSTANCE;
+        throw CodingError::overflow();
     (gint &) _position = _position + n;
     return p;
 }

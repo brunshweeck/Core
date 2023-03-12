@@ -2,11 +2,11 @@
 #include "Charset.h"
 #include "../String.h"
 #include "../Character.h"
-#include "../Errors/MemoryAllocationError.h"
-#include "../Errors/CodingError.h"
-#include "../Errors/OverflowError.h"
-#include "../Errors/UnderflowError.h"
-#include "../Errors/StateError.h"
+#include "../MemoryError.h"
+#include "../CodingError.h"
+#include "../CodingError.h"
+#include "../CodingError.h"
+#include "../StateError.h"
 #include "../Enum.h"
 
 Charset::Charset(const String &name) {}
@@ -91,9 +91,9 @@ CharBuffer Charset::decode(ByteBuffer &in) {
         }
         switch (cr) {
             case CoderResult::UNDERFLOW:
-                throw UnderflowError::INSTANCE;
+                throw CodingError::underflow();
             case CoderResult::OVERFLOW:
-                throw OverflowError::INSTANCE;
+                throw CodingError::overflow();
             case CoderResult::MALFORMED:
                 throw CodingError::malformed(errorLength);
             case CoderResult::UNMAPPABLE:
@@ -182,9 +182,9 @@ ByteBuffer Charset::encode(CharBuffer &in) {
         }
         switch (cr) {
             case CoderResult::UNDERFLOW:
-                throw UnderflowError::INSTANCE;
+                throw CodingError::underflow();
             case CoderResult::OVERFLOW:
-                throw OverflowError::INSTANCE;
+                throw CodingError::overflow();
             case CoderResult::MALFORMED:
                 throw CodingError::malformed(errorLength);
             case CoderResult::UNMAPPABLE:
@@ -346,7 +346,7 @@ public:
         try {
             return *new PrivateCharset(action, result, charset);
         } catch (...) {
-            throw MemoryAllocationError();
+            throw MemoryError();
         }
     }
 
@@ -362,7 +362,7 @@ Charset &Charset::onMalformed(ErrorAction action) {
     try {
         return *new PrivateCharset(action, CoderResult::MALFORMED, *this);
     } catch (...) {
-        throw MemoryAllocationError();
+        throw MemoryError();
     }
 }
 
@@ -372,7 +372,7 @@ Charset &Charset::onUnmapped(ErrorAction action) {
     try {
         return *new PrivateCharset(action, CoderResult::UNMAPPABLE, *this);
     } catch (...) {
-        throw MemoryAllocationError();
+        throw MemoryError();
     }
 }
 

@@ -3,9 +3,9 @@
 //
 
 #include "CharArray.h"
-#include "../Errors/ValueError.h"
-#include "../Errors/MemoryAllocationError.h"
-#include "../Errors/IndexError.h"
+#include "../ValueError.h"
+#include "../MemoryError.h"
+#include "../IndexError.h"
 
 CharArray::CharArray(gint length, gchar fill) : len(0), value() {
     if (length < 0)
@@ -17,7 +17,7 @@ CharArray::CharArray(gint length, gchar fill) : len(0), value() {
             value[i] = fill;
         value[i] = '\u0000';
         len = length;
-    } catch (...) { throw MemoryAllocationError(); }
+    } catch (...) { throw MemoryError(); }
 }
 
 CharArray::CharArray(const CharArray &array) : len() {
@@ -28,7 +28,7 @@ CharArray::CharArray(const CharArray &array) : len() {
             value[i] = array.value[i];
         value[i] = '\u0000';
         len = array.len;
-    } catch (...) { throw MemoryAllocationError(); }
+    } catch (...) { throw MemoryError(); }
 }
 
 CharArray::CharArray(CharArray &&array) CORE_NOTHROW {
@@ -51,7 +51,7 @@ CharArray &CharArray::operator=(const CharArray &array) {
                 value[i] = array.value[i];
             value[i] = '\u0000';
             len = array.len;
-        } catch (...) { throw MemoryAllocationError(); }
+        } catch (...) { throw MemoryError(); }
     }
     return *this;
 }
@@ -117,7 +117,7 @@ gbool CharArray::equals(const Object &obj) const {
 }
 
 Object &CharArray::clone() const {
-    try { return *new CharArray(*this); }catch (...) { throw MemoryAllocationError(); }
+    try { return *new CharArray(*this); }catch (...) { throw MemoryError(); }
 }
 
 String CharArray::toString() const {

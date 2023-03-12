@@ -3,13 +3,22 @@
 //
 
 #include "../Collections/ArrayList.h"
+#include "../Charset/GB18030.h"
+#include "../CodingError.h"
 
 void func(int i) {
     i += 2;
 }
+#include <cstdio>
+#include <unistd.h>
 
 int main(int, char const *[], char const *[]) {
-    ArrayList<String> arrayList = ArrayList<String>(50);
-    arrayList.add("50");
-    arrayList.forEach([](String const& s) {});
+    throw CodingError();
+    FILE* f = fopen("C:/Users/brunshweeck/CLionProjects/Core/Test/text.txt", "r");
+    fgetc(f);
+    gbyte * ptr = (gbyte *)f->_ptr - 1;
+    fseek(f, 0, SEEK_END);
+    gint size = ftell(f);
+    String string = String(ptr, ftell(f), UTF8::INSTANCE);
+    return string.length();
 }

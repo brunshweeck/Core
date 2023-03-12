@@ -4,7 +4,7 @@
 
 #include "UTF16BE.h"
 #include "../String.h"
-#include "../Errors/OverflowError.h"
+#include "../CodingError.h"
 
 UTF16BE::UTF16BE(): Unicode("UTF-16BE") {
     encoderReplacement[0] = (gbyte) 0xff;

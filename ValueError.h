@@ -1,5 +1,5 @@
 //
-// Created by brunshweeck on 26/02/2023.
+// Created by brunshweeck on 2023/3/12.
 //
 
 #ifndef CORE_VALUE_ERROR_H
@@ -7,27 +7,20 @@
 
 
 #include "Error.h"
-#include "../String.h"
 
 class ValueError: public Error {
 public:
-    /**
-     * Construct new instance of this type with details message
-     * \param message details message
-     */
+    ValueError();
+
     CORE_EXPLICIT ValueError(const String &message);
 
-    /**
-     * Return detail message
-     */
-    String message() const override;
+    const String &message() const override;
 
     gbool equals(const Object &obj) const override;
 
     Object &clone() const override;
 
-private:
-    String _message;
+    String toString() const override;
 };
 
 

@@ -3,11 +3,11 @@
 //
 
 #include "String.h"
-#include "Errors/MemoryAllocationError.h"
+#include "MemoryError.h"
 #include "Character.h"
-#include "Errors/ValueError.h"
-#include "Errors/IndexError.h"
-#include "Errors/CastError.h"
+#include "ValueError.h"
+#include "IndexError.h"
+#include "CastError.h"
 #include "Charset/MS1251.h"
 #include "Charset/MS1250.h"
 
@@ -41,7 +41,7 @@ static T *allocate(glong len) {
     } catch (...) {
         if (len == 0)
             return 0x0;
-        throw MemoryAllocationError();
+        throw MemoryError();
     }
     fill(buffer, 0x00, len + 1);
     return buffer;
@@ -575,7 +575,7 @@ gbool String::isTitleCase() const {
 }
 
 Object &String::clone() const {
-    try { return *new String(*this); } catch (...) { throw MemoryAllocationError(); }
+    try { return *new String(*this); } catch (...) { throw MemoryError(); }
 }
 
 void String::set(const Object &obj) {

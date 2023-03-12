@@ -8,7 +8,7 @@
 #include "../String.h"
 #include "../Integer.h"
 #include "../Function/Consumer.h"
-#include "../Errors/Break.h"
+#include "../Break.h"
 #include "../Function/Predicate.h"
 
 template<class E>

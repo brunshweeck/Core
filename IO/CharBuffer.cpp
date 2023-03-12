@@ -3,9 +3,9 @@
 //
 
 #include "CharBuffer.h"
-#include "../Errors/MemoryAllocationError.h"
-#include "../Errors/IndexError.h"
-#include "../Errors/OverflowError.h"
+#include "../MemoryError.h"
+#include "../IndexError.h"
+#include "../CodingError.h"
 
 CharBuffer::CharBuffer(gint mark, gint position, gint limit, gint capacity, gchar buffer[], gint offset) :
         Buffer(mark, position, limit, capacity), _buffer(buffer), _offset(offset) {}
@@ -18,7 +18,7 @@ CharBuffer::CharBuffer(gint mark, gint position, gint limit, gint capacity) :
         for (gint i = 0; i < capacity; ++i)
             _buffer[i] = 0;
     } catch (...) {
-        throw MemoryAllocationError();
+        throw MemoryError();
     }
 }
 
@@ -83,7 +83,7 @@ CharBuffer::CharBuffer(gint capacity) : Buffer(capacity), _offset(0) {
         for (gint i = 0; i < capacity; ++i)
             _buffer[i] = 0;
     } catch (...) {
-        throw MemoryAllocationError();
+        throw MemoryError();
     }
 }
 
@@ -97,7 +97,7 @@ CharBuffer &CharBuffer::put(CharBuffer &src) {
     gint dstLim = limit();
     gint dstRem = dstPos < dstLim ? dstLim - dstPos : 0;
     if (srcRem > dstRem)
-        throw OverflowError::INSTANCE;
+        throw CodingError::overflow();
     for (int i = srcPos, j = dstPos; i < srcRem; ++i, j++)
         _buffer[j] = src._buffer[i];
     position(dstPos + srcRem);

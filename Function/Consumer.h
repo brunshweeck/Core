@@ -7,9 +7,9 @@
 
 #include "../Object.h"
 #include "Functional.h"
-#include "../Errors/ValueError.h"
-#include "../Errors/MemoryAllocationError.h"
-#include "../Errors/CastError.h"
+#include "../ValueError.h"
+#include "../MemoryError.h"
+#include "../CastError.h"
 #include "../Long.h"
 
 template<class T>
@@ -33,7 +33,7 @@ public:
         try {
             manager = new FunctionManager<_Func>((_Func &&) func);
         } catch (...) {
-            throw MemoryAllocationError();
+            throw MemoryError();
         }
     }
 
@@ -48,7 +48,7 @@ public:
         try {
             manager = new MethodManager<_Func, Target>((_Func &&) func, (Target &&) target);
         } catch (...) {
-            throw MemoryAllocationError();
+            throw MemoryError();
         }
     }
 
@@ -64,7 +64,7 @@ public:
         try {
             manager = new LambdaManager<_Func>((_Func &&) func);
         } catch (...) {
-            throw MemoryAllocationError();
+            throw MemoryError();
         }
     }
 
@@ -181,7 +181,7 @@ public:
             return (Object &) EMPTY_ACTION;
         if (manager->isEmpty() || manager == &EMPTY)
             return (Object &) EMPTY_ACTION;
-        try { return *new Consumer<T>(*this); } catch (...) { throw MemoryAllocationError(); }
+        try { return *new Consumer<T>(*this); } catch (...) { throw MemoryError(); }
     }
 
     /**
@@ -199,7 +199,7 @@ public:
 private:
     void set(const Object &obj) override {
         if (!dynamic_cast<Consumer<T> const *>(&obj))
-            throw CastError("casting from Object to Consumer fail");
+            throw CastError();
         *this = (Consumer<T> const &) obj;
     }
 
@@ -270,7 +270,7 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new FunctionManager(func); } catch (...) { throw MemoryAllocationError(); }
+            try { return *new FunctionManager(func); } catch (...) { throw MemoryError(); }
         }
 
     private:
@@ -309,7 +309,7 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new MethodManager(*this); } catch (...) { throw MemoryAllocationError(); }
+            try { return *new MethodManager(*this); } catch (...) { throw MemoryError(); }
         }
 
     private:
@@ -350,7 +350,7 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new LambdaManager(*this); } catch (...) { throw MemoryAllocationError(); }
+            try { return *new LambdaManager(*this); } catch (...) { throw MemoryError(); }
         }
 
     private:

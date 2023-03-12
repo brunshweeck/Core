@@ -3,10 +3,10 @@
 //
 
 #include "ByteBuffer.h"
-#include "../Errors/MemoryAllocationError.h"
-#include "../Errors/ValueError.h"
-#include "../Errors/OverflowError.h"
-#include "../Errors/IndexError.h"
+#include "../MemoryError.h"
+#include "../ValueError.h"
+#include "../CodingError.h"
+#include "../IndexError.h"
 #include "../Byte.h"
 
 ByteBuffer::ByteBuffer(gint mark, gint position, gint limit, gint capacity, gbyte buffer[], gint offset) :
@@ -23,7 +23,7 @@ ByteBuffer::ByteBuffer(gint mark, gint position, gint limit, gint capacity) :
         for (int i = 0; i < capacity; ++i)
             _buffer[i] = 0;
     } catch (...) {
-        throw MemoryAllocationError();
+        throw MemoryError();
     }
 }
 
@@ -88,7 +88,7 @@ ByteBuffer::ByteBuffer(gint capacity) : Buffer(capacity), _offset(0) {
         for (gint i = 0; i < capacity; ++i)
             _buffer[i] = 0;
     } catch (...) {
-        throw MemoryAllocationError();
+        throw MemoryError();
     }
 }
 
@@ -102,7 +102,7 @@ ByteBuffer &ByteBuffer::put(ByteBuffer &src) {
     gint srcRem = srcPos < srcLim ? srcLim - srcPos : 0;
     gint dstRem = dstPos < dstLim ? dstLim - dstPos : 0;
     if (srcRem > dstRem)
-        throw OverflowError::INSTANCE;
+        throw CodingError::overflow();
     for (gint i = srcPos, j = dstPos; i < srcLim; ++i, ++j)
         _buffer[j] = src._buffer[i];
     position(dstPos + srcRem);

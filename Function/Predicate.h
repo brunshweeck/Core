@@ -9,9 +9,9 @@
 #include "../Object.h"
 #include "Functional.h"
 #include "../String.h"
-#include "../Errors/MemoryAllocationError.h"
+#include "../MemoryError.h"
 #include "../Long.h"
-#include "../Errors/ValueError.h"
+#include "../ValueError.h"
 
 template<class T>
 class Predicate : public Object, public Functional<T, Boolean> {
@@ -35,7 +35,7 @@ public:
         try {
             tester = new FunctionTest<_Func>((_Func &&) func);
         } catch (...) {
-            throw MemoryAllocationError();
+            throw MemoryError();
         }
     }
 
@@ -51,7 +51,7 @@ public:
         try {
             tester = new MethodTest<_Func, Target>((_Func &&) func, (Target &&) target);
         } catch (...) {
-            throw MemoryAllocationError();
+            throw MemoryError();
         }
     }
 
@@ -67,7 +67,7 @@ public:
         try {
             tester = new LambdaTest<_Func>((_Func &&) func);
         } catch (...) {
-            throw MemoryAllocationError();
+            throw MemoryError();
         }
     }
 
@@ -182,7 +182,7 @@ public:
             return (Object &) ALWAYS_TRUE;
         if (tester == &FALSE)
             return (Object &) ALWAYS_FALSE;
-        try { return *new Predicate<T>(*this); } catch (...) { throw MemoryAllocationError(); }
+        try { return *new Predicate<T>(*this); } catch (...) { throw MemoryError(); }
     }
 
     /**
@@ -209,7 +209,7 @@ public:
             ReverseTest const&reverseTest = (ReverseTest const& )*tester;
             p.tester = &(Test &) reverseTest.lhs->clone();
         } else
-            try { p.tester = new ReverseTest((Test &) *tester); } catch (...) { throw MemoryAllocationError(); }
+            try { p.tester = new ReverseTest((Test &) *tester); } catch (...) { throw MemoryError(); }
         return p;
     }
 
@@ -226,7 +226,7 @@ public:
             return ALWAYS_FALSE;
         Predicate<T> p2;
         try { p2.tester = new LogicalTest(*tester, *p.tester, LogicalTest::LOGICAL_AND); }
-        catch (...) { throw MemoryAllocationError(); }
+        catch (...) { throw MemoryError(); }
         return p2;
     }
 
@@ -245,7 +245,7 @@ public:
             return *this;
         Predicate<T> p2;
         try { p2.tester = new LogicalTest(*tester, *p.tester, LogicalTest::LOGICAL_OR); }
-        catch (...) { throw MemoryAllocationError(); }
+        catch (...) { throw MemoryError(); }
         return p2;
     }
 
@@ -256,7 +256,7 @@ public:
     virtual Predicate logicalXor(Predicate<T> const &p) const {
         Predicate<T> p2;
         try { p2.tester = new LogicalTest(*tester, *p.tester, LogicalTest::LOGICAL_OR); }
-        catch (...) { throw MemoryAllocationError(); }
+        catch (...) { throw MemoryError(); }
         return p2;
     }
 
@@ -341,7 +341,7 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new FunctionTest(func); } catch (...) { throw MemoryAllocationError(); }
+            try { return *new FunctionTest(func); } catch (...) { throw MemoryError(); }
         }
 
         String toString() const override {
@@ -378,7 +378,7 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new MethodTest(*this); } catch (...) { throw MemoryAllocationError(); }
+            try { return *new MethodTest(*this); } catch (...) { throw MemoryError(); }
         }
 
         String toString() const override {
@@ -417,7 +417,7 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new LambdaTest(*this); } catch (...) { throw MemoryAllocationError(); }
+            try { return *new LambdaTest(*this); } catch (...) { throw MemoryError(); }
         }
 
         String toString() const override {
@@ -454,7 +454,7 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new ReverseTest(*this); } catch (...) { throw MemoryAllocationError(); }
+            try { return *new ReverseTest(*this); } catch (...) { throw MemoryError(); }
         }
 
         String toString() const override {
@@ -518,7 +518,7 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new LogicalTest(*this); } catch (...) { throw MemoryAllocationError(); }
+            try { return *new LogicalTest(*this); } catch (...) { throw MemoryError(); }
         }
 
         String toString() const override {

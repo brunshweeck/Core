@@ -6,7 +6,7 @@
 #include "UTF16LE_BOM.h"
 #include "UTF16BE_BOM.h"
 #include "../String.h"
-#include "../Errors/OverflowError.h"
+#include "../CodingError.h"
 
 
 UTF16 UTF16::INSTANCE{};
