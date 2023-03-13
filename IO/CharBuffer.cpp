@@ -28,7 +28,7 @@ gchar CharBuffer::get() const {
 
 gchar CharBuffer::get(gint index) const {
     if (index >= limit() || index < 0)
-        throw IndexError(index, 0, limit());
+        throw IndexError(index);
     return _buffer[index + _offset];
 }
 

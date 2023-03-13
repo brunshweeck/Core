@@ -4,8 +4,9 @@
 
 #include "UTF16BE_BOM.h"
 #include "../String.h"
+#include "../Character.h"
 
-UTF16BE_BOM::UTF16BE_BOM(): Unicode("X-UTF-16BE-BOM") {
+UTF16BE_BOM::UTF16BE_BOM() : Unicode("X-UTF-16BE-BOM") {
     encoderReplacement[0] = (gbyte) 0xff;
     encoderReplacement[1] = (gbyte) 0xfd;
     encoderReplacement[2] = (gbyte) 0;
@@ -150,7 +151,7 @@ gchar UTF16BE_BOM::decode(int b1, int b2) {
     return (gchar) ((b1 << 8) | b2);
 }
 
-void UTF16BE_BOM::put(gchar c, ByteBuffer& dst) {
+void UTF16BE_BOM::put(gchar c, ByteBuffer &dst) {
     dst.put((gbyte) (c >> 4));
     dst.put((gbyte) (c & 0xff));
 }

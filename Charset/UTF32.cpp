@@ -6,6 +6,7 @@
 #include "UTF32LE_BOM.h"
 #include "UTF32BE_BOM.h"
 #include "../String.h"
+#include "../Character.h"
 
 UTF32::UTF32() : Unicode("UTF-32"), _byteOrder((Endian)(AUTO << 4 | BIG)) {
     encoderReplacement[0] = (gbyte) 0;

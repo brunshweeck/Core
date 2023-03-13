@@ -5,7 +5,7 @@
 #include "IBM866.h"
 #include "../String.h"
 #include "../extern/SingleByte.h"
-
+#include "../Character.h"
 static gchar b2c[] = u""
                      "\u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417"       // 0x80 - 0x87
                      "\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F"       // 0x88 - 0x8f

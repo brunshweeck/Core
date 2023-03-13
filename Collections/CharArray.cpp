@@ -6,6 +6,7 @@
 #include "../ValueError.h"
 #include "../MemoryError.h"
 #include "../IndexError.h"
+#include "../IO/CharBuffer.h"
 
 CharArray::CharArray(gint length, gchar fill) : len(0), value() {
     if (length < 0)

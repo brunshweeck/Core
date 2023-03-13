@@ -4,7 +4,7 @@
 
 #include "ISO8859_1.h"
 #include "../String.h"
-
+#include "../Character.h"
 ISO8859_1::ISO8859_1() : Charset("ISO-8859-1") {}
 
 ISO8859_1 ISO8859_1::INSTANCE{};

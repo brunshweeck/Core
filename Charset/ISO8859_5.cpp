@@ -5,7 +5,7 @@
 #include "ISO8859_5.h"
 #include "../String.h"
 #include "../extern/SingleByte.h"
-
+#include "../Character.h"
 static gchar b2c[] = u""
                      "\u0080\u0081\u0082\u0083\u0084\u0085\u0086\u0087"       // 0x80 - 0x87
                      "\u0088\u0089\u008A\u008B\u008C\u008D\u008E\u008F"       // 0x88 - 0x8f

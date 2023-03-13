@@ -4,6 +4,7 @@
 
 #include "GB18030.h"
 #include "../String.h"
+#include "../Character.h"
 
 static CORE_FAST gint GB18030_SINGLE_BYTE = 1;
 static CORE_FAST gint GB18030_DOUBLE_BYTE = 2;

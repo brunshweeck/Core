@@ -4,7 +4,7 @@
 
 #include "US_ASCII.h"
 #include "../String.h"
-
+#include "../Character.h"
 US_ASCII::US_ASCII() : Charset("US-ASCII") {}
 
 US_ASCII US_ASCII::INSTANCE{};

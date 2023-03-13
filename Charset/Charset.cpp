@@ -8,6 +8,7 @@
 #include "../CodingError.h"
 #include "../StateError.h"
 #include "../Enum.h"
+#include "UTF8.h"
 
 Charset::Charset(const String &name) {}
 

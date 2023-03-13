@@ -4,6 +4,7 @@
 
 #include "CodingError.h"
 #include "MemoryError.h"
+#include "Integer.h"
 
 CodingError::CodingError() : IOError() {}
 

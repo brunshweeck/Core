@@ -8,8 +8,8 @@
 #include "ValueError.h"
 #include "IndexError.h"
 #include "CastError.h"
-#include "Charset/MS1251.h"
-#include "Charset/MS1250.h"
+#include "Collections/CharArray.h"
+#include "Charset/Charset.h"
 
 template<class T, class K>
 static void fill(T v[], K i, glong len) {
@@ -34,13 +34,13 @@ static void swap(T &&v, K &i) {
 template<class T = gbyte>
 static T *allocate(glong len) {
     if (len < 0)
-        return 0x0;
+        return nullptr;
     T *buffer;
     try {
         buffer = new T[(len << 1) + 1];
     } catch (...) {
         if (len == 0)
-            return 0x0;
+            return nullptr;
         throw MemoryError();
     }
     fill(buffer, 0x00, len + 1);
@@ -318,7 +318,7 @@ gbool String::isAscii() const {
 
 String String::subString(gint begin) const {
     if (begin < 0 || begin > len)
-        throw IndexError(begin, 0, len);
+        throw IndexError(begin);
     String out;
     delete[] out.value;
     out.value = allocate(len - begin);
@@ -329,7 +329,7 @@ String String::subString(gint begin) const {
 
 String String::subString(gint begin, gint end) const {
     if (begin < 0 || begin > len)
-        throw IndexError(begin, 0, len);
+        throw IndexError(begin);
     if (end < 0)
         throw IndexError(end);
     if (end >= len)
@@ -344,13 +344,13 @@ String String::subString(gint begin, gint end) const {
 
 gchar String::charAt(gint index) const {
     if (index < 0 || index >= len)
-        throw IndexError(index, 0, len - 1);
+        throw IndexError(index);
     return getChar(value, index);
 }
 
 gint String::codepointAt(gint index) const {
     if (index < 0 || index >= len)
-        throw IndexError(index, 0, len - 1);
+        throw IndexError(index);
     return getCP(value, index);
 }
 
@@ -698,7 +698,7 @@ String::String(const gbyte b[], gint memorySize, gint memoryCharSize, gint codec
 String::~String() {
     len = 0;
     delete[] value;
-    value = 0;
+    value = nullptr;
 }
 
 CharArray String::chars() const {

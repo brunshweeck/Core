@@ -4,8 +4,9 @@
 
 #include "UTF32LE.h"
 #include "../String.h"
+#include "../Character.h"
 
-UTF32LE::UTF32LE(): Unicode("UTF-32LE") {
+UTF32LE::UTF32LE() : Unicode("UTF-32LE") {
     encoderReplacement[0] = (gbyte) 0xfd;
     encoderReplacement[1] = (gbyte) 0xff;
     encoderReplacement[2] = (gbyte) 0;

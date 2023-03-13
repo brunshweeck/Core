@@ -4,8 +4,9 @@
 
 #include "UTF32BE.h"
 #include "../String.h"
+#include "../Character.h"
 
-UTF32BE::UTF32BE(): Unicode("UTF-32BE") {
+UTF32BE::UTF32BE() : Unicode("UTF-32BE") {
     encoderReplacement[0] = (gbyte) 0;
     encoderReplacement[1] = (gbyte) 0;
     encoderReplacement[2] = (gbyte) 0xff;

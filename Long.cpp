@@ -3,6 +3,7 @@
 //
 
 #include "Long.h"
+#include "Integer.h"
 #include "String.h"
 #include "ValueError.h"
 

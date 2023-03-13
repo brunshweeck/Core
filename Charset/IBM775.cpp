@@ -5,6 +5,7 @@
 #include "IBM775.h"
 #include "../String.h"
 #include "../extern/SingleByte.h"
+#include "../Character.h"
 
 static gchar b2c[] = u""
                      "\u0106\u00FC\u00E9\u0101\u00E4\u0123\u00E5\u0107"       // 0x80 - 0x87

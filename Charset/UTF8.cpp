@@ -3,6 +3,7 @@
 //
 #include "UTF8.h"
 #include "../String.h"
+#include "../Character.h"
 
 gbool UTF8::isNotContinuation(gint b) {
     return (b & 0xc0) != 0x80;
@@ -64,7 +65,6 @@ static Charset::CoderResult xflow(Buffer &src, gint mark, gint length) {
 
 static gint len = 0;
 gint &Charset::errorLength = len;
-
 
 
 static Charset::CoderResult malformedN(ByteBuffer &src, gint nb) {

@@ -3,7 +3,8 @@
 //
 
 #include "Byte.h"
-#include "/ValueError.h"
+#include "ValueError.h"
+#include "Integer.h"
 
 Byte::Byte() : Byte(0) {}
 

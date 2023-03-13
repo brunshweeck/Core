@@ -4,6 +4,7 @@
 
 #include "UTF32LE_BOM.h"
 #include "../String.h"
+#include "../Character.h"
 
 UTF32LE_BOM::UTF32LE_BOM() : Unicode("X-UTF-32LE-BOM") {
     encoderReplacement[0] = (gbyte) 0xfd;

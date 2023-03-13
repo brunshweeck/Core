@@ -5,19 +5,8 @@
 #ifndef CORE_STRING_H
 #define CORE_STRING_H
 
-#include "Object.h"
 #include "Comparable.h"
-#include "Character.h"
-#include "Integer.h"
-#include "Long.h"
-#include "Class.h"
-#include "Error.h"
-#include "Charset/Charset.h"
-#include "Charset/UTF32.h"
-#include "Charset/UTF16.h"
-#include "Charset/UTF8.h"
 #include "Hashable.h"
-#include "Collections/CharArray.h"
 
 /**
  * The class String includes methods for examining individual characters of the sequence, for

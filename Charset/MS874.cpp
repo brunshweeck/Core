@@ -4,7 +4,7 @@
 
 #include "MS874.h"
 #include "../String.h"
-
+#include "../Character.h"
 static gchar bytesToChar[] =
         u"\u20AC\uFFFD\uFFFD\uFFFD\uFFFD\u2026\uFFFD\uFFFD"       // 0x80 - 0x87
         "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD"       // 0x88 - 0x8f

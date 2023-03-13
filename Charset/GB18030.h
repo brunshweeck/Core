@@ -7,7 +7,7 @@
 
 
 #include "Charset.h"
-
+#include "../Character.h"
 class GB18030 final : public Charset {
 private:
     CORE_EXPLICIT GB18030();

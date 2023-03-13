@@ -5,8 +5,9 @@
 #include "UTF16BE.h"
 #include "../String.h"
 #include "../CodingError.h"
+#include "../Character.h"
 
-UTF16BE::UTF16BE(): Unicode("UTF-16BE") {
+UTF16BE::UTF16BE() : Unicode("UTF-16BE") {
     encoderReplacement[0] = (gbyte) 0xff;
     encoderReplacement[1] = (gbyte) 0xfd;
     encoderReplacement[2] = (gbyte) 0;

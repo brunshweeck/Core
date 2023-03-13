@@ -7,28 +7,7 @@
 
 #include "Class.h"
 
-class Void;
-
-class Boolean;
-
-class Byte;
-
-class Short;
-
-class Integer;
-
-class Long;
-
-class Float;
-
-class Double;
-
-class String;
-
-class Character;
-
-template<class E>
-class Enum;
+CORE_CLASS_DECLARATIONS
 
 /**
  *  Object class is a base of class hierarchy

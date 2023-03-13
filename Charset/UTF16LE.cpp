@@ -4,6 +4,7 @@
 
 #include "UTF16LE.h"
 #include "../String.h"
+#include "../Character.h"
 
 UTF16LE::UTF16LE() : Unicode("UTF-16LE") {
     encoderReplacement[0] = (gbyte) 0xfd;

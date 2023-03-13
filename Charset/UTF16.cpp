@@ -7,7 +7,7 @@
 #include "UTF16BE_BOM.h"
 #include "../String.h"
 #include "../CodingError.h"
-
+#include "../Character.h"
 
 UTF16 UTF16::INSTANCE{};
 
@@ -99,7 +99,7 @@ Charset::CoderResult UTF16::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
         }
         src.position(mark);
         return Charset::CoderResult::UNDERFLOW;
-    } catch (OverflowError const &) {}
+    } catch (...) {}
     src.position(mark);
     return Charset::CoderResult::UNDERFLOW;
 }

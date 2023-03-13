@@ -7,6 +7,8 @@
 
 #include "extern/Class.h"
 
+CORE_CLASS_DECLARATIONS
+
 /**
  *  Class is used to do test on any type
  *

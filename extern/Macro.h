@@ -174,4 +174,51 @@ CORE_REQUIRE(sizeof(gbool) << 3 == 8, u"This Compiler is not supported");
 #endif
 #pragma endregion //PLATFORM MACRO LIST
 
+#define CORE_CLASS_DECLARATIONS \
+    template <class E> class ArrayList;\
+    template <class T, class U> class BiConsumer;\
+    template <class T, class U, class R> class BiFunction;\
+    template <class T, class U> class BiPredicate;\
+    class Boolean;\
+    class Break;\
+    class Byte;\
+    class CastError;\
+    class Charater;\
+    class CharArray;\
+    class CharBuffer;\
+    class Charset;\
+    template <class T> class Class;\
+    class CodingError;\
+    template <class E> class Collection;\
+    template <class T> class Comparable;\
+    template <class T> class Consumer;\
+    class Double;\
+    template <class E> class Enum;\
+    class Error;\
+    class Float;\
+    template <class T, class R> class Function;\
+    class Hashable;\
+    template <class K, class V> class HashMap;\
+    template <class E> class HashSet;\
+    class IndexError;\
+    class Integer;\
+    class IOError;\
+    template <class E> class LinkedList;\
+    template <class E> class List;\
+    class Long;\
+    template <class K, class V> class Map;\
+    class MemoryError;\
+    class Number;\
+    class Object;\
+    template <class T> class Predicate;\
+    template <class E> class Set;\
+    class Short;\
+    class StateError;\
+    class String;\
+    template <class K, class V> class TreeMap;\
+    template <class E> class TreeSet;\
+    class ValueError;\
+    class Void;
+
+
 #endif //CORE_MACRO_H

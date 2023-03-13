@@ -4,8 +4,9 @@
 
 #include "UTF16LE_BOM.h"
 #include "../String.h"
+#include "../Character.h"
 
-UTF16LE_BOM::UTF16LE_BOM(): Unicode("X-UTF-16BE-BOM") {
+UTF16LE_BOM::UTF16LE_BOM() : Unicode("X-UTF-16BE-BOM") {
     encoderReplacement[0] = (gbyte) 0xff;
     encoderReplacement[1] = (gbyte) 0xfd;
     encoderReplacement[2] = (gbyte) 0;

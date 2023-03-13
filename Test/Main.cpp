@@ -5,6 +5,7 @@
 #include "../Collections/ArrayList.h"
 #include "../Charset/GB18030.h"
 #include "../CodingError.h"
+#include "../Charset/UTF8.h"
 
 void func(int i) {
     i += 2;
@@ -13,7 +14,7 @@ void func(int i) {
 #include <unistd.h>
 
 int main(int, char const *[], char const *[]) {
-    throw CodingError();
+    throw Error();
     FILE* f = fopen("C:/Users/brunshweeck/CLionProjects/Core/Test/text.txt", "r");
     fgetc(f);
     gbyte * ptr = (gbyte *)f->_ptr - 1;

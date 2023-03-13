@@ -4,7 +4,7 @@
 
 #include "MS1250.h"
 #include "../String.h"
-
+#include "../Character.h"
 static gchar bytesToChar[] =
         u"\u20AC\uFFFD\u201A\uFFFD\u201E\u2026\u2020\u2021"       // 0x80 - 0x87
         "\uFFFD\u2030\u0160\u2039\u015A\u0164\u017D\u0179"       // 0x88 - 0x8f

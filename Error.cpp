@@ -4,7 +4,10 @@
 
 #include "Error.h"
 #include "MemoryError.h"
-#include <typeinfo>
+#include "Collections/CharArray.h"
+#include "IO/CharBuffer.h"
+#include "IO/ByteBuffer.h"
+#include "Charset/UTF8.h"
 
 Error::Error() : _message() {}
 
