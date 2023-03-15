@@ -220,5 +220,10 @@ CORE_REQUIRE(sizeof(gbool) << 3 == 8, u"This Compiler is not supported");
     class ValueError;\
     class Void;
 
+#define CORE_TEMPLATE_REQUIRE_PRIMITIVE(_Obj, _Prim, _Holder, _Mask) \
+    Class<gbool>::Require<!Class<_Prim>::isClass() && Class<_Prim>::isLiteral()> = true,                        \
+    class _Holder = typename Class<_Prim>::Object,                      \
+    Class<gbool>::Require<Class<_Obj>::template isSuper<_Holder>()> = true
+
 
 #endif //CORE_MACRO_H

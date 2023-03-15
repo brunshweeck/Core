@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 
 project(Core LANGUAGES CXX ASM)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
@@ -15,7 +15,7 @@ file(GLOB CORE
         IO/*.cpp IO/*.h
         )
 
-add_library(Core SHARED ${CORE})
+add_library(Core SHARED ${CORE} Collections/Set.cpp Collections/Set.h)
 
 add_executable(Main Test/Main.cpp)
 

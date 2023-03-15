@@ -14,13 +14,13 @@
 template<class E>
 class ArrayList : public List<E> {
 private:
-    using Element = Class<E>::Pointer;
+    using Element = typename Class<E>::Pointer;
 
     static Element EMPTY_DATA[0];
     CORE_FAST static gint DEFAULT_CAPACITY = 10;
     static Element UNINITIALIZED;
 
-    Class<Element>::Pointer data = {};
+    typename Class<Element>::Pointer data = {};
 
     gint len = 0;
 
@@ -75,8 +75,9 @@ public:
     }
 
     /**
-     * Construct new list contening the element of specified collection
-     * \param
+     * Construct new list containing the elements of specified collection
+     * in the order they are returned by the collection's iteration
+     * \param c the collection whose elements are to be placed into this list
      */
     template<class _E, Class<gbool>::Require<Class<E>::template isSuper<_E>()> = true>
     CORE_EXPLICIT ArrayList(Collection<_E> const &c) {
@@ -85,11 +86,12 @@ public:
                 data = new Element[capacity];
                 UNINITIALIZED = data[0];
             } catch (...) {
+                capacity = 0;
                 throw MemoryError();
             }
             if (Class<ArrayList>::hasInstance(c)) {
                 ArrayList<E> const &arrayList = (ArrayList<E> const &) c;
-                for (int i = 0; i < arrayList.len; ++i)
+                for (gint i = 0; i < arrayList.len; ++i)
                     data[i] = ElementCreator<E>::newInstance(arrayList.get(i));
                 len = arrayList.len;
             } else
@@ -100,6 +102,67 @@ public:
         }
     }
 
+    ArrayList(ArrayList const &arrayList) {
+        if ((capacity = arrayList.size()) > 0) {
+            try {
+                data = new Element[capacity];
+                UNINITIALIZED = data[0];
+            } catch (...) {
+                capacity = 0;
+                data = EMPTY_DATA;
+                throw MemoryError();
+            }
+            for (gint i = 0; i < arrayList.len; ++i)
+                data[i] = &ElementCreator<E>::newInstance(arrayList.get(i));
+            len = arrayList.len;
+        } else {
+            capacity = 0;
+            data = EMPTY_DATA;
+        }
+    }
+
+    ArrayList(ArrayList &&arrayList) CORE_NOTHROW {
+        capacity = arrayList.capacity;
+        data = arrayList.data;
+        len = arrayList.len;
+        arrayList.len = arrayList.capacity = 0;
+        arrayList.data = EMPTY_DATA;
+    }
+
+    ArrayList &operator=(ArrayList const &arrayList) {
+        if (this != &arrayList) {
+            this.~ArrayList();
+            if ((capacity = arrayList.size()) > 0) {
+                try {
+                    data = new Element[capacity];
+                    UNINITIALIZED = data[0];
+                } catch (...) {
+                    capacity = 0;
+                    data = EMPTY_DATA;
+                    throw MemoryError();
+                }
+                for (gint i = 0; i < arrayList.len; ++i)
+                    data[i] = ElementCreator<E>::newInstance(arrayList.get(i));
+                len = arrayList.len;
+            } else {
+                capacity = 0;
+                data = EMPTY_DATA;
+            }
+        }
+        return *this;
+    }
+
+    ArrayList &operator=(ArrayList &&arrayList) CORE_NOTHROW {
+        if (this != &arrayList) {
+            capacity = arrayList.capacity;
+            data = arrayList.data;
+            len = arrayList.len;
+            arrayList.len = arrayList.capacity = 0;
+            arrayList.data = EMPTY_DATA;
+        }
+        return *this;
+    }
+
     gbool add(const E &obj) override {
         if (len == capacity)
             resize();
@@ -108,12 +171,22 @@ public:
         return true;
     }
 
+    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
+    gbool add(U &&v) {
+        return add(_E((U &&) v));
+    }
+
     void add(gint index, const E &obj) override {
         checkIndex(index, len + 1);
         if (len == capacity)
             resize();
         arrayCopy(data, index, data, index + 1, len - index);
         data[index] = &ElementCreator<E>::newInstance(obj);
+    }
+
+    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
+    void add(gint index, U &&v) {
+        add(index, _E((U &&) v));
     }
 
     gbool addAll(const Collection<E> &c) override {
@@ -164,6 +237,11 @@ public:
         return true;
     }
 
+    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
+    gbool remove(U &&v) {
+        return remove(_E((U &&) v));
+    }
+
     gbool remove(gint index, const E &obj) override {
         if (0 <= index && index < len)
             if (obj.equals(get(index))) {
@@ -171,6 +249,11 @@ public:
                 return true;
             }
         return false;
+    }
+
+    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
+    gbool remove(gint index, U &&v) {
+        return remove(index, _E((U &&) v));
     }
 
     E &removeAt(gint index) override {
@@ -188,7 +271,7 @@ public:
             clear();
             return true;
         }
-        int i, j;
+        gint i, j;
         for (i = j = 0; i < len; ++i) {
             if (!c.contains(*data[i]))
                 data[j++] = data[i];
@@ -201,7 +284,7 @@ public:
     gbool removeIf(const Predicate<const E &> &p) override {
         if (isEmpty())
             return false;
-        int i, j;
+        gint i, j;
         for (i = j = 0; i < len; ++i) {
             if (!p.test(*data[i]))
                 data[j++] = data[i];
@@ -215,6 +298,11 @@ public:
         return indexOf(obj) >= 0;
     }
 
+    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
+    gbool contains(U &&v) const {
+        return contains(_E((U &&) v));
+    }
+
     gbool containsAll(const Collection<E> &c) const override {
         gint limit = c.size();
         if (limit == 0)
@@ -223,7 +311,7 @@ public:
             return true;
         if (Class<ArrayList>::hasInstance(c)) {
             ArrayList<E> const &arrayList = (ArrayList<E> const &) c;
-            for (int i = 0; i < limit; ++i) {
+            for (gint i = 0; i < limit; ++i) {
                 if (!contains(arrayList.get(i)))
                     return false;
             }
@@ -241,7 +329,7 @@ public:
     gbool retainAll(const Collection<E> &c) override {
         if (this == &c)
             clear();
-        int i, j;
+        gint i, j;
         for (i = j = 0; i < len; ++i) {
             if (c.contains(*data[i]))
                 data[j++] = data[i];
@@ -265,12 +353,12 @@ public:
     }
 
     void forEach(Consumer<E const &> const &action) const override {
-        for (int i = 0, limit = len; i < limit && limit == len; ++i)
+        for (gint i = 0, limit = len; i < limit && limit == len; ++i)
             try { action.accept(get(i)); } catch (Break const &) { break; }
     }
 
     void forEach(const Consumer<E &> &action) override {
-        for (int i = 0, limit = len; i < limit && limit == len; ++i)
+        for (gint i = 0, limit = len; i < limit && limit == len; ++i)
             try { action.accept(get(i)); } catch (Break const &) { break; }
     }
 
@@ -291,21 +379,36 @@ public:
         return *oldValue;
     }
 
+    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
+    void set(gint index, U &&v) {
+        set(index, _E((U &&) v));
+    }
+
     gint indexOf(const E &obj) const override {
-        for (int i = 0, limit = len; i < limit; ++i) if (obj.equals(get(i))) return i;
+        for (gint i = 0, limit = len; i < limit; ++i) if (obj.equals(get(i))) return i;
         return -1;
     }
 
+    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
+    gint indexOf(U &&v) const {
+        return indexOf(_E((U &&) v));
+    }
+
     gint lastIndexOf(const E &obj) const override {
-        for (int i = len - 1; i >= 0; --i) if (obj.equals(get(i))) return i;
+        for (gint i = len - 1; i >= 0; --i) if (obj.equals(get(i))) return i;
         return -1;
+    }
+
+    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
+    gint lastIndexOf(U &&v) const {
+        return lastIndexOf(_E((U &&) v));
     }
 
     String toString() const override {
         if (isEmpty())
             return "[]";
         String s = "[";
-        for (int i = 0, limit = len - 1; i <= limit; ++i) {
+        for (gint i = 0, limit = len - 1; i <= limit; ++i) {
             Object const &obj = get(i);
             s += i < limit ? obj.toString() + ", " : obj.toString() + "]";
         }
@@ -378,13 +481,13 @@ private:
 
     template<class U, class V>
     static void arrayCopy(U const src[], gint srcBegin, V dst[], gint dstBegin, gint length) {
-        for (int i = 0; i < length; ++i)
+        for (gint i = 0; i < length; ++i)
             dst[i + dstBegin] = src[i + srcBegin];
     }
 
     template<class U>
     static void fillNull(U src[], gint srcBegin, gint length) {
-        for (int i = 0; i < length; ++i)
+        for (gint i = 0; i < length; ++i)
             src[i + srcBegin] = UNINITIALIZED;
     }
 
@@ -395,9 +498,15 @@ private:
 };
 
 template<class E>
-ArrayList<E>::Element ArrayList<E>::EMPTY_DATA[0] = {};
+typename ArrayList<E>::Element ArrayList<E>::EMPTY_DATA[0] = {};
 
 template<class E>
-ArrayList<E>::Element ArrayList<E>::UNINITIALIZED = {};
+typename ArrayList<E>::Element ArrayList<E>::UNINITIALIZED = {};
+
+#if __cpp_deduction_guides > 201565
+ArrayList() -> ArrayList<Object>;
+ArrayList(gint) -> ArrayList<Object>;
+template<class E> ArrayList(Collection<E> const &) -> ArrayList<E>;
+#endif //
 
 #endif //CORE_ARRAYLIST_H

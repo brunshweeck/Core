@@ -27,7 +27,7 @@ public:
      * \throw ValueError if specified function is null
      */
     template<class _Func,
-            class _Ret = Class<_Func>::template Return<T>,
+            class _Ret = typename Class<_Func>::template Return<T>,
             Class<gbool>::Require<Class<_Func>::isFunction() && Class<gbool>::isConstruct<_Ret>()> = true>
     CORE_IMPLICIT Predicate(_Func &&func): tester() {
         if (!func)
@@ -45,7 +45,7 @@ public:
      * \param target object instance
      */
     template<class _Func, class Target,
-            class _Ret = Class<_Func>::template Return<Target, T>,
+            class _Ret = typename Class<_Func>::template Return<Target, T>,
             Class<gbool>::Require<Class<_Func>::isMember() && Class<gbool>::isConstruct<_Ret>()> = true>
     CORE_EXPLICIT Predicate(_Func &&func, Target &&target): tester() {
         try {
@@ -59,7 +59,7 @@ public:
      * Construct new Predicate with callable object or lambda function as test
      */
     template<class _Func,
-            class _Ret = Class<_Func>::template Return<T>,
+            class _Ret = typename Class<_Func>::template Return<T>,
             Class<gbool>::Require<Class<_Func>::isClass() &&
                                   !Class<Object>::isSuper<_Func>() &&
                                   Class<gbool>::isConstruct<_Ret>()> = true>
@@ -470,7 +470,7 @@ private:
             }
         }
 
-        Class<Test const>::Pointer lhs;
+        typename Class<Test const>::Pointer lhs;
     };
 
     class LogicalTest : public Test {
@@ -546,23 +546,23 @@ private:
         }
 
     private:
-        Class<Test const>::Pointer lhs;
-        Class<Test const>::Pointer rhs;
+        typename Class<Test const>::Pointer lhs;
+        typename Class<Test const>::Pointer rhs;
         gint op;
     };
 
     static Test TRUE;
     static ReverseTest FALSE;
 
-    Class<Test>::Pointer tester = &TRUE;
+    typename Class<Test>::Pointer tester = &TRUE;
 
 public:
     static const Predicate<T> ALWAYS_TRUE;
     static const Predicate<T> ALWAYS_FALSE;
 };
 
-template<class T> Predicate<T>::Test Predicate<T>::TRUE = Test();
-template<class T> Predicate<T>::ReverseTest Predicate<T>::FALSE = ReverseTest(TRUE);
+template<class T> typename Predicate<T>::Test Predicate<T>::TRUE = Test();
+template<class T> typename Predicate<T>::ReverseTest Predicate<T>::FALSE = ReverseTest(TRUE);
 template<class T> const Predicate<T> Predicate<T>::ALWAYS_TRUE = Predicate<T>();
 template<class T> const Predicate<T> Predicate<T>::ALWAYS_FALSE = ALWAYS_TRUE.logicalNot();
 

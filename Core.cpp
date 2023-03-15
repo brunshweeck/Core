@@ -3,6 +3,27 @@
 //
 
 #include "Object.h"
+#include "String.h"
+#include "extern/Class.h"
+#include "MemoryError.h"
+
+static String classname = {};
+
+#include <cxxabi.h>
+#include <cstdlib>
+
+static char *mangle_name = (char *) malloc(256);
+size_t mangle_size = 256;
+gint mangle_status = 0;
+
+String const &core::Class::className(const void *const v) {
+    if(v == nullptr)
+        throw MemoryError("Access to memory address failed");
+    const char *c = ((std::type_info const * const) v)->name();
+    __cxxabiv1::__cxa_demangle(c, mangle_name, &mangle_size, &mangle_status);
+    classname = mangle_name;
+    return classname;
+}
 
 gbool operator==(Object const &obj1, Object const &obj2) {
     if (&obj1 == &obj2)
@@ -29,6 +50,7 @@ Object &Object::operator=(const Object &obj) {
 }
 
 #include "String.h"
+
 String Object::toString() const {
     return "object@768";
 }

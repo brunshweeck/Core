@@ -75,7 +75,7 @@ public:
      */
     template<class T,
             Class<gbool>::Require<!Class<T>::isEnum()> = true,
-            class U = Class<T>::NIVR>
+            class U = typename Class<T>::NIVR>
     gbool equals(T &&v) const {
         return equals(Enum<U>((T &&) v));
     }

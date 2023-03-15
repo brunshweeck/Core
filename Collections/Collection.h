@@ -22,13 +22,21 @@ public:
      */
     virtual gbool add(E const &obj) = 0;
 
+    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(
+            E, U, _E,)>
+    gbool add(U &&v) {
+        return add(_E((U &&) v));
+    }
+
     /**
      * Add all of element of specified collection from the this collection
      * \param c collection containing elements to add from this collection
      */
     virtual gbool addAll(Collection<E> const &c) {
-        c.forEach(Consumer<E const&>(&Collection::add, *this));
-        return !c.isEmpty();
+        if (c.isEmpty())
+            return false;
+        c.forEach([this](E const &obj) -> void { add(obj); });
+        return true;
     }
 
     /**
@@ -37,14 +45,18 @@ public:
      */
     virtual gbool remove(E const &obj) = 0;
 
+    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(
+            E, U, _E,)>
+    gbool remove(U &&v) {
+        return remove(_E((U &&) v));
+    }
+
     /**
      * Remove all of element of this collection that are contained in specified collection
      * \param c collection containing elements to remove from this collection
      */
     virtual gbool removeAll(Collection<E> const &c) {
-        gint oldSize = size();
-        removeIf(Predicate<E const &>(&Collection<E>::contains, c));
-        return oldSize > size();
+        return removeIf([&c](E const &obj) -> gbool { return c.contains(obj); });
     };
 
     /**
@@ -75,6 +87,12 @@ public:
                 throw Break();
         });
         return b;
+    }
+
+    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(
+            E, U, _E,)>
+    gbool contains(U &&v) const {
+        return contains(_E((U &&) v));
     }
 
     /**
@@ -119,7 +137,7 @@ public:
      * \param c collection containing element to not remove
      */
     virtual gbool retainAll(Collection<E> const &c) {
-        return removeIf(Predicate<E const &>(&Collection<E>::contains, c).logicalNot());
+        return removeIf([&c](E const &obj) -> gbool { return !c.contains(obj); });
     };
 
     /**
@@ -152,7 +170,7 @@ public:
      * Performed action to each all of element of this collection
      * \param action performed action
      */
-    virtual void forEach(Consumer<E const&> const &action) const = 0;
+    virtual void forEach(Consumer<E const &> const &action) const = 0;
 
 private:
     void set(const Object &obj) override {
@@ -165,5 +183,9 @@ private:
 
 };
 
+#if __cpp_deduction_guides > 201565
+Collection() -> Collection<Object>;
+template<class E> Collection(Collection<E> const &) -> Collection<E>;
+#endif //
 
 #endif //CORE_COLLECTION_H

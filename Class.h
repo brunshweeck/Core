@@ -7,8 +7,6 @@
 
 #include "extern/Class.h"
 
-CORE_CLASS_DECLARATIONS
-
 /**
  *  Class is used to do test on any type
  *
@@ -22,43 +20,47 @@ public:
      */
     Class() = delete;
 
+    static String const& name() {
+        return core::Class::className(&typeid(T));
+    }
+
     /**
      * Constant version of target type
      * \example Class<gint>::Immutable -> gint const
      */
-    using Immutable = core::Class::Constant<T>::Type;
+    using Immutable = typename core::Class::Constant<T>::Type;
 
     /**
      * Non constant version of target type
      * \example Class<gint const>::Mutable -> gint
      */
-    using Mutable = core::Class::Constant<T>::Type2;
+    using Mutable = typename core::Class::Constant<T>::Type2;
 
     /**
      * Reference version of target type
      * \example Class<gint>::Reference -> gint&
      */
-    using Reference = core::Class::Reference<T>::Type;
+    using Reference = typename core::Class::Reference<T>::Type;
 
     /**
      * Unreferenced version of target type
      * \example Class<gint&>::Unreferenced -> gint
      * \example Class<gint&&>::UnReferenced -> gint
      */
-    using Unreferenced = core::Class::Reference<T>::Type2;
+    using Unreferenced = typename core::Class::Reference<T>::Type2;
 
     /**
      * Reference version of target type
      * \example Class<gint>::MoveReference -> gint&&
      */
-    using MoveReference = core::Class::Reference<T>::Type3;
+    using MoveReference = typename core::Class::Reference<T>::Type3;
 
     /**
      * Constant reference version of target type
      * \example Class<gint>::ImmutableReference -> gint const&
      * \example Class<gint&>::ImmutableReference -> gint const&
      */
-    using ImmutableReference = core::Class::CR<T>::Type;
+    using ImmutableReference = typename core::Class::CR<T>::Type;
 
     /**
      * Constant reference version of target type
@@ -66,7 +68,7 @@ public:
      * \example Class<gint const>::ImmutableVolatile -> gint const volatile
      * \example Class<gint volatile>::ImmutableVolatile -> gint const volatile
      */
-    using ImmutableVolatile = core::Class::CV<T>::Type;
+    using ImmutableVolatile = typename core::Class::CV<T>::Type;
 
     /**
      * Constant reference version of target type
@@ -78,7 +80,7 @@ public:
      * \example Class<gint volatile&>::ImmutableVolatileReference -> gint const volatile&
      * \example Class<gint const volatile>::ImmutableVolatileReference -> gint const volatile&
      */
-    using ImmutableVolatileReference = core::Class::CVR<T>::Type;
+    using ImmutableVolatileReference = typename core::Class::CVR<T>::Type;
 
     /**
      * Constant reference version of target type
@@ -112,7 +114,7 @@ public:
      * \example Class<gint&>::NIR -> gint
      * \example Class<gint const&>::NIR -> gint
      */
-    using NIR = core::Class::CR<T>::Type2;
+    using NIR = typename core::Class::CR<T>::Type2;
 
     /**
      * Remove Constant reference version of target type
@@ -120,7 +122,7 @@ public:
      * \example Class<gint volatile>::NIV -> gint
      * \example Class<gint const volatile>::NIV -> gint
      */
-    using NIV = core::Class::CV<T>::Type2;
+    using NIV = typename core::Class::CV<T>::Type2;
 
     /**
      * Remove Constant reference version of target type
@@ -132,25 +134,25 @@ public:
      * \example Class<gint const volatile>::NIVR -> gint
      * \example Class<gint const volatile&>::NIVR -> gint
      */
-    using NIVR = core::Class::CVR<T>::Type2;
+    using NIVR = typename core::Class::CVR<T>::Type2;
 
     /**
      * Pointer version of target type
      * \example Class<gint>::Pointer -> gint *
      * \example Class<gint&>::Pointer -> gint *
      */
-    using Pointer = core::Class::Pointer<T>::Type;
+    using Pointer = typename core::Class::Pointer<T>::Type;
 
     /**
      * Remove Pointer version of target type
      * \example Class<gint*>::Pointer -> gint
      */
-    using NoPointer = core::Class::Pointer<T>::Type2;
+    using NoPointer = typename core::Class::Pointer<T>::Type2;
 
     template<CORE_SIZE S>
-    using Array = core::Class::Array3<T, S>::Type;
+    using Array = typename core::Class::Array3<T, S>::Type;
 
-    using ArrayElement = core::Class::Array2<T>::Type;
+    using ArrayElement = typename core::Class::Array2<T>::Type;
 
     /**
      * Return true if target type is immutable type. In other terms, if target has extension 'const'
@@ -331,8 +333,8 @@ public:
      * Return true if target type is primitive string type.
      */
     CORE_FAST static gbool isString() {
-        using U = Class<NIVR>::NoPointer;
-        using V = Class<NIVR>::ArrayElement;
+        using U = typename Class<NIVR>::NoPointer;
+        using V = typename Class<NIVR>::ArrayElement;
         return Class<U>::isCharacter() || Class<V>::isCharacter();
     }
 
@@ -380,7 +382,7 @@ public:
     CORE_FAST static gbool hasInstance(U&& obj) {
         CORE_REQUIRE(isClass(), "This Function require object type");
         CORE_REQUIRE(Class<U>::isClass(), "This Function require object type");
-        using _T = Class<NIVR>::Immutable;
+        using _T = typename Class<NIVR>::Immutable;
         return dynamic_cast<_T*>(&obj);
     }
 
@@ -388,22 +390,22 @@ public:
      * Require is a first type if and only if condition is true. In otherwise it not exists
      */
     template<gbool condition>
-    using Require = core::Class::If<T, condition>::Type;
+    using Require = typename core::Class::If<T, condition>::Type;
 
     /**
      * Conditional is a first type if and only if condition is true. In otherwise a second type
      */
     template<gbool condition, class Else>
-    using Conditional = core::Class::IfElse<T, condition, Else>::Type;
+    using Conditional = typename core::Class::IfElse<T, condition, Else>::Type;
 
     /**
      * Return is a return type of target type (if it callable with specified arguments type)
      */
     template<class ...Args>
-    using Return = core::Class::Return<NIV, Args...>::Type::Type;
+    using Return = typename core::Class::Return<NIV, Args...>::Type::Type;
 
-    using Primitive = core::Class::Primitive<T>::Type;
-    using Object = core::Class::Class<T>::Type;
+    using Primitive = typename core::Class::Primitive<NIVR>::Type;
+    using Object = typename core::Class::Class<NIVR>::Type;
 };
 
 

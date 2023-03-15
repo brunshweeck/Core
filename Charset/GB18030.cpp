@@ -137,6 +137,8 @@ Charset::CoderResult GB18030::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
 
 Charset::CoderResult GB18030::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
     struct Surrogate {
+        CORE_IMPLICIT Surrogate(gint &errorLength) : errorLength(errorLength) {}
+
         gint &errorLength;
         gint isPair = false;
         Charset::CoderResult error = Charset::CoderResult::UNDERFLOW;
@@ -168,7 +170,7 @@ Charset::CoderResult GB18030::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
             return character;
         }
     };
-    Surrogate sgp = {errorLength};
+    Surrogate sgp{errorLength};
     gint condensedKey = 0;
     gint hiByte = 0, loByte = 0;
     currentState = GB18030_DOUBLE_BYTE;

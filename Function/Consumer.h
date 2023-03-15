@@ -320,7 +320,7 @@ private:
     template<class _Func>
     class LambdaManager final : public Manager {
     private:
-        using _Fn = Class<_Func>::NIVR;
+        using _Fn = typename Class<_Func>::NIVR;
     public:
         CORE_EXPLICIT LambdaManager(_Func &&func) : func((_Func &&) func) {}
 
@@ -359,14 +359,14 @@ private:
 
     static Manager EMPTY;
 
-    Class<Manager>::Pointer manager = &EMPTY;
+    typename Class<Manager>::Pointer manager = &EMPTY;
 
 public:
     static const Consumer<T> EMPTY_ACTION;
 };
 
 template<class T>
-Consumer<T>::Manager Consumer<T>::EMPTY = Manager{};
+typename Consumer<T>::Manager Consumer<T>::EMPTY = Manager{};
 
 template<class T>
 Consumer<T> const Consumer<T>::EMPTY_ACTION = Consumer<T>{};

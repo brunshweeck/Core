@@ -100,6 +100,7 @@ Charset::CoderResult IBM862::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
 
 Charset::CoderResult IBM862::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
     struct Surrogate {
+        CORE_IMPLICIT Surrogate(gint &errorLength) : errorLength(errorLength) {}
         gint& errorLength;
         gint isPair = false;
         Charset::CoderResult error = Charset::CoderResult::UNDERFLOW;

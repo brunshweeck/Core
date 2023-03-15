@@ -347,8 +347,8 @@ public:
      */
     template<class T,
             Class<gbool>::Require<!Class<T>::isClass()> = true,
-            class S = Class<T>::NIVR,
-            class U = Class<S>::Object,
+            class S = typename Class<T>::NIVR,
+            class U = typename Class<S>::Object,
             Class<gbool>::Require<!Class<U>::isVoid()> = true>
     gbool equals(T &&v) const {
         return equals(U((T &&) v));

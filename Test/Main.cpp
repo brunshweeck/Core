@@ -3,23 +3,23 @@
 //
 
 #include "../Collections/ArrayList.h"
-#include "../Charset/GB18030.h"
-#include "../CodingError.h"
 #include "../Charset/UTF8.h"
+#include "../Collections/LinkedList.h"
+#include "../Collections/CharArray.h"
 
-void func(int i) {
-    i += 2;
+int& aaa(int b) {
+    static int i;
+    i = b;
+    return i;
 }
-#include <cstdio>
-#include <unistd.h>
 
-int main(int, char const *[], char const *[]) {
-    throw Error();
-    FILE* f = fopen("C:/Users/brunshweeck/CLionProjects/Core/Test/text.txt", "r");
-    fgetc(f);
-    gbyte * ptr = (gbyte *)f->_ptr - 1;
-    fseek(f, 0, SEEK_END);
-    gint size = ftell(f);
-    String string = String(ptr, ftell(f), UTF8::INSTANCE);
-    return string.length();
+template<class T, CORE_SIZE S>
+void ff(T(&&v)[S]) {
+    for (const auto &item: v){}
+}
+
+int main() {
+    ff<float>({1,2,3,4,5});
+    LinkedList<Integer> ll{{1.0, 2, 4}};
+    return 0;
 }

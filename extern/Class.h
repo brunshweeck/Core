@@ -6,6 +6,7 @@
 #define CORE_EXTERN_CLASS_H
 
 #include "Macro.h"
+#include <typeinfo>
 
 class Void;
 
@@ -588,6 +589,8 @@ namespace core {
         template<CORE_SIZE S>
         struct Class<wchar_t const volatile[S]> : Always<String> {
         };
+
+        String const& className(void const* const address);
 
     }
 #pragma visibility pop
