@@ -40,20 +40,20 @@ private:
      * \tparam U class of current object
      */
     template<class U = E, gbool = Class<U>::isAbstract() || !Class<U>::template isConstruct<U const &>()>
-    class ElementCreator;
+    class Maker;
 
     template<class U>
-    class ElementCreator<U, true> {
+    class Maker<U, true> {
     public:
-        static U &newInstance(U const &obj) {
+        static U &copyOf(U const &obj) {
             try { return (U &) ((Object &) obj).clone(); } catch (std::bad_alloc const &) { throw MemoryError(); }
         }
     };
 
     template<class U>
-    class ElementCreator<U, false> {
+    class Maker<U, false> {
     public:
-        static U &newInstance(U const &obj) {
+        static U &copyOf(U const &obj) {
             try { return *new U(obj); } catch (std::bad_alloc const &) { throw MemoryError(); }
         }
     };
@@ -215,7 +215,7 @@ public:
     }
 
     gbool add(const E &obj) override {
-        E &copy = ElementCreator<E>::newInstance(obj);
+        E &copy = Maker<E>::copyOf(obj);
         linkLast(copy);
         return true;
     }
@@ -228,7 +228,7 @@ public:
 
     void add(gint index, const E &obj) override {
         checkIndex(index, len + 1);
-        E &copy = ElementCreator<E>::newInstance(obj);
+        E &copy = Maker<E>::copyOf(obj);
         if (index == 0)
             linkFirst(copy);
         else if (index == len)
@@ -251,13 +251,13 @@ public:
             Element element = linkedList.first;
             gint limit = linkedList.len;
             for (gint i = 0; i < limit; ++i) {
-                E &copy = ElementCreator<E>::newInstance(element->item);
+                E &copy = Maker<E>::copyOf(element->item);
                 linkLast(copy);
                 element = element->next;
             }
         } else {
             c.forEach([this](E const &item) -> void {
-                E &copy = ElementCreator<E>::newInstance(item);
+                E &copy = Maker<E>::copyOf(item);
                 linkLast(copy);
             });
         }
@@ -276,14 +276,14 @@ public:
             Element element1 = checkElement(index);
             gint limit = linkedList.len;
             for (gint i = 0; i < limit; ++i) {
-                E &copy = ElementCreator<E>::newInstance(element->item);
+                E &copy = Maker<E>::copyOf(element->item);
                 linkBefore(copy, element1);
                 element = element->next;
             }
         } else {
             Element element = checkElement(index);
             c.forEach([this, &element](E const &item) -> void {
-                E &copy = ElementCreator<E>::newInstance(item);
+                E &copy = Maker<E>::copyOf(item);
                 linkBefore(copy, element);
             });
         }

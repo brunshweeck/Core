@@ -4,6 +4,7 @@
 
 #include "Object.h"
 #include "String.h"
+#include "Long.h"
 #include "extern/Class.h"
 #include "MemoryError.h"
 
@@ -49,10 +50,8 @@ Object &Object::operator=(const Object &obj) {
     return *this;
 }
 
-#include "String.h"
-
 String Object::toString() const {
-    return "object@768";
+    return core::Class::className(&typeid(*this)) + "@" + Long::toHexString((glong) this);
 }
 
 #pragma GCC diagnostic pop

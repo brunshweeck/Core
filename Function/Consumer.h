@@ -27,7 +27,7 @@ public:
      */
     template<class _Func,
             Class<gbool>::Require<Class<_Func>::isFunction() && Class<_Func>::template isCallable<T>()> = true>
-    CORE_IMPLICIT Consumer(_Func &&func): manager() {
+    CORE_IMPLICIT Consumer(_Func &&func): manager(nullptr) {
         if (!func)
             throw ValueError("Invalid function");
         try {
@@ -44,7 +44,7 @@ public:
      */
     template<class _Func, class Target,
             Class<gbool>::Require<Class<_Func>::isMember() && Class<_Func>::template isCallable<Target, T>()> = true>
-    CORE_EXPLICIT Consumer(_Func &&func, Target &&target): manager() {
+    CORE_EXPLICIT Consumer(_Func &&func, Target &&target): manager(nullptr) {
         try {
             manager = new MethodManager<_Func, Target>((_Func &&) func, (Target &&) target);
         } catch (...) {
@@ -60,7 +60,7 @@ public:
             Class<gbool>::Require<Class<_Func>::isClass() &&
                                   !Class<Object>::isSuper<_Func>() &&
                                   Class<_Func>::template isCallable<T>()> = true>
-    CORE_IMPLICIT Consumer(_Func &&func): manager() {
+    CORE_IMPLICIT Consumer(_Func &&func): manager(nullptr) {
         try {
             manager = new LambdaManager<_Func>((_Func &&) func);
         } catch (...) {
@@ -72,10 +72,8 @@ public:
      * Construct new consumer with action of other consumer
      * \param c consumer
      */
-    CORE_IMPLICIT Consumer(Consumer<T> const &c) : manager() {
-        if (!c.manager || &c == &EMPTY_ACTION)
-            manager = &EMPTY;
-        else if (c.manager->isEmpty() || c.manager == &EMPTY)
+    CORE_IMPLICIT Consumer(Consumer<T> const &c) : manager(nullptr) {
+        if (!c.manager || c.manager == &EMPTY)
             manager = &EMPTY;
         else
             manager = &(Manager &) c.manager->clone();
@@ -85,7 +83,7 @@ public:
      * Construct new consumer with action of other consumer
      * \param c consumer
      */
-    CORE_IMPLICIT Consumer(Consumer<T> &&c) CORE_NOTHROW: manager() {
+    CORE_IMPLICIT Consumer(Consumer<T> &&c) CORE_NOTHROW: manager(nullptr) {
         manager = c.manager;
         c.manager = &EMPTY;
     }
@@ -96,7 +94,7 @@ public:
      */
     template<class _T,
             Class<gbool>::Require<Class<_T>::template isSuper<T>()> = true>
-    CORE_IMPLICIT Consumer(Consumer<_T> const &c) {
+    CORE_IMPLICIT Consumer(Consumer<_T> const &c): manager(nullptr) {
         if (!c.manager || &c == &Consumer<_T>::EMPTY_ACTION)
             manager = &EMPTY;
         else if (c.manager->isEmpty() || c.manager == &EMPTY)
@@ -168,19 +166,20 @@ public:
     gbool equals(const Object &obj) const override {
         if (this == &obj)
             return true;
-        if (!dynamic_cast<Consumer<T> const *>(&obj))
+        if (!Class<Consumer>::hasInstance(obj))
             return false;
-        return true;
+        Consumer<T> const &c = (Consumer<T> const &) obj;
+        if (c.manager == nullptr || c.manager == &EMPTY)
+            return manager == nullptr || manager == &EMPTY;
+        if (manager == nullptr || manager == &EMPTY)
+            return c.manager == nullptr || c.manager == &EMPTY;
+        return manager->equals(*c.manager);
     }
 
     /**
      * Return copy of this consumer
      */
     Object &clone() const override {
-        if (!manager || this == &EMPTY_ACTION)
-            return (Object &) EMPTY_ACTION;
-        if (manager->isEmpty() || manager == &EMPTY)
-            return (Object &) EMPTY_ACTION;
         try { return *new Consumer<T>(*this); } catch (...) { throw MemoryError(); }
     }
 
@@ -189,9 +188,7 @@ public:
      * \return consumer{action: ...}
      */
     String toString() const override {
-        if (!manager || this == &EMPTY_ACTION)
-            return u"consumer" + EMPTY.toString();
-        if (manager->isEmpty() || manager == &EMPTY)
+        if (!manager == nullptr || manager == &EMPTY)
             return u"consumer" + EMPTY.toString();
         return u"consumer" + manager->toString();
     }
@@ -206,14 +203,6 @@ private:
 private:
     class Manager : public Object {
     public:
-        virtual gbool isEmpty() const { return true; }
-
-        virtual gbool isMember() const { return false; }
-
-        virtual gbool isFunction() const { return false; }
-
-        virtual gbool isObject() const { return false; }
-
         virtual void launch(T t) const {}
 
         String toString() const override {
@@ -223,13 +212,9 @@ private:
         gbool equals(Object const &obj) const override {
             if (this == &obj)
                 return true;
-            if (!dynamic_cast<Manager const *>(&obj))
+            if (!Class<Manager>::hasInstance(obj))
                 return false;
-            Manager const &manager1 = (Manager const &) obj;
-            return isEmpty() && manager1.isEmpty()
-                   || isMember() && manager1.isMember()
-                   || isFunction() && manager1.isFunction()
-                   || isObject() && manager1.isObject();
+            return true;
         }
 
         Object &clone() const override {
@@ -244,14 +229,6 @@ private:
     class FunctionManager final : public Manager {
     public:
         CORE_EXPLICIT FunctionManager(_Func &&func) : func((_Func &&) func) {}
-
-        gbool isEmpty() const override {
-            return false;
-        }
-
-        gbool isFunction() const override {
-            return true;
-        }
 
         void launch(T t) const override {
             func(t);
@@ -283,20 +260,12 @@ private:
         CORE_EXPLICIT MethodManager(_Func &&func, Target &&target) :
                 func((_Func &&) func), target((Target &&) target) {}
 
-        gbool isEmpty() const override {
-            return false;
-        }
-
-        gbool isMember() const override {
-            return true;
-        }
-
         void launch(T t) const override {
             (target.*func)(t);
         }
 
         String toString() const override {
-            return u"{action: target@" + Long::toUnsignedString((glong) &target, 16) + u"- method@" +
+            return u"{action: object@" + Long::toUnsignedString((glong) &target, 16) + u"- method@" +
                    Long::toUnsignedString((glong) &func, 16) + u"}";
         }
 
@@ -324,21 +293,13 @@ private:
     public:
         CORE_EXPLICIT LambdaManager(_Func &&func) : func((_Func &&) func) {}
 
-        gbool isEmpty() const override {
-            return false;
-        }
-
-        gbool isObject() const override {
-            return true;
-        }
-
         void launch(T t) const override {
             func(t);
         }
 
         String toString() const override {
-            return (!Class<_Func>::template isConstruct<_Fn>() ?
-                    u"{action: $lambda@" : u"{action: object@") + Long::toUnsignedString((glong) &func, 16) + u"}";
+            return (!Class<_Fn>::template isConstruct<_Func>() ?
+                    u"{action: lambda$" : u"{action: object@") + Long::toUnsignedString((glong) &func, 16) + u"}";
         }
 
         gbool equals(const Object &obj) const override {
@@ -361,14 +322,10 @@ private:
 
     typename Class<Manager>::Pointer manager = &EMPTY;
 
-public:
-    static const Consumer<T> EMPTY_ACTION;
 };
 
 template<class T>
 typename Consumer<T>::Manager Consumer<T>::EMPTY = Manager{};
 
-template<class T>
-Consumer<T> const Consumer<T>::EMPTY_ACTION = Consumer<T>{};
 
 #endif //CORE_CONSUMER_H

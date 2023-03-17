@@ -27,20 +27,20 @@ private:
     gint capacity = DEFAULT_CAPACITY;
 
     template<class U = E, gbool = Class<U>::isAbstract() || !Class<U>::template isConstruct<U const &>()>
-    class ElementCreator;
+    class Maker;
 
     template<class U>
-    class ElementCreator<U, true> {
+    class Maker<U, true> {
     public:
-        static U &newInstance(U const &obj) {
+        static U &copyOf(U const &obj) {
             return (U &) ((Object &) obj).clone();
         }
     };
 
     template<class U>
-    class ElementCreator<U, false> {
+    class Maker<U, false> {
     public:
-        static U &newInstance(U const &obj) {
+        static U &copyOf(U const &obj) {
             try {
                 return *new U(obj);
             } catch (...) {
@@ -74,34 +74,6 @@ public:
             throw ValueError("Negative capacity: " + Integer::toString(initialCapacity));
     }
 
-    /**
-     * Construct new list containing the elements of specified collection
-     * in the order they are returned by the collection's iteration
-     * \param c the collection whose elements are to be placed into this list
-     */
-    template<class _E, Class<gbool>::Require<Class<E>::template isSuper<_E>()> = true>
-    CORE_EXPLICIT ArrayList(Collection<_E> const &c) {
-        if ((capacity = c.size()) > 0) {
-            try {
-                data = new Element[capacity];
-                UNINITIALIZED = data[0];
-            } catch (...) {
-                capacity = 0;
-                throw MemoryError();
-            }
-            if (Class<ArrayList>::hasInstance(c)) {
-                ArrayList<E> const &arrayList = (ArrayList<E> const &) c;
-                for (gint i = 0; i < arrayList.len; ++i)
-                    data[i] = ElementCreator<E>::newInstance(arrayList.get(i));
-                len = arrayList.len;
-            } else
-                c.forEach([this](E const &obj) -> void { add(obj); });
-        } else {
-            data = EMPTY_DATA;
-            capacity = 0;
-        }
-    }
-
     ArrayList(ArrayList const &arrayList) {
         if ((capacity = arrayList.size()) > 0) {
             try {
@@ -113,7 +85,7 @@ public:
                 throw MemoryError();
             }
             for (gint i = 0; i < arrayList.len; ++i)
-                data[i] = &ElementCreator<E>::newInstance(arrayList.get(i));
+                data[i] = &Maker<E>::copyOf(arrayList.get(i));
             len = arrayList.len;
         } else {
             capacity = 0;
@@ -142,7 +114,7 @@ public:
                     throw MemoryError();
                 }
                 for (gint i = 0; i < arrayList.len; ++i)
-                    data[i] = ElementCreator<E>::newInstance(arrayList.get(i));
+                    data[i] = Maker<E>::copyOf(arrayList.get(i));
                 len = arrayList.len;
             } else {
                 capacity = 0;
@@ -166,14 +138,9 @@ public:
     gbool add(const E &obj) override {
         if (len == capacity)
             resize();
-        data[len] = &ElementCreator<E>::newInstance(obj);
+        data[len] = &Maker<E>::copyOf(obj);
         len = len + 1;
         return true;
-    }
-
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
-    gbool add(U &&v) {
-        return add(_E((U &&) v));
     }
 
     void add(gint index, const E &obj) override {
@@ -181,12 +148,7 @@ public:
         if (len == capacity)
             resize();
         arrayCopy(data, index, data, index + 1, len - index);
-        data[index] = &ElementCreator<E>::newInstance(obj);
-    }
-
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
-    void add(gint index, U &&v) {
-        add(index, _E((U &&) v));
+        data[index] = &Maker<E>::copyOf(obj);
     }
 
     gbool addAll(const Collection<E> &c) override {
@@ -237,11 +199,6 @@ public:
         return true;
     }
 
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
-    gbool remove(U &&v) {
-        return remove(_E((U &&) v));
-    }
-
     gbool remove(gint index, const E &obj) override {
         if (0 <= index && index < len)
             if (obj.equals(get(index))) {
@@ -249,11 +206,6 @@ public:
                 return true;
             }
         return false;
-    }
-
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
-    gbool remove(gint index, U &&v) {
-        return remove(index, _E((U &&) v));
     }
 
     E &removeAt(gint index) override {
@@ -296,11 +248,6 @@ public:
 
     gbool contains(const E &obj) const override {
         return indexOf(obj) >= 0;
-    }
-
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
-    gbool contains(U &&v) const {
-        return contains(_E((U &&) v));
     }
 
     gbool containsAll(const Collection<E> &c) const override {
@@ -375,13 +322,8 @@ public:
     const E &set(gint index, const E &obj) override {
         checkIndex(index, len);
         Element oldValue = data[index];
-        data[index] = &ElementCreator<E>::newInstance(obj);
+        data[index] = &Maker<E>::copyOf(obj);
         return *oldValue;
-    }
-
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
-    void set(gint index, U &&v) {
-        set(index, _E((U &&) v));
     }
 
     gint indexOf(const E &obj) const override {
@@ -389,19 +331,9 @@ public:
         return -1;
     }
 
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
-    gint indexOf(U &&v) const {
-        return indexOf(_E((U &&) v));
-    }
-
     gint lastIndexOf(const E &obj) const override {
         for (gint i = len - 1; i >= 0; --i) if (obj.equals(get(i))) return i;
         return -1;
-    }
-
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
-    gint lastIndexOf(U &&v) const {
-        return lastIndexOf(_E((U &&) v));
     }
 
     String toString() const override {
@@ -436,6 +368,54 @@ public:
         len = 0;
         data = EMPTY_DATA;
     };
+private:
+    template<class U>
+    class Iter : public Iterator<E> {
+        ArrayList<E> &self;
+        gint current = 0;
+    public:
+        CORE_EXPLICIT Iter(ArrayList<E> &self) : self(self) {}
+
+        gbool hasNext() const override {
+            return 0 <= current && current < self.len;
+        }
+
+        E &next() override {
+            E &currentValue = self.get(current);
+            current += 1;
+            return currentValue;
+        }
+
+        void remove() override {
+            if (current >= 1 && current <= self.len) {
+                self.removeAt(current - 1);
+                current -= 1;
+            }
+            throw StateError("No such item");
+        }
+
+        gbool equals(const Object &obj) const override {
+            if (this == &obj)
+                return true;
+            if (!Class<Iter>::hasInstance(obj))
+                return false;
+            Iter const &iter = (Iter const &) obj;
+            return &self == &iter.self;
+        }
+
+        Object &clone() const override {
+            try { return *new Iter(self); } catch (...) { throw MemoryError(); }
+        }
+    };
+
+public:
+    Iterator<const E> &&iterator() const override {
+        return Iter<E const>((ArrayList<E> &) *this);
+    }
+
+    Iterator<E> &&iterator() override {
+        return Iter<E>(*this);
+    }
 
 private:
     static gint newLength(gint oldLength, gint minOffset, gint prefOffset) {

@@ -2,24 +2,19 @@
 // Created by brunshweeck on 16/02/2023.
 //
 
+#include <map>
 #include "../Collections/ArrayList.h"
 #include "../Charset/UTF8.h"
 #include "../Collections/LinkedList.h"
 #include "../Collections/CharArray.h"
-
-int& aaa(int b) {
-    static int i;
-    i = b;
-    return i;
-}
-
-template<class T, CORE_SIZE S>
-void ff(T(&&v)[S]) {
-    for (const auto &item: v){}
-}
+#include "../Collections/TreeMap.h"
 
 int main() {
-    ff<float>({1,2,3,4,5});
-    LinkedList<Integer> ll{{1.0, 2, 4}};
+    std::map<int, int> m;
+    for (const auto &item: m) {
+        //
+    }
+    m.end();
+    TreeMap<Integer, Integer> i = {};
     return 0;
 }
