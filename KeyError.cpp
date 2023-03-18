@@ -3,10 +3,9 @@
 //
 
 #include "KeyError.h"
+#include "MemoryError.h"
 
-
-
-KeyError::KeyError(const Object &key): ValueError("key not found: " + key.toString()) {}
-
-KeyError::KeyError(): ValueError("No such key") {}
+Object &KeyError::clone() const {
+    try { return *new KeyError(*this); } catch (...) { throw MemoryError(); }
+}
 

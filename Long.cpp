@@ -7,12 +7,8 @@
 #include "String.h"
 #include "ValueError.h"
 
-Long::Long() : Long(0) {}
-
-Long::Long(i64 v) : value(v) {}
-
 gint Long::intValue() const {
-    return (i32) value;
+    return (gint) value;
 }
 
 glong Long::longValue() const {
@@ -39,7 +35,7 @@ gint Long::compareTo(const Long &i) const {
     return compare(value, i.value);
 }
 
-gint Long::compare(i64 x, i64 y) {
+gint Long::compare(glong x, glong y) {
     return x > y ? +1 :
            x < y ? -1 : +0;
 }
@@ -54,7 +50,7 @@ Long::operator glong() const {
     return longValue();
 }
 
-Long Long::valueOf(i64 i) {
+Long Long::valueOf(glong i) {
     return i;
 }
 
@@ -62,7 +58,7 @@ Long::operator glong &() {
     return value;
 }
 
-gint Long::bitCount(i64 i) {
+gint Long::bitCount(glong i) {
     gint v = 0;
     for (int j = 0; j < 64; ++j) {
         if (i & (1 << v))
@@ -71,43 +67,43 @@ gint Long::bitCount(i64 i) {
     return v;
 }
 
-gint Long::compareUnsigned(i64 x, i64 y) {
+gint Long::compareUnsigned(glong x, glong y) {
     return compare(x < 0 ? -x : x, y < 0 ? -y : y);
 }
 
-i64 Long::compressBits(i64 i, i64 mask) {
+glong Long::compressBits(glong i, glong mask) {
     if (mask == 0 || i == 0)
         return 0;
-    i64 v = 0;
+    glong v = 0;
     gint s1 = 64 - leadingZeros(i);
     gint s2 = 64 - leadingZeros(mask);
     while (s1 >= 0 && s2 >= 0) {
-        i64 bit1 = shiftRight(i, s2) & 1;
-        i64 bit2 = shiftRight(mask, s2) & 1;
-        i64 bit3 = bit1 & bit2;
+        glong bit1 = shiftRight(i, s2) & 1;
+        glong bit2 = shiftRight(mask, s2) & 1;
+        glong bit3 = bit1 & bit2;
         if (bit3)
             v = shiftLeft(v | bit3, 1);
         s1 = s1 - 1;
         s2 = s2 - 1;
     }
     while (s1 >= 0) {
-        i64 bit1 = shiftRight(i, s2) & 1;
+        glong bit1 = shiftRight(i, s2) & 1;
         v = shiftLeft(v | bit1, 1);
         s1 = s1 - 1;
     }
     return v;
 }
 
-i64 Long::expandBits(i64 i, i64 mask) {
+glong Long::expandBits(glong i, glong mask) {
     if (mask == 0 || i == 0)
         return 0;
-    i64 v = 0;
+    glong v = 0;
     gint s1 = 64 - leadingZeros(i);
     gint s2 = 64 - leadingZeros(mask);
     while (s1 >= 0 && s2 >= 0) {
-        i64 bit2 = shiftRight(mask, s2) & 1;
+        glong bit2 = shiftRight(mask, s2) & 1;
         if (bit2) {
-            i64 bit1 = shiftRight(i, s2) & 1;
+            glong bit1 = shiftRight(i, s2) & 1;
             v = shiftLeft(v | bit1, 1);
             s1 = s1 - 1;
         } else
@@ -115,19 +111,19 @@ i64 Long::expandBits(i64 i, i64 mask) {
         s2 = s2 - 1;
     }
     while (s1 >= 0) {
-        i64 bit1 = shiftRight(i, s2) & 1;
+        glong bit1 = shiftRight(i, s2) & 1;
         v = shiftLeft(v | bit1, 1);
         s1 = s1 - 1;
     }
     return v;
 }
 
-i64 Long::reverseBits(i64 i) {
-    //    i64 v = 0;
+glong Long::reverseBits(glong i) {
+    //    glong v = 0;
 //    for (gint k = 0; k < 64; ++k)
 //        v = v | shiftLeft(shiftRight(i, k) & 0b1, 63 - k);
 //    return v;
-    return (i64) (
+    return (glong) (
             ((i & 0b0000000000000000000000000000000000000000000000000000000000000001) >> 0) << 63 |
             ((i & 0b0000000000000000000000000000000000000000000000000000000000000010) >> 1) << 62 |
             ((i & 0b0000000000000000000000000000000000000000000000000000000000000100) >> 2) << 61 |
@@ -195,8 +191,8 @@ i64 Long::reverseBits(i64 i) {
     );
 }
 
-i64 Long::reverseBytes(i64 i) {
-    return (i64) (
+glong Long::reverseBytes(glong i) {
+    return (glong) (
             ((i & 0b0000000000000000000000000000000000000000000000000000000011111111) >> 0) << 56 |
             ((i & 0b0000000000000000000000000000000000000000000000001111111100000000) >> 8) << 48 |
             ((i & 0b0000000000000000000000000000000000000000111111110000000000000000) >> 16) << 40 |
@@ -208,47 +204,47 @@ i64 Long::reverseBytes(i64 i) {
     );
 }
 
-i64 Long::rotateLeft(i64 i, gint distance) {
+glong Long::rotateLeft(glong i, gint distance) {
     distance = distance & 0x3f;
     return shiftLeft(i, distance) | shiftRight(i & (shiftLeft(1, 64 - distance) - 1), 63 - distance);
 }
 
-i64 Long::rotateRight(i64 i, gint distance) {
+glong Long::rotateRight(glong i, gint distance) {
     distance = distance & 0x3F;
     return shiftRight(i, distance) | shiftLeft(i & (shiftLeft(1, distance + 1) - 1), 63 - distance);
 }
 
-i64 Long::shiftLeft(i64 i, gint distance) {
+glong Long::shiftLeft(glong i, gint distance) {
     if (distance < 0) {
         distance = -distance;
         if (distance > 63)
             return 0;
-        return (i64) ((i & ~0ULL) >> distance);
+        return (glong) ((i & ~0ULL) >> distance);
     } else {
         if (distance > 63)
             return 0;
-        return (i64) ((i & ~0ULL) << distance);
+        return (glong) ((i & ~0ULL) << distance);
     }
 }
 
-i64 Long::shiftRight(i64 i, gint distance) {
+glong Long::shiftRight(glong i, gint distance) {
     if (distance < 0) {
         distance = -distance;
         if (distance > 63)
             return 0;
-        return (i64) ((i & ~0ULL) << distance);
+        return (glong) ((i & ~0ULL) << distance);
     } else {
         if (distance > 63)
             return 0;
-        return (i64) ((i & ~0ULL) >> distance);
+        return (glong) ((i & ~0ULL) >> distance);
     }
 }
 
-gint Long::signum(i64 i) {
+gint Long::signum(glong i) {
     return i < 0 ? -1 : i > 0 ? 1 : 0;
 }
 
-gint Long::leadingZeros(i64 i) {
+gint Long::leadingZeros(glong i) {
     gint v = 0;
     if (i < 0)
         return 0;
@@ -281,7 +277,7 @@ gint Long::leadingZeros(i64 i) {
     return 64 - v;
 }
 
-gint Long::trailingZeros(i64 i) {
+gint Long::trailingZeros(glong i) {
     gint v = 0;
     if (i < 0)
         i = -i;

@@ -1,16 +1,12 @@
 #include <cassert>
 #include "Charset.h"
-#include "../String.h"
 #include "../Character.h"
 #include "../MemoryError.h"
-#include "../CodingError.h"
-#include "../CodingError.h"
-#include "../CodingError.h"
 #include "../StateError.h"
 #include "../Enum.h"
 #include "UTF8.h"
 
-Charset::Charset(const String &name) {}
+Charset::Charset(String name) {}
 
 gint Charset::compareTo(const Charset &obj) const {
     return name().compareToIgnoreCase(obj.name());
@@ -25,10 +21,8 @@ gbool Charset::equals(const Object &obj) const {
     return name().equalsIgnoreCase(cs.name());
 }
 
-void Charset::set(const Object &obj) {}
-
 static gint _initEnumNames() {
-    Enum<Charset::CoderResult>::customAlias = [](Charset::CoderResult cr) -> String {
+    Enum<Charset::CoderResult>::alias = [](Charset::CoderResult cr) -> String {
         switch (cr) {
             case Charset::CoderResult::UNDERFLOW:
                 return u"UNDERFLOW";
@@ -41,7 +35,7 @@ static gint _initEnumNames() {
         }
         return "";
     };
-    Enum<Charset::State>::customAlias = [](Charset::State s) -> String {
+    Enum<Charset::State>::alias = [](Charset::State s) -> String {
         switch (s) {
             case Charset::State::RESET:
                 return "RESET";
@@ -54,7 +48,7 @@ static gint _initEnumNames() {
         }
         return "";
     };
-    Enum<Charset::ErrorAction>::customAlias = [](Charset::ErrorAction action) -> String {
+    Enum<Charset::ErrorAction>::alias = [](Charset::ErrorAction action) -> String {
         switch (action) {
             case Charset::ErrorAction::IGNORE:
                 return "IGNORE";

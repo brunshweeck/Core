@@ -8,19 +8,13 @@
 
 #include "Error.h"
 
-class StateError: public Error {
+class StateError : public Error {
 public:
-    StateError();
+    StateError() {};
 
-    explicit StateError(const String &message);
-
-    const String &message() const override;
-
-    gbool equals(const Object &obj) const override;
+    CORE_EXPLICIT StateError(String message) : Error((String &&) message) {};
 
     Object &clone() const override;
-
-    String toString() const override;
 };
 
 

@@ -27,10 +27,6 @@ gshort Number::shortValue() const {
     return (gshort) intValue();
 }
 
-String Number::toString() const {
-    return String("Number@").concat(Integer::toUnsignedString(glong(this), 16));
-}
-
 gchar NUMBER_CONVERSION_BUFFER[4096] = u"";
 gchar DIGIT_NUMBERS[] = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',

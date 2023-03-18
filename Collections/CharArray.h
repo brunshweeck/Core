@@ -229,17 +229,12 @@ public:
 
     Object &clone() const override;
 
-    ~CharArray() override = default;
-
     String toString() const override;
 
     CORE_EXPLICIT operator CharBuffer();
 
-protected:
-    void set(const Object &obj) override;
-
 private:
-    Class<gchar>::Pointer value;
+    typename Class<gchar>::Pointer value;
     gint len;
 };
 

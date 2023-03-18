@@ -172,15 +172,6 @@ public:
         Iterable<E>::forEach(action);
     }
 
-private:
-    void set(const Object &obj) override {
-        if (this != &obj)
-            if (Class<Collection<E>>::hasInstance(obj)) {
-                clear();
-                addAll((Collection<E> const &) obj);
-            }
-    }
-
 };
 
 #if __cpp_deduction_guides > 201565

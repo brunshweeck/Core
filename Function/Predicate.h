@@ -268,14 +268,6 @@ public:
     }
 
 private:
-    void set(const Object &obj) override {
-        if (this != &obj)
-            if (dynamic_cast<Predicate<T> const *>(&obj)) {
-                *this = (Predicate<T> const &) obj;
-            }
-    }
-
-private:
     class Test : public Object {
     public:
         virtual gbool isAlwaysTrue() const { return true; }
@@ -310,9 +302,6 @@ private:
         String toString() const override {
             return "constant[true]";
         }
-
-    private:
-        void set(const Object &obj) override {}
     };
 
     template<class _Func>

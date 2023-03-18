@@ -60,9 +60,6 @@ public:
         while (hasNext())
             action.accept(next());
     }
-
-protected:
-    void set(const Object &obj) override {}
 };
 
 

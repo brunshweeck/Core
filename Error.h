@@ -7,10 +7,9 @@
 
 
 #include <exception>
-#include "Object.h"
 #include "String.h"
 
-class Error: public Object, protected std::exception {
+class Error : public Object, public std::exception {
 private:
     /**
      * This field contains details of error
@@ -21,18 +20,18 @@ public:
     /**
      * Construct new error without details message
      */
-    Error();
+    Error() {}
 
     /**
      * Construct new error with details message or description
      * \param message details message
      */
-    CORE_EXPLICIT Error(const String &message);
+    CORE_EXPLICIT Error(String message) : _message((String &&) message) {};
 
     /**
      * Return error description
      */
-    virtual const String &message() const;
+    virtual String message() const;
 
     /**
      * Return true if this instance equals to specified object
@@ -50,9 +49,10 @@ public:
      */
     String toString() const override;
 
-protected:
-    void set(const Object &obj) override;
-
+private:
+    /**
+     * Return delimited message between 1st - 500th bytes
+     */
     const char *what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override;
 };
 

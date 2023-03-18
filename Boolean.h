@@ -7,6 +7,7 @@
 
 
 #include "Comparable.h"
+#include "String.h"
 
 /**
  * The Boolean class wraps a value of the primitive type boolean in an object.
@@ -20,13 +21,13 @@ public:
     /**
      * Construct new instance of Boolean
      */
-    CORE_IMPLICIT Boolean();
+    CORE_FAST Boolean() {}
 
     /**
      * Construct new instance of Boolean and initialize with true/false
      * \param v literal true or false
      */
-    CORE_IMPLICIT Boolean(gbool v);
+    CORE_FAST Boolean(gbool v): value(v) {}
 
     /**
      * Return value of this instance as boolean
@@ -87,7 +88,7 @@ public:
     /**
      * Return value of this instance as boolean
      */
-    operator gbool &();
+    operator gbool &() ;
 
     /**
      * Return copy of this instance
@@ -106,11 +107,8 @@ public:
 
     String toString() const override;
 
-protected:
-    void set(const Object &obj) override;
-
 private:
-    gbool value;
+    gbool value = false;
 };
 
 

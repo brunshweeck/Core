@@ -16,9 +16,9 @@ class ArrayList : public List<E> {
 private:
     using Element = typename Class<E>::Pointer;
 
-    static Element EMPTY_DATA[0];
     CORE_FAST static gint DEFAULT_CAPACITY = 10;
-    static Element UNINITIALIZED;
+
+    Element UNINITIALIZED = nullptr;
 
     typename Class<Element>::Pointer data = {};
 
@@ -49,9 +49,22 @@ private:
         }
     };
 
+    template<class T, class U>
+    static void swap(T &t, U &u) {
+        T t2 = t;
+        t = u;
+        u = t2;
+    }
+
+    template<class T, class U>
+    static void copy(T src, gint srcBegin, U dst, gint dstBegin, gint length) {
+        for (int i = 0; i < length; ++i)
+            dst[i + dstBegin] = src[i + srcBegin];
+    }
+
 public:
     /**
-     *
+     * Construct new empty Array list
      */
     ArrayList() : ArrayList(DEFAULT_CAPACITY) {}
     /**
@@ -60,77 +73,52 @@ public:
      * \throw ValueError if capacity is negative
      */
     CORE_EXPLICIT ArrayList(gint initialCapacity) {
-        if (initialCapacity > 0) {
+        if (initialCapacity > 0)
             try {
                 data = new Element[initialCapacity];
                 capacity = initialCapacity;
                 UNINITIALIZED = data[0];
-//                fillNull(data, 0, capacity);
-            } catch (...) {}
-        } else if (initialCapacity == 0) {
-            data = EMPTY_DATA;
+            } catch (...) {
+                throw MemoryError();
+            }
+        else if (initialCapacity == 0)
             capacity = 0;
-        } else
+        else
             throw ValueError("Negative capacity: " + Integer::toString(initialCapacity));
     }
 
-    ArrayList(ArrayList const &arrayList) {
-        if ((capacity = arrayList.size()) > 0) {
-            try {
-                data = new Element[capacity];
-                UNINITIALIZED = data[0];
-            } catch (...) {
-                capacity = 0;
-                data = EMPTY_DATA;
-                throw MemoryError();
-            }
-            for (gint i = 0; i < arrayList.len; ++i)
-                data[i] = &Maker<E>::copyOf(arrayList.get(i));
-            len = arrayList.len;
-        } else {
-            capacity = 0;
-            data = EMPTY_DATA;
-        }
+    CORE_EXPLICIT ArrayList(Collection<E> const &c) : ArrayList() {
+        addAll(c);
     }
 
-    ArrayList(ArrayList &&arrayList) CORE_NOTHROW {
-        capacity = arrayList.capacity;
-        data = arrayList.data;
-        len = arrayList.len;
-        arrayList.len = arrayList.capacity = 0;
-        arrayList.data = EMPTY_DATA;
+    /**
+     * Construct new Array list with element of specified array list
+     */
+    ArrayList(ArrayList const &a) : ArrayList() {
+        addAll(a);
     }
 
-    ArrayList &operator=(ArrayList const &arrayList) {
-        if (this != &arrayList) {
-            this.~ArrayList();
-            if ((capacity = arrayList.size()) > 0) {
-                try {
-                    data = new Element[capacity];
-                    UNINITIALIZED = data[0];
-                } catch (...) {
-                    capacity = 0;
-                    data = EMPTY_DATA;
-                    throw MemoryError();
-                }
-                for (gint i = 0; i < arrayList.len; ++i)
-                    data[i] = Maker<E>::copyOf(arrayList.get(i));
-                len = arrayList.len;
-            } else {
-                capacity = 0;
-                data = EMPTY_DATA;
-            }
+    ArrayList(ArrayList &&a) CORE_NOTHROW {
+        swap(data, a.data);
+        swap(len, a.len);
+        swap(capacity, a.capacity);
+        swap(UNINITIALIZED, a.UNINITIALIZED);
+    }
+
+    ArrayList &operator=(ArrayList const &a) {
+        if (this != &a) {
+            clear();
+            addAll(a);
         }
         return *this;
     }
 
-    ArrayList &operator=(ArrayList &&arrayList) CORE_NOTHROW {
-        if (this != &arrayList) {
-            capacity = arrayList.capacity;
-            data = arrayList.data;
-            len = arrayList.len;
-            arrayList.len = arrayList.capacity = 0;
-            arrayList.data = EMPTY_DATA;
+    ArrayList &operator=(ArrayList &&a) CORE_NOTHROW {
+        if (this != &a) {
+            swap(data, a.data);
+            swap(len, a.len);
+            swap(capacity, a.capacity);
+            swap(UNINITIALIZED, a.UNINITIALIZED);
         }
         return *this;
     }
@@ -158,11 +146,22 @@ public:
         gint remaining = capacity - len;
         if (newOffset > remaining)
             resize(len + newOffset);
-        if (this != &c)
-            c.forEach([&](E const &obj) -> void { add(obj); });
-        else {
-            arrayCopy(data, 0, data, len, len);
-            len = len * 2;
+        if (Class<ArrayList>::hasInstance(c)) {
+            ArrayList const &a = (ArrayList const &) c;
+            copy(a.data, 0, data, len, a.len);
+            len += a.len;
+        } else {
+            Iterator<E const> &&it = c.iterator();
+            if (Class<List<E>>::hasInstance(c))
+                while (it.hasNext()) {
+                    data[len] = (Element) &it.next();
+                    len += 1;
+                }
+            else
+                while (it.hasNext()) {
+                    data[len] = &Maker<E>::copyOf(it.next());
+                    len += 1;
+                }
         }
         return true;
     }
@@ -175,18 +174,28 @@ public:
         gint remaining = capacity - len;
         if (newOffset > remaining)
             resize(len + newOffset);
-        if (this != &c) {
-            gint i = 0;
-            c.forEach([&i, this](E const &obj) -> void {
-                add(i, obj);
-                i = i + 1;
-            });
-        } else {
-            if (len > index)
-                arrayCopy(data, index, data, index + newOffset, len - index);
-            arrayCopy(data, 0, data, index, index);
-            arrayCopy(data, index + newOffset, data, index * 2, len - index);
+        if (len > index)
+            copy(data, index, data, index + len, len - index);
+        if (this == &c) {
+            copy(data, 0, data, index, index);
+            copy(data, index + len, data, index * 2, len - index);
             len = len * 2;
+        } else if (Class<ArrayList>::hasInstance(c)) {
+            ArrayList const &a = (ArrayList const &) c;
+            copy(a.data, 0, data, index, a.len);
+            len += a.len;
+        } else {
+            Iterator<E const> &&it = c.iterator();
+            if (Class<List<E>>::hasInstance(c))
+                while (it.hasNext()) {
+                    data[index] = (Element) &it.next();
+                    index += 1;
+                }
+            else
+                while (it.hasNext()) {
+                    data[index] = &Maker<E>::copyOf(it.next());
+                    index += 1;
+                }
         }
         return true;
     }
@@ -211,7 +220,7 @@ public:
     E &removeAt(gint index) override {
         checkIndex(index, len);
         Element oldValue = data[index];
-        arrayCopy(data, index + 1, data, index, len - 1);
+        copy(data, index + 1, data, index, len - 1);
         fillNull(data, len = len - 1, 1);
         return *oldValue;
     }
@@ -224,11 +233,12 @@ public:
             return true;
         }
         gint i, j;
-        for (i = j = 0; i < len; ++i) {
-            if (!c.contains(*data[i]))
-                data[j++] = data[i];
-        }
-        fillNull(data, j, len);
+        for (i = j = 0; i < len; ++i)
+            if (!c.contains(*data[i])) {
+                data[j] = data[i];
+                j += 1;
+            }
+        fillNull(data, j, i - j);
         len = j;
         return true;
     }
@@ -237,11 +247,12 @@ public:
         if (isEmpty())
             return false;
         gint i, j;
-        for (i = j = 0; i < len; ++i) {
-            if (!p.test(*data[i]))
-                data[j++] = data[i];
-        }
-        fillNull(data, j, len);
+        for (i = j = 0; i < len; ++i)
+            if (!p.test(*data[i])) {
+                data[j] = data[i];
+                j += 1;
+            }
+        fillNull(data, j, i - j);
         len = j;
         return true;
     }
@@ -258,32 +269,24 @@ public:
             return true;
         if (Class<ArrayList>::hasInstance(c)) {
             ArrayList<E> const &arrayList = (ArrayList<E> const &) c;
-            for (gint i = 0; i < limit; ++i) {
+            for (gint i = 0; i < limit; ++i)
                 if (!contains(arrayList.get(i)))
                     return false;
-            }
             return true;
         }
-        c.forEach([&limit, this](E const &obj) -> void {
-            if (!contains(obj)) {
-                throw Break();
-            }
-            limit = limit - 1;
-        });
-        return limit == 0;
+        return List<E>::containsAll(c);
     }
 
     gbool retainAll(const Collection<E> &c) override {
-        if (this == &c)
-            clear();
         gint i, j;
-        for (i = j = 0; i < len; ++i) {
-            if (c.contains(*data[i]))
-                data[j++] = data[i];
-        }
-        fillNull(data, j, len);
+        for (i = j = 0; i < len; ++i)
+            if (c.contains(*data[i])) {
+                data[j] = data[i];
+                j += 1;
+            }
+        fillNull(data, j, i - j);
         len = j;
-        return true;
+        return i > j;
     }
 
     void clear() override {
@@ -292,11 +295,11 @@ public:
     }
 
     gbool isEmpty() const override {
-        return List<E>::isEmpty();
+        return len == 0 || data == nullptr;
     }
 
     gint size() const override {
-        return len;
+        return data == nullptr || len < 0 ? 0 : len;
     }
 
     void forEach(Consumer<E const &> const &action) const override {
@@ -342,8 +345,11 @@ public:
         String s = "[";
         for (gint i = 0, limit = len - 1; i <= limit; ++i) {
             Object const &obj = get(i);
-            s += i < limit ? obj.toString() + ", " : obj.toString() + "]";
+            s += obj.toString();
+            if (i < limit)
+                s += ", ";
         }
+        s += "]";
         return s;
     }
 
@@ -366,55 +372,24 @@ public:
         fillNull(data, 0, capacity);
         delete[] data;
         len = 0;
-        data = EMPTY_DATA;
+        data = nullptr;
     };
 private:
     template<class U>
-    class Iter : public Iterator<E> {
-        ArrayList<E> &self;
-        gint current = 0;
-    public:
-        CORE_EXPLICIT Iter(ArrayList<E> &self) : self(self) {}
+    class Itr: public Iterator<U> {
+        gint nextIndex;
+        gint lastReturned = -1;
+        friend ArrayList;
 
-        gbool hasNext() const override {
-            return 0 <= current && current < self.len;
-        }
-
-        E &next() override {
-            E &currentValue = self.get(current);
-            current += 1;
-            return currentValue;
-        }
-
-        void remove() override {
-            if (current >= 1 && current <= self.len) {
-                self.removeAt(current - 1);
-                current -= 1;
-            }
-            throw StateError("No such item");
-        }
-
-        gbool equals(const Object &obj) const override {
-            if (this == &obj)
-                return true;
-            if (!Class<Iter>::hasInstance(obj))
-                return false;
-            Iter const &iter = (Iter const &) obj;
-            return &self == &iter.self;
-        }
-
-        Object &clone() const override {
-            try { return *new Iter(self); } catch (...) { throw MemoryError(); }
-        }
     };
 
 public:
     Iterator<const E> &&iterator() const override {
-        return Iter<E const>((ArrayList<E> &) *this);
+        return Itr<E const>((ArrayList<E> &) *this);
     }
 
     Iterator<E> &&iterator() override {
-        return Iter<E>(*this);
+        return Itr<E>(*this);
     }
 
 private:
@@ -434,13 +409,12 @@ private:
     }
 
     void resize(gint minCapacity) {
-        if (capacity >= 0 && data != EMPTY_DATA) {
+        if (capacity > 0 && data != nullptr) {
             gint newCapacity = newLength(capacity, minCapacity - capacity, capacity >> 1);
             Element *obj = new Element[newCapacity];
             arrayCopy(data, 0, obj, 0, len);
             fillNull(data, 0, len);
             UNINITIALIZED = obj[0];
-//            fillNull(obj, len, newCapacity);
             delete[] data;
             data = obj;
             capacity = newCapacity;
@@ -459,14 +433,8 @@ private:
         resize(len + 1);
     }
 
-    template<class U, class V>
-    static void arrayCopy(U const src[], gint srcBegin, V dst[], gint dstBegin, gint length) {
-        for (gint i = 0; i < length; ++i)
-            dst[i + dstBegin] = src[i + srcBegin];
-    }
-
     template<class U>
-    static void fillNull(U src[], gint srcBegin, gint length) {
+    void fillNull(U src[], gint srcBegin, gint length) {
         for (gint i = 0; i < length; ++i)
             src[i + srcBegin] = UNINITIALIZED;
     }
@@ -476,12 +444,6 @@ private:
             throw IndexError(index);
     }
 };
-
-template<class E>
-typename ArrayList<E>::Element ArrayList<E>::EMPTY_DATA[0] = {};
-
-template<class E>
-typename ArrayList<E>::Element ArrayList<E>::UNINITIALIZED = {};
 
 #if __cpp_deduction_guides > 201565
 ArrayList() -> ArrayList<Object>;

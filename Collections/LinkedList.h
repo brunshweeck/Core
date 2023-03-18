@@ -29,10 +29,11 @@ private:
      */
     class Node final {
     public:
-        E &item;
-        Element prev, next;
+        E *item;
+        Element prev = nullptr;
+        Element next = nullptr;
 
-        CORE_EXPLICIT Node(E &item, Element prev, Element next) : item(item), prev(prev), next(next) {}
+        CORE_EXPLICIT Node(E &item, Element prev, Element next) : item(&item), prev(prev), next(next) {}
     };
 
     /**
@@ -132,9 +133,10 @@ private:
         element->next = nullptr;
         (first == nullptr ? last : first->prev) = nullptr;
         len -= 1;
-        E &item = element->item;
+        E *item = element->item;
+        element->item = nullptr;
         delete element;
-        return item;
+        return *item;
     }
 
     E &unlinkLast() {
@@ -143,9 +145,10 @@ private:
         element->next = nullptr;
         (last == nullptr ? first : last->next) = nullptr;
         len -= 1;
-        E &item = element->item;
+        E *item = element->item;
+        element->item = nullptr;
         delete element;
-        return item;
+        return *item;
     }
 
     E &unlink(Element element) {
@@ -155,9 +158,10 @@ private:
         (element1 == nullptr ? first : element1->next) = element2;
         (element2 == nullptr ? last : element2->prev) = element1;
         len -= 1;
-        E &item = element->item;
+        E *item = element->item;
+        element->item = nullptr;
         delete element;
-        return item;
+        return *item;
     }
 
     template<class U, class V>
@@ -172,20 +176,6 @@ public:
      * Construct new empty list
      */
     LinkedList() = default;
-
-    template<gint S = 1>
-    CORE_EXPLICIT LinkedList(E const(&&items)[S]) {
-        for (E const &item: items) {
-            add(item);
-        }
-    };
-
-    template<class U, gint S, class _U = E, CORE_TEMPLATE_REQUIRE_PRIMITIVE(E, U, _E,)>
-    CORE_EXPLICIT LinkedList(U(&&items)[S]) {
-        for (U &item: items) {
-            add(item);
-        }
-    };
 
     /**
      * Construct new list containing the elements of specified collection
@@ -220,12 +210,6 @@ public:
         return true;
     }
 
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(
-            E, U, _E,)>
-    gbool add(U &&v) {
-        return add(_E((U &&) v));
-    }
-
     void add(gint index, const E &obj) override {
         checkIndex(index, len + 1);
         E &copy = Maker<E>::copyOf(obj);
@@ -237,31 +221,19 @@ public:
             linkBefore(copy, checkElement(index));
     }
 
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(
-            E, U, _E,)>
-    void add(gint index, U &&v) {
-        add(index, _E((U &&) v));
-    }
-
     gbool addAll(const Collection<E> &c) override {
-        if (c.isEmpty())
-            return false;
-        if (Class<LinkedList>::hasInstance(c)) {
-            LinkedList const &linkedList = (LinkedList const &) c;
-            Element element = linkedList.first;
-            gint limit = linkedList.len;
-            for (gint i = 0; i < limit; ++i) {
-                E &copy = Maker<E>::copyOf(element->item);
-                linkLast(copy);
-                element = element->next;
-            }
-        } else {
-            c.forEach([this](E const &item) -> void {
-                E &copy = Maker<E>::copyOf(item);
-                linkLast(copy);
-            });
+        gint size = c.size();
+        if (size > 0) {
+            Iterator<E const> &&it = c.iterator();
+            if (Class<List<E>>::hasInstance(c))
+                while (it.hasNext() && size-- > 0)
+                    linkLast((E &) it.next());
+            else
+                while (it.hasNext() && size-- > 0)
+                    linkLast(Maker<E>::copyOf(it.next()));
+            return true;
         }
-        return true;
+        return false;
     }
 
     gbool addAll(gint index, const Collection<E> &c) override {
@@ -270,23 +242,24 @@ public:
             return false;
         if (index == len)
             return addAll(c);
-        if (Class<LinkedList>::hasInstance(c)) {
-            LinkedList const &linkedList = (LinkedList const &) c;
-            Element element = linkedList.first;
-            Element element1 = checkElement(index);
-            gint limit = linkedList.len;
-            for (gint i = 0; i < limit; ++i) {
-                E &copy = Maker<E>::copyOf(element->item);
-                linkBefore(copy, element1);
-                element = element->next;
-            }
-        } else {
-            Element element = checkElement(index);
-            c.forEach([this, &element](E const &item) -> void {
-                E &copy = Maker<E>::copyOf(item);
-                linkBefore(copy, element);
-            });
+        Element element = checkElement(index);
+        if (this == &c) {
+            if (index == 0)
+                return addAll(c);
+            Element prev = element->prev;
+            for (Element node = first; node != prev->next; node = node->next)
+                linkBefore(node->item, element);
+            for (Element node = element; node != nullptr; node = node->next)
+                linkBefore(node->item, element);
+            return true;
         }
+        Iterator<E const> &&it = c.iterator();
+        if (Class<List<E>>::hasInstance(c))
+            while (it.hasNext())
+                linkBefore((E &) it.next(), element);
+        else
+            while (it.hasNext())
+                linkBefore(Maker<E>::copyOf(it.next()), element);
         return true;
     }
 
@@ -301,12 +274,6 @@ public:
         return false;
     }
 
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(
-            E, U, _E,)>
-    gbool remove(U &&v) {
-        return remove(_E((U &&) v));
-    }
-
     gbool remove(gint index, const E &obj) override {
         checkIndex(index, len);
         Element element = checkElement(index);
@@ -315,12 +282,6 @@ public:
             return true;
         }
         return false;
-    }
-
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(
-            E, U, _E,)>
-    gbool remove(gint index, U &&v) {
-        return remove(index, _E((U &&) v));
     }
 
     E &removeAt(gint index) override {
@@ -359,12 +320,6 @@ public:
             if (obj.equals(element->item))
                 return true;
         return false;
-    }
-
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(
-            E, U, _E,)>
-    gbool contains(U &&v) const {
-        return contains(_E((U &&) v));
     }
 
     gbool containsAll(const Collection<E> &c) const override {
@@ -431,14 +386,8 @@ public:
         return checkElement(index)->item;
     }
 
-    const E &set(gint index, const E &obj) override {
+    E &set(gint index, const E &obj) override {
         return get(index) = obj;
-    }
-
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(
-            E, U, _E,)>
-    void set(gint index, U &&v) {
-        set(index, _E((U &&) v));
     }
 
     gint indexOf(const E &obj) const override {
@@ -451,12 +400,6 @@ public:
         return -1;
     }
 
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(
-            E, U, _E,)>
-    gint indexOf(U &&v) const {
-        return indexOf(_E((U &&) v));
-    }
-
     gint lastIndexOf(const E &obj) const override {
         gint index = size() - 1;
         for (Element element = last; element != nullptr; element = element->prev) {
@@ -467,18 +410,12 @@ public:
         return -1;
     }
 
-    template<class U, class _U = E, Class<gbool>::Require<Class<_U>::isAbstract()> = true, CORE_TEMPLATE_REQUIRE_PRIMITIVE(
-            E, U, _E,)>
-    gint lastIndexOf(U &&v) const {
-        return lastIndexOf(_E((U &&) v));
-    }
-
     String toString() const override {
         if (isEmpty())
             return "[]";
         String string = "[";
         for (Element element = last; element != nullptr; element = element->prev) {
-            string += element->item.toString();
+            string += element->item->toString();
             if (element != last)
                 string += ", ";
         }
@@ -496,7 +433,7 @@ public:
             return false;
         for (Element element = first, element1 = linkedList.first;
              element != nullptr && element1 != nullptr; element = element->next, element1 = element1->next)
-            if (!element->item.equals(element1->item))
+            if (!element->item->equals(element1->item))
                 return false;
         return true;
     }
@@ -512,12 +449,90 @@ public:
         len = 0;
     }
 
-protected:
-    void set(const Object &obj) override {
-        if (!Class<Collection<E>>::hasInstance(obj))
-            throw CastError();
-        *this = LinkedList((Collection<E> const &) obj);
-    }
+private:
+    class ListIter : public ListIterator<E> {
+    public:
+        LinkedList<E> &self;
+        Node lastReturned = nullptr;
+        Node nextElement = nullptr;
+        gint index = 0;
+
+        CORE_EXPLICIT ListIter(LinkedList<E> &self) : self(self) {
+            nextElement = self.first;
+        }
+
+        gbool hasNext() const override {
+            return 0 <= index && index <= self.len && nextElement != nullptr;
+        }
+
+        E &next() override {
+            if (!hasNext())
+                throw StateError("No such item");
+            lastReturned = nextElement;
+            nextElement = nextElement.next;
+            index += 1;
+            return *lastReturned.item;
+        }
+
+        gbool hasPrevious() const override {
+            return index > 0;
+        }
+
+        E &previous() override {
+            if (!hasNext())
+                throw StateError("No such item");
+            lastReturned = nextElement = (nextElement == nullptr) ? self.last : nextElement.prev;
+            index -= 1;
+            return *lastReturned.item;
+        }
+
+        gint nextIndex() const override {
+            return index;
+        }
+
+        gint previousIndex() const override {
+            return index - 1;
+        }
+
+        void remove() override {
+            if (lastReturned == nullptr)
+                throw StateError("No such item");
+            Element element = lastReturned.next;
+            if (lastReturned.prev == nullptr && lastReturned != self.first ||
+                lastReturned.next == nullptr && lastReturned != self.last)
+                throw MemoryError("Concurrent modification");
+            unlink(lastReturned);
+            if (lastReturned == nextElement)
+                nextElement = element;
+            else
+                index -= 1;
+            lastReturned = nullptr;
+        }
+
+        void set(const E &obj) override {
+            if (lastReturned == nullptr)
+                throw StateError("No such item");
+            lastReturned.item = &Maker<E>::copyOf(obj);
+        }
+
+        void add(const E &obj) override {
+            lastReturned = nullptr;
+            if (nextElement == nullptr)
+                self.linkLast(Maker<E>::copyOf(obj));
+            else
+                self.linkBefore(Maker<E>::copyOf(obj), nextElement);
+        }
+
+        gbool equals(const Object &obj) const override {
+            if(this == &obj)
+                return true;
+
+        }
+
+        Object &clone() const override {
+            return ListIterator::clone();
+        }
+    };
 };
 
 #if __cpp_deduction_guides > 201565

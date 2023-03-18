@@ -4,27 +4,19 @@
 
 #include "Boolean.h"
 #include "String.h"
-
-Boolean::Boolean() : Boolean(false) {}
-
-Boolean::Boolean(gbool v) : value(v) {}
+#include "MemoryError.h"
 
 gbool Boolean::equals(const Object &obj) const {
-    Boolean const *b = dynamic_cast<Boolean const *>(&obj);
-    if (!b) return false;
-    return value == b->value;
+    if (Object::equals(obj))
+        return true;
+    if (!Class<Boolean>::hasInstance(obj))
+        return false;
+    Boolean const &boolean = (const Boolean &) obj;
+    return value == boolean.value;
 }
 
 Object &Boolean::clone() const {
-    Boolean *b;
-    try { b = new Boolean(value); } catch (...) {}
-    return *b;
-}
-
-void Boolean::set(const Object &obj) {
-    Boolean const *b = dynamic_cast<Boolean const *>(&obj);
-    if (!b) {}
-    value = b->value;
+    try { return *new Boolean(value); } catch (...) { throw MemoryError(); }
 }
 
 gint Boolean::compareTo(const Boolean &b) const {
@@ -32,7 +24,7 @@ gint Boolean::compareTo(const Boolean &b) const {
 }
 
 gint Boolean::compare(gbool x, gbool y) {
-    return x ? y ? 0 : 1 : y ? -1 : 0;
+    return (gint) x - (gint) y;
 }
 
 Boolean Boolean::valueOf(gbool b) {
@@ -59,14 +51,14 @@ gbool Boolean::logicalXor(gbool x, gbool y) {
     return x == !y;
 }
 
-gbool Boolean::booleanValue() const {
-    return value;
-}
-
 Boolean const Boolean::TRUE = true;
 
 Boolean const Boolean::FALSE = false;
 
 String Boolean::toString() const {
     return value ? "true" : "false";
+}
+
+gbool Boolean::booleanValue() const {
+    return value;
 }

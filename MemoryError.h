@@ -8,19 +8,26 @@
 
 #include "Error.h"
 
-class MemoryError: public Error {
+/**
+ * Thrown to indicate allocation error or memory address access error
+ */
+class MemoryError : public Error {
 public:
-    MemoryError();
+    /**
+     * Construct new instance of Memory error
+     */
+    MemoryError() : Error("Out of memory") {}
 
-    CORE_EXPLICIT MemoryError(const String &message);
+    /**
+     * Construct new instance of Memory error
+     * \param message description message
+     */
+    CORE_EXPLICIT MemoryError(String message) : Error((String &&) message) {}
 
-    const String &message() const override;
-
-    gbool equals(const Object &obj) const override;
-
+    /**
+     * Return copy of this object
+     */
     Object &clone() const override;
-
-    String toString() const override;
 };
 
 

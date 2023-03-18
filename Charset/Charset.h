@@ -9,6 +9,7 @@
 #include "../Comparable.h"
 #include "../IO/ByteBuffer.h"
 #include "../IO/CharBuffer.h"
+#include "../CodingError.h"
 
 class Charset : public Object, public Comparable<Charset> {
 protected:
@@ -17,7 +18,7 @@ protected:
      * Initializes a new charset with the given canonical name
      * \param name canonical name
      */
-    CORE_EXPLICIT Charset(const String &name);
+    CORE_EXPLICIT Charset(String name);
 
     /**
      * Replacement used by decode method. must End With byte 0x00
@@ -165,8 +166,7 @@ public:
      */
     static Charset &forName(String const &charset);
 
-private:
-    void set(const Object &obj) override;
+
 
     CoderResult flush(Buffer const &buffer);
 

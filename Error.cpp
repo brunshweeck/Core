@@ -9,11 +9,7 @@
 #include "IO/ByteBuffer.h"
 #include "Charset/UTF8.h"
 
-Error::Error() : _message() {}
-
-Error::Error(const String &message) : _message(message) {}
-
-const String &Error::message() const {
+String Error::message() const {
     return _message;
 }
 
@@ -23,9 +19,9 @@ gbool Error::equals(const Object &obj) const {
     if (!Class<Error>::hasInstance(obj))
         return false;
     Error const &error = (Error const &) obj;
-    if (typeid(*this) != typeid(error) && typeid(Error) != typeid(error))
+    if (typeid(*this) != typeid(error))
         return false;
-    return error.message() == message();
+    return error._message == _message;
 }
 
 Object &Error::clone() const {
@@ -33,15 +29,7 @@ Object &Error::clone() const {
 }
 
 String Error::toString() const {
-    if(message().isEmpty())
-        return "Error";
-    return "Error: " + message();
-}
-
-void Error::set(const Object &obj) {
-    if (!Class<Error>::hasInstance(obj)) {}
-    Error const &error = (Error const &) obj;
-    _message = error.message();
+    return "Message: " + message();
 }
 
 const char *Error::what() const noexcept {
@@ -54,9 +42,15 @@ const char *Error::what() const noexcept {
             .encode(in);
     gint i = 0;
     for (char &c: buffer) {
-        if (!out.hasRemaining())
+        if (i < 10)
+            c = '\b';
+        else if (i < 512)
+            if (!out.hasRemaining())
+                break;
+            else
+                c = out.get();
+        else
             break;
-        c = out.get();
         i += 1;
     }
     buffer[i] = 0;

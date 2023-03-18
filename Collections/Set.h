@@ -70,11 +70,6 @@ public:
     Set &interSet(Set const &set) const = 0;
 
     Iterator<const E> &&iterator() const override = 0;
-
-protected:
-    void set(const Object &obj) override {
-
-    }
 };
 
 

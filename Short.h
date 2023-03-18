@@ -7,8 +7,7 @@
 
 
 #include "Number.h"
-#include "Comparable.h"
-#include "Hashable.h"
+#include "String.h"
 
 /**
  * The Short class wraps a value of primitive type short in an object.
@@ -22,13 +21,13 @@ public:
     /**
      * Construct new instance of Short
      */
-    CORE_IMPLICIT Short();
+    CORE_FAST Short() {}
 
     /**
      * Construct new instance of Short and Initialize
      * \param v 16 bits signed integer
      */
-    CORE_IMPLICIT Short(gshort v);
+    CORE_FAST Short(gshort v) : value(v) {}
 
     /**
      * Return value of this instance as int
@@ -137,17 +136,15 @@ public:
 
     static String toUnsignedString(gshort i, gint base);
 
-    void set(const Object &obj) override;
-
     static glong hash(gshort i);
 
-    static gshort parseShort(String const& str);
+    static gshort parseShort(String const &str);
 
-    static gshort parseShort(String const& str, gint base);
+    static gshort parseShort(String const &str, gint base);
 
-    static Short valueOf(String const& str);
+    static Short valueOf(String const &str);
 
-    static Short valueOf(String const& str, gint base);
+    static Short valueOf(String const &str, gint base);
 
     /**
      * Decodes a String into a Short.
@@ -167,16 +164,12 @@ public:
      *      "127" -> 127.
      * \throw ValueError if specified string not respect grammar or value represented out of range [MIN;MAX]
      */
-    static Short decode(String const& str);
+    static Short decode(String const &str);
 
-private:
     glong hash() const override;
 
-protected:
-
-
 private:
-    gshort value;
+    gshort value = (gshort) 0;
 
 };
 

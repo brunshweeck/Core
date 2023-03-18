@@ -7,7 +7,7 @@
 
 
 #include "Number.h"
-#include "Hashable.h"
+#include "String.h"
 
 /**
  * The Byte class wraps a value of primitive type byte in an object.
@@ -21,13 +21,13 @@ public:
     /**
      * Construct new instance of Byte
      */
-    CORE_IMPLICIT Byte();
+    CORE_FAST Byte() {}
 
     /**
      * Construct new instance of Byte and initialize with gbyte
      * \param v literal 8 bits signed integer
      */
-    CORE_IMPLICIT Byte(gbyte v);
+    CORE_FAST Byte(gbyte v): value(v) {};
 
     /**
      * Return value of this instance as int
@@ -59,12 +59,10 @@ public:
      * Compares this object to the specified value.
      * \param v literal number
      */
-    template<class T,
-            Class<gbool>::Require<!Class<T>::isNumber()> = true,
-            class S = typename Class<T>::NIVR,
-            class U = typename Class<S>::Object>
-    gbool equals(T &&v) const {
-        return equals(U((T &&) v));
+    template<class T, CORE_TEMPLATE_REQUIRE_PRIMITIVE(Object, T, Obj, )>
+    gbool equals(T v) const {
+        Obj o = v;
+        return equals(o);
     }
 
     /**
@@ -103,34 +101,87 @@ public:
     /**
      * A constant holding the maximum value a byte can have, 2^7 - 1.
      */
-    CORE_FAST static gbyte MAX = 0b01111111;
+    CORE_FAST static gbyte MAX = 127;
 
     /**
      * A constant holding the minimum value a byte can have, -2^7.
      */
-    CORE_FAST static gbyte MIN = (gbyte) 0b10000000;
+    CORE_FAST static gbyte MIN = -128;
 
+    /**
+     * Return string representation of this object
+     */
     String toString() const override;
 
+    /**
+     * Return string representation of specified number
+     * \param i byte
+     */
     static String toString(gbyte i);
 
+    /**
+     * Return string representation of specified number in specified base
+     * \param i byte
+     * \param base conversion base
+     * \throw ValueError If base great than 36 or less than 2
+     */
     static String toString(gbyte i, gint base);
 
+    /**
+     * Return unsigned string representation of specified byte number
+     * \param i byte
+     */
     static String toUnsignedString(gbyte i);
 
+    /**
+     * Return unsigned string representation of specified byte number in specified base
+     * \param i byte
+     * \param base conversion base
+     * \throw ValueError If base great than 36 or less than 2
+     */
     static String toUnsignedString(gbyte i, gint base);
 
+    /**
+     * Return hash code of this object
+     */
     glong hash() const override;
 
+    /**
+     * Return hash code of specified byte number
+     */
     static glong hash(gbyte b);
 
-    static gbyte parseByte(String const& str);
+    /**
+     * Return byte number represented by specified string
+     * \param str string representation  of byte number
+     * \throw ValueError If specified string not represent byte number
+     */
+    static gbyte parseByte(String const &str);
 
-    static gbyte parseByte(String const& str, gint base);
+    /**
+     * Return byte number represented by specified string in specified base
+     * \param str string representation  of byte number
+     * \param base conversion base
+     * \throw ValueError If base great than 36 or less than 2
+     * \throw ValueError If specified string not represent byte number
+     */
+    static gbyte parseByte(String const &str, gint base);
 
-    static Byte valueOf(String const& str);
+    /**
+     * Return byte number represented by specified string
+     * \param str string representation  of byte number
+     * \throw ValueError If specified string not represent byte number
+     */
+    static Byte valueOf(String const &str);
 
-    static Byte valueOf(String const& str, gint base);
+    /**
+     * Return Byte object represented by specified string in specified base
+     * \param str string representation  of byte number
+     * \param base conversion base
+     * \throw ValueError If base great than 36 or less than 2
+     * \throw ValueError If specified string not represent byte number
+     */
+    static Byte valueOf(String const &str, gint base);
 
     /**
      * Decodes a String into a Byte.
@@ -150,11 +201,7 @@ public:
      *      "127" -> 127.
      * \throw ValueError if specified string not respect grammar or value represented out of range [MIN;MAX]
      */
-    static Byte decode(String const& str);
-    static CORE_FAST auto a = 0177;
-
-protected:
-    void set(const Object &obj) override;
+    static Byte decode(String const &str);
 
 private:
     gbyte value;

@@ -6,10 +6,6 @@
 #include "ValueError.h"
 #include "Integer.h"
 
-Byte::Byte() : Byte(0) {}
-
-Byte::Byte(i8 v) : value(v) {}
-
 gint Byte::intValue() const {
     return (i32) value;
 }
@@ -36,12 +32,6 @@ Object &Byte::clone() const {
     Byte *b;
     try { b = new Byte(value); } catch (...) {}
     return *b;
-}
-
-void Byte::set(const Object &obj) {
-    Byte const *b = dynamic_cast<Byte const *>(&obj);
-    if (!b) {}
-    value = b->value;
 }
 
 gint Byte::compareTo(const Byte &i) const {

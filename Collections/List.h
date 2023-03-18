@@ -6,6 +6,7 @@
 #define CORE_LIST_H
 
 #include "Collection.h"
+#include "ListIterator.h"
 
 template<class E>
 class List : public Collection<E>, public Iterable2<E> {
@@ -147,8 +148,8 @@ public:
     virtual E const &get(gint index) const = 0;
 
     /**
-     * Set element value at the specified position
-     * \param index
+     * Replace element value at the specified position with specified object
+     * \param index the position of element
      * \param obj
      */
     virtual E& set(gint index, E const &obj) = 0;
@@ -208,12 +209,12 @@ public:
     /**
      * Returns an iterator over elements of type
      */
-    Iterator<const E> &&iterator() const override = 0;
+    ListIterator<const E> &&iterator() const override = 0;
 
     /**
      * Returns an iterator over elements of type
      */
-    virtual Iterator<E> &&iterator() = 0;
+    virtual ListIterator<E> &&iterator() = 0;
 
     /**
      * Return true if this list equals to specified object
@@ -225,9 +226,6 @@ public:
      * Return copy of this object
      */
     Object &clone() const override = 0;
-
-protected:
-    void set(const Object &obj) override {}
 };
 
 #if __cpp_deduction_guides > 201565

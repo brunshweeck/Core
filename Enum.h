@@ -5,9 +5,8 @@
 #ifndef CORE_ENUM_H
 #define CORE_ENUM_H
 
-#include "Comparable.h"
-#include "String.h"
 #include "Integer.h"
+#include "MemoryError.h"
 
 /**
  * Enum class is object representing primitive enumeration type
@@ -19,7 +18,7 @@ public:
     /**
      * Construct new instance of Enum<E>
      */
-    CORE_FAST Enum() : Enum<E>(E()) {}
+    CORE_FAST Enum() {}
 
     /**
      * Construct new instance of Enum<E>
@@ -46,7 +45,7 @@ public:
      * Compares this instance with an other object
      * \param e enum value to be compared
      */
-    CORE_FAST gint compareTo(Enum<E> const &e) const override {
+    gint compareTo(Enum<E> const &e) const override {
         return compare(value, e.value);
     }
 
@@ -64,20 +63,21 @@ public:
      * \param obj object to compared
      */
     gbool equals(const Object &obj) const override {
-        Enum<E> const *e = dynamic_cast<Enum<E> const *>(&obj);
-        if (!e) return false;
-        return value == e->value;
+        if (this == &obj)
+            return true;
+        if (!Class<Enum>::hasInstance(obj))
+            return false;
+        Enum const &o = (Enum const &) obj;
+        return value == o.value;
     }
 
     /**
      * Compares this instance with literal enum
      * \param v literal enumeration
      */
-    template<class T,
-            Class<gbool>::Require<!Class<T>::isEnum()> = true,
-            class U = typename Class<T>::NIVR>
-    gbool equals(T &&v) const {
-        return equals(Enum<U>((T &&) v));
+    template<class T, CORE_TEMPLATE_REQUIRE_PRIMITIVE(Object, T, Obj,)>
+    CORE_FAST gbool equals(T v) const {
+        return value == v;
     }
 
     /**
@@ -107,55 +107,41 @@ public:
      * Return copy of this instance
      */
     Object &clone() const override {
-        Enum<E> *e;
-        try { e = new Enum<E>(value); } catch (...) {}
-        return *e;
+        try { return *new Enum<E>(value); } catch (...) { throw MemoryError(); }
     }
 
-    CORE_DEPRECATED static String (*customAlias)(E);
+    /**
+     * It defined by user
+     */
+    static String (*alias)(E);
 
     String toString() const override {
         return toString(value);
     }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
     static String toString(E v) {
-        return customAlias ? customAlias(v) : Integer::toString(ordinal(v));
+        return alias != nullptr ? alias(v) : Integer::toString(ordinal(v));
     }
 
-#pragma GCC diagnostic pop
-
     glong hash() const override {
-        return ordinal();
+        return hash(value);
+    }
+
+    CORE_FAST static glong hash(E v) {
+        return ordinal(v);
     }
 
 protected:
-    /**
-     * Set value of this instance
-     * \param obj source of new value
-     * \throw CastError if is not compatible
-     */
-    void set(const Object &obj) override {
-        Enum<E> const *e = dynamic_cast<Enum<E> const *>(&obj);
-        if (!e) {}
-        value = e->value;
-    }
-
-    static_assert(!Class<E>::isReference(), "E in Enum<E> must be unreferenced type");
-
-    static_assert(!Class<E>::isImmutable(), "E in Enum<E> must be mutable type");
-
-    static_assert(!Class<E>::isVolatile(), "E in Enum<E> must be non volatile type");
-
-    static_assert(Class<E>::isEnum(), "E in Enum<E> must be enum type");
+    CORE_TEMPLATE_REQUIRE_UNREFERENCED(E);
+    CORE_TEMPLATE_REQUIRE_MUTABLE(E);
+    CORE_TEMPLATE_REQUIRE_NON_VOLATILE(E);
+    CORE_REQUIRE(Class<E>::isEnum(), "E in Enum<E> must be enum type");
 
 private:
-    E value;
+    E value = E();
 };
 
 template<class E>
-String (*Enum<E>::customAlias)(E) = 0;
+String (*Enum<E>::alias)(E) = nullptr;
 
 #endif //CORE_ENUM_H

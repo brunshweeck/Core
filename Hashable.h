@@ -7,8 +7,16 @@
 
 #include "Object.h"
 
+/**
+ * The Hashable class Represent all object that support hashing
+ */
 class Hashable {
 public:
+    /**
+     * Construct new hashable object
+     */
+    CORE_FAST Hashable() {}
+
     /**
      * Return hash code of this object
      */

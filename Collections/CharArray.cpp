@@ -143,14 +143,6 @@ String CharArray::toString() const {
     return String(out+0, 0, j);
 }
 
-void CharArray::set(const Object &obj) {
-    if (this != &obj)
-        if (dynamic_cast<CharArray const *>(&obj)) {
-            CharArray const &array = (CharArray const &) obj;
-            *this = array;
-        }
-}
-
 CharArray CharArray::of(gchar _0) {
     gchar c[] = {_0};
     return CharArray(c);

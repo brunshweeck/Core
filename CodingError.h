@@ -8,26 +8,47 @@
 
 #include "IOError.h"
 
+/**
+ * Thrown to indicate error during character coding
+ */
 class CodingError : public IOError {
 public:
-    CodingError();
+    /**
+     * Construct new instance of Coding error
+     */
+    CodingError() {}
 
-    CORE_EXPLICIT CodingError(const String &message);
+    /**
+     * Construct new instance of Coding error
+     * \param message description message
+     */
+    CORE_EXPLICIT CodingError(String message) : IOError((String &&) message) {}
 
-    const String &message() const override;
-
-    gbool equals(const Object &obj) const override;
-
+    /**
+     * Return copy of this object
+     */
     Object &clone() const override;
 
-    String toString() const override;
-
+    /**
+     * Construct new coding error with underflow error message
+     */
     static CodingError underflow();
 
+    /**
+     * Construct new coding error with overflow error message
+     */
     static CodingError overflow();
 
+    /**
+     * Construct new coding error with malformed error message
+     * \param length number of bytes/chars used
+     */
     static CodingError malformed(gint length);
 
+    /**
+     * Construct new coding error with underflow error message
+     * \param length number of bytes/chars used
+     */
     static CodingError unmappable(gint length);
 };
 

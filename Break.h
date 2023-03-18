@@ -11,18 +11,22 @@
 /**
  * Thrown to indicate end of iteration
  */
-class Break final : Error {
+class Break final : public Error {
 public:
-    Break();
+    /**
+     * Construct new instance of break
+     */
+    Break() {}
 
-    const String &message() const override;
-
+    /**
+     * Return true if specified object is instance of Break Error
+     */
     gbool equals(const Object &obj) const override;
 
-
+    /**
+     * Return copy of this instance
+     */
     Object &clone() const override;
-
-    String toString() const override;
 };
 
 

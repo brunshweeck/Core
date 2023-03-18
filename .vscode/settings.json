@@ -1,0 +1,23 @@
+{
+    "sonarlint.pathToCompileCommands": "${workspaceFolder}\\build\\Debug\\compile_commands.json",
+    "cmake.configureOnOpen": true,
+    "cmake.buildDirectory": "${workspaceFolder}/build/Debug",
+    "cSpell.words": [
+        "brunshweeck",
+        "gbool",
+        "gbyte",
+        "gchar",
+        "gdouble",
+        "gfloat",
+        "gint",
+        "glong",
+        "gshort",
+        "নততকংকমলংনলোৈিপহপে",
+        "প্রনমকলব",
+        "বূহূরপরসর",
+        "রকহবকরবলুলূবরূরবরু",
+        "রিকবরনব",
+        "লসমবসনলনে",
+        "লিবলিসবলক"
+    ]
+}

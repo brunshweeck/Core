@@ -19,7 +19,7 @@ public:
     /**
      * Construct new empty string
      */
-    String();
+    CORE_FAST String() {}
 
     /**
      * Initializes a newly created String object so that it represents
@@ -589,11 +589,6 @@ public:
     Object &clone() const override;
 
 private:
-    /**
-     * set string properties
-     * \param obj
-     */
-    void set(Object const &obj) override;
 
     template<class T>
     static String arrayOrPointerToString(T &&arrayOrPointer) {
@@ -660,7 +655,7 @@ private:
     }
 
 public:
-    ~String() override;
+    ~String();
 
 private:
 
@@ -672,12 +667,12 @@ private:
      * Overwriting this field after construction will cause problems.
      * it encoded to UTF-16BE
      */
-    Class<gbyte>::Pointer value;
+    Class<gbyte>::Pointer value = nullptr;
 
     /**
      * the number of bytes for the string
      */
-    gint len;
+    gint len = 0;
 };
 
 extern String operator+(String const &lhs, String const &rhs);

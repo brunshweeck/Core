@@ -141,14 +141,6 @@ public:
     }
 
 private:
-    void set(const Object &obj) override {
-        if (!Class<BiConsumer>::hasInstance(obj))
-            throw CastError();
-        BiConsumer const &c = (BiConsumer const &) obj;
-        *this = c;
-    }
-
-private:
     class BiManager : public Object {
     public:
         virtual void launch(T t, U u) const {}
@@ -168,9 +160,6 @@ private:
         String toString() const override {
             return "[?]";
         }
-
-    protected:
-        void set(const Object &obj) override {}
     };
 
     template<class _BiFunc>

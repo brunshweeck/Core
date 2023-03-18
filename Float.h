@@ -7,7 +7,7 @@
 
 
 #include "Number.h"
-#include "Hashable.h"
+#include "String.h"
 
 /**
  * The Float class wraps a value of primitive type float in an object.
@@ -21,13 +21,13 @@ public:
     /**
      * Construct new instance of Float
      */
-    CORE_IMPLICIT Float();
+    CORE_FAST Float() {};
 
     /**
      * Construct new instance of Float and initialize
      * \param v 32 bits literal floating value
      */
-    CORE_IMPLICIT Float(f32 v);
+    CORE_FAST Float(gfloat v) : value(v) {};
 
     /**
      * Return value of this instance as int after narrowing
@@ -68,19 +68,19 @@ public:
      * Return true if specified 32 bits float is infinitely magnetude
      * \param v 32 bits floating number
      */
-    static gbool isInfinite(f32 v);
+    static gbool isInfinite(gfloat v);
 
     /**
      * Return true if specified 32 bits float is finite value
      * \param v 32 bits floating number
      */
-    static gbool isFinite(f32 v);
+    static gbool isFinite(gfloat v);
 
     /**
      * Return true if specified 32 bits float is not a number
      * \param v 32 bits floating number
      */
-    static gbool isNaN(f32 v);
+    static gbool isNaN(gfloat v);
 
     /**
      * Return 32 bits IEEE 754 'single format' representation of specified floating number
@@ -92,7 +92,7 @@ public:
      * \example +0.0 = 0 00000000 00000000000000000000000 = 0x00000000
      * \example -0.0 = 1 00000000 00000000000000000000000 = 0x80000000
      */
-    static i32 toIntBits(f32 v);
+    static gint toIntBits(gfloat v);
 
     /**
      * Return 32 bits floating value represented by specified IEEE 754 'single format'
@@ -105,7 +105,7 @@ public:
      * \example 0x00000000 = 0 00000000 00000000000000000000000 = +0.0
      * \example 0x80000000 = 1 00000000 00000000000000000000000 = -0.0
      */
-    static f32 fromIntBits(i32 v);
+    static gfloat fromIntBits(gint v);
 
     /**
      * Compares this instance with specified object
@@ -117,12 +117,9 @@ public:
      * Compares this instance with literal number
      * \param v literal number
      */
-    template<class T,
-            Class<gbool>::Require<!Class<T>::isNumber()> = true,
-            class S = typename Class<T>::NIVR,
-            class U = typename Class<S>::Object>
-    gbool equals(T &&v) const {
-        return equals(U((T &&) v));
+    template<class T, CORE_TEMPLATE_REQUIRE_PRIMITIVE(Object, T, Obj,)>
+    CORE_FAST gbool equals(T v) const {
+        return value == v;
     }
 
     /**
@@ -146,12 +143,12 @@ public:
      * \param x the first operand
      * \param y the second operand
      */
-    static gint compare(f32 x, f32 y);
+    static gint compare(gfloat x, gfloat y);
 
     /**
      * Return new instance representing by specified literal value
      */
-    static Float valueOf(f32 f);
+    static Float valueOf(gfloat f);
 
     /**
      * Return copy of this instance
@@ -161,17 +158,17 @@ public:
     /**
      * Constant representing the max floating value represented in 32 bits
      */
-    CORE_FAST static f32 MAX = 0x1.fffffeP127f;
+    CORE_FAST static gfloat MAX = 0x1.fffffeP127f;
 
     /**
      * Constant representing the min floating value represented in 32 bits
      */
-    CORE_FAST static f32 MIN = 0x0.000002P-126f;
+    CORE_FAST static gfloat MIN = 0x0.000002P-126f;
 
     /**
      * Constant representing the min normal floating value represented in 32 bits
      */
-    CORE_FAST static f32 MIN_NORMAL = 0x1.0P-126f;
+    CORE_FAST static gfloat MIN_NORMAL = 0x1.0P-126f;
 
     /**
      * Constant representing the binary exponent bias.
@@ -182,12 +179,12 @@ public:
     /**
      * Constant representing infinitely large magnetude represented in 32 bits
      */
-    static f32 const INF;
+    static gfloat const INF;
 
     /**
      * Constant representing Not a Number
      */
-    static f32 const NAN;
+    static gfloat const NAN;
 
     String toString() const;
 
@@ -199,15 +196,12 @@ public:
 
     static glong hash(gfloat f);
 
-    static gfloat parseFloat(String const& str);
+    static gfloat parseFloat(String const &str);
 
-    static Float valueOf(String const& str);
-
-protected:
-    void set(const Object &obj) override;
+    static Float valueOf(String const &str);
 
 private:
-    f32 value;
+    gfloat value = 0.0f;
 
     static gfloat _x10(gfloat result, gint pow);
 

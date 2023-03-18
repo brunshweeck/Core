@@ -5,7 +5,7 @@
 #ifndef CORE_COMPARABLE_H
 #define CORE_COMPARABLE_H
 
-#include "Object.h"
+#include "Class.h"
 
 /**
  * This interface imposes a total ordering on the objects of each class that implements it.
@@ -16,6 +16,15 @@
 template<class T>
 class Comparable /* interface */ {
 public:
+    CORE_TEMPLATE_REQUIRE_UNREFERENCED(T);
+    CORE_TEMPLATE_REQUIRE_NON_VOLATILE(T);
+    CORE_TEMPLATE_REQUIRE_MUTABLE(T);
+
+    /**
+     * Construct new comparable object
+     */
+    CORE_FAST Comparable() {}
+
     /**
      * Compares this object with the specified object for order.
      * Returns a negative integer, zero, or a positive integer as this object
@@ -23,11 +32,6 @@ public:
      * \param obj object to be compared
      */
     virtual gint compareTo(T const &obj) const = 0;
-
-    /**
-     * Destroy Comparable object
-     */
-    virtual ~Comparable() = default;
 };
 
 

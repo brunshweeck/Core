@@ -8,9 +8,15 @@
 
 #include "ValueError.h"
 
+/**
+ * Thrown to indicate that index out of bounds
+ */
 class IndexError : public ValueError {
 public:
-    IndexError();
+    /**
+     * Construct new instance of Index error
+     */
+    IndexError() {}
 
     CORE_EXPLICIT IndexError(gint index);
 
@@ -18,13 +24,7 @@ public:
 
     CORE_EXPLICIT IndexError(const String &message);
 
-    const String &message() const override;
-
-    gbool equals(const Object &obj) const override;
-
     Object &clone() const override;
-
-    String toString() const override;
 };
 
 

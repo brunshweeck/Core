@@ -74,13 +74,6 @@ Object &ByteBuffer::clone() const {
     return *new ByteBuffer(markValue(), position(), limit(), capacity(), _buffer, _offset);
 }
 
-void ByteBuffer::set(const Object &obj) {
-    if (!dynamic_cast<ByteBuffer const *>(&obj)) {}
-    ByteBuffer const &b = (const ByteBuffer &) obj;
-    _buffer = b._buffer;
-    _offset = b._offset;
-}
-
 ByteBuffer::ByteBuffer(gint capacity) : Buffer(capacity), _offset(0) {
     try {
         _buffer = new gbyte[capacity + 1];

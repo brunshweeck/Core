@@ -8,16 +8,16 @@
 
 #include "Object.h"
 
-class Void final: public Object {
-public:
-    CORE_FAST Void() = delete;
-
-    gbool equals(const Object &obj) const override;
-
-    Object &clone() const override;
-
+/**
+ * The Void class is an uninstantiable placeholder class to hold a
+ * reference to the Class object representing the keyword void.
+ */
+class Void final : public Object {
 private:
-    virtual void set(const Object &obj);
+    /*
+     * The Void class cannot be instantiated.
+     */
+    CORE_FAST Void() {};
 };
 
 

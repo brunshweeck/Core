@@ -7,10 +7,6 @@
 #include "String.h"
 #include "ValueError.h"
 
-Short::Short() : Short(0) {}
-
-Short::Short(i16 v) : value(v) {}
-
 gint Short::intValue() const {
     return (i32) value;
 }
@@ -28,19 +24,18 @@ gdouble Short::doubleValue() const {
 }
 
 gbool Short::equals(const Object &obj) const {
-    return 0;
+    if(this == &obj)
+        return true;
+    if(!Class<Short>::hasInstance(obj))
+        return false;
+    Short const& aShort = (const Short &) obj;
+    return value == aShort.value;
 }
 
 Object &Short::clone() const {
     Short *s;
     try { s = new Short(value); } catch (...) {}
     return *s;
-}
-
-void Short::set(const Object &obj) {
-    Short const *s = dynamic_cast<Short const *>(&obj);
-    if (!s) {}
-    value = s->value;
 }
 
 gint Short::compare(i16 x, i16 y) {

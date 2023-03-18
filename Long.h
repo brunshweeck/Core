@@ -7,8 +7,7 @@
 
 
 #include "Number.h"
-#include "Comparable.h"
-#include "Hashable.h"
+#include "String.h"
 
 /**
  * Long class represent all integer number representing with 64 bits
@@ -18,13 +17,13 @@ public:
     /**
      * Construct new Long instance
      */
-    CORE_IMPLICIT Long();
+    CORE_FAST Long() {}
 
     /**
      * Construct new Long instance and initialize with glong value
      * \param v 64-bits signed integer
      */
-    CORE_IMPLICIT Long(glong v);
+    CORE_FAST Long(glong v) : value(v) {}
 
     /**
      * Return value of this instance as int after narrowing conversion
@@ -56,12 +55,9 @@ public:
      * Compares this instance with literal number
      * \param v literal number
      */
-    template<class T,
-            Class<gbool>::Require<!Class<T>::isNumber()> = true,
-            class S = typename Class<T>::NIVR,
-            class U = typename Class<S>::Object>
-    gbool equals(T &&v) const {
-        return equals(U((T &&) v));
+    template<class T, CORE_TEMPLATE_REQUIRE_PRIMITIVE(Object, T, Obj,)>
+    CORE_FAST gbool equals(T v) const {
+        return value == v;
     }
 
     /**
@@ -101,17 +97,17 @@ public:
 
     static String toBinaryString(glong i);
 
-    static glong parseLong(String const& str);
+    static glong parseLong(String const &str);
 
-    static glong parseLong(String const& str, gint base);
+    static glong parseLong(String const &str, gint base);
 
-    static glong parseUnsignedLong(String const& str);
+    static glong parseUnsignedLong(String const &str);
 
-    static glong parseUnsignedLong(String const& str, gint base);
+    static glong parseUnsignedLong(String const &str, gint base);
 
-    static Long valueOf(String const& str);
+    static Long valueOf(String const &str);
 
-    static Long valueOf(String const& str, gint base);
+    static Long valueOf(String const &str, gint base);
 
     /**
      * Decodes a String into a Long.
@@ -131,19 +127,7 @@ public:
      *      "127" -> 127.
      * \throw ValueError if specified string not respect grammar or value represented out of range [MIN;MAX]
      */
-    static Long decode(String const& str);
-
-protected:
-    /**
-     * Set long value
-     * \param obj long instance
-     * \throw CastError if specified object is not Long instance
-     */
-    void set(const Object &obj) override {
-        Long const *l = dynamic_cast<Long const *>(&obj);
-        if (!l) {}
-        value = l->value;
-    }
+    static Long decode(String const &str);
 
 public:
 
@@ -251,7 +235,7 @@ public:
     static glong hash(glong i);
 
 private:
-    glong value;
+    glong value = 0L;
 };
 
 

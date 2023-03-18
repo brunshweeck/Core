@@ -6,10 +6,6 @@
 #include "String.h"
 #include "Enum.h"
 
-Character::Character() : Character('\u0000') {}
-
-Character::Character(u16 v) : value(v) {}
-
 Character::Character(gbyte h, gbyte l) : value((u16) ((h & 0xFF) << 8 | (l & 0xFF))) {}
 
 gchar Character::charValue() const {
@@ -305,12 +301,6 @@ Object &Character::clone() const {
 
 Character Character::valueOf(gchar c) {
     return c;
-}
-
-void Character::set(const Object &obj) {
-    Character const *c = dynamic_cast<Character const *>(&obj);
-    if (!c) {}
-    value = c->value;
 }
 
 gbool Character::isSupplementary(gint c) {
@@ -693,7 +683,7 @@ String Character::decompose(gint ch) {
 }
 
 glong Character::hash() const {
-    return codepoint();
+    return hash(value);
 }
 
 gbool Character::isAscii(gint ch) {
@@ -714,4 +704,8 @@ gchar Character::highSurrogate(gint c) {
 
 gbool Character::isSurrogatesPair(gint h, gint l) {
     return isHighSurrogate(h) && isLowerCase(l) && isBMP(h) && isBMP(l);
+}
+
+glong Character::hash(gchar c) {
+    return (gint) c;
 }

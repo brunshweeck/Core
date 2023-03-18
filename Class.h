@@ -5,7 +5,7 @@
 #ifndef CORE_CLASS_H
 #define CORE_CLASS_H
 
-#include "extern/Class.h"
+#include "Object.h"
 
 /**
  *  Class is used to do test on any type
@@ -13,17 +13,14 @@
  *  \tparam T target for test
  */
 template<class T>
-class Class final {
-public:
+class Class final: public Object {
+private:
     /**
      * Cannot create instance of this type
      */
-    Class() = delete;
+    CORE_FAST Class() {}
 
-    static String const& name() {
-        return core::Class::className(&typeid(T));
-    }
-
+public:
     /**
      * Constant version of target type
      * \example Class<gint>::Immutable -> gint const
@@ -382,8 +379,8 @@ public:
     CORE_FAST static gbool hasInstance(U&& obj) {
         CORE_REQUIRE(isClass(), "This Function require object type");
         CORE_REQUIRE(Class<U>::isClass(), "This Function require object type");
-        using _T = typename Class<NIVR>::Immutable;
-        return dynamic_cast<_T*>(&obj);
+        using V = typename Class<NIVR>::Immutable;
+        return dynamic_cast<V*>(&obj);
     }
 
     /**
@@ -405,6 +402,7 @@ public:
     using Return = typename core::Class::Return<NIV, Args...>::Type::Type;
 
     using Primitive = typename core::Class::Primitive<NIVR>::Type;
+
     using Object = typename core::Class::Class<NIVR>::Type;
 };
 

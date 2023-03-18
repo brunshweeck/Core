@@ -8,19 +8,26 @@
 
 #include "Error.h"
 
-class IOError: public Error {
+/**
+ * Thrown to indicate input/output error
+ */
+class IOError : public Error {
 public:
-    IOError();
+    /**
+     * Construct new instance of IOError
+     */
+    IOError() {};
 
-    explicit IOError(const String &message);
+    /**
+     * Construct new instance of IOError
+     * \param message description message
+     */
+    CORE_EXPLICIT IOError(String message) : Error((String &&) message) {}
 
-    const String &message() const override;
-
-    gbool equals(const Object &obj) const override;
-
+    /**
+     * Return copy of this object
+     */
     Object &clone() const override;
-
-    String toString() const override;
 };
 
 

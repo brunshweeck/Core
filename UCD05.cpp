@@ -6,11 +6,8 @@
 #include "String.h"
 #include "Enum.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
-static String function() {
-    Enum<Character::Category>::customAlias = [](Character::Category value) -> String {
+static gint function() {
+    Enum<Character::Category>::alias = [](Character::Category value) -> String {
         switch (value) {
             case Character::Category::UNASSIGNED:
                 return u"UNASSIGNED";
@@ -76,7 +73,7 @@ static String function() {
                 return u"";
         }
     };
-    Enum<Character::Decomposition>::customAlias = [](Character::Decomposition value) -> String {
+    Enum<Character::Decomposition>::alias = [](Character::Decomposition value) -> String {
         switch (value) {
             case Character::Decomposition::NONE:
                 return u"NOT REGISTERED";
@@ -118,7 +115,7 @@ static String function() {
                 return u"";
         }
     };
-    Enum<Character::Combining>::customAlias = [](Character::Combining value) -> String {
+    Enum<Character::Combining>::alias = [](Character::Combining value) -> String {
         switch (value) {
             case Character::Combining::BELOW_LEFT_ATTACHED:
                 return u"BELOW LEFT ATTACHED";
@@ -162,7 +159,7 @@ static String function() {
                 return u"";
         }
     };
-    Enum<Character::UnicodeScript>::customAlias = [](Character::UnicodeScript value) -> String {
+    Enum<Character::UnicodeScript>::alias = [](Character::UnicodeScript value) -> String {
         switch (value) {
             case Character::UnicodeScript::COMMON:
                 return u"COMMON";
@@ -500,9 +497,6 @@ static String function() {
     String __str0000000000000345678912 = __var0000000000345678912.toString();
     String __str0000000000000456789123 = __var0000000000456789123.toString();
     String __str0000000000000567891234 = __var0000000000567891234.toString();
-    return u"gcore::lang::Character";
 }
 
-String const Character::UCD05 = function();
-
-#pragma GCC diagnostic pop
+static gint _ = function();

@@ -7,9 +7,9 @@
 #include "Character.h"
 #include "ValueError.h"
 #include "IndexError.h"
-#include "CastError.h"
 #include "Collections/CharArray.h"
 #include "Charset/Charset.h"
+#include "Integer.h"
 
 template<class T, class K>
 static void fill(T v[], K i, glong len) {
@@ -115,7 +115,7 @@ static void put(gbyte v[], gint index, gint cp) {
     }
 }
 
-String::String() : value(allocate(0)), len(0) {}
+//String::String() : value(allocate(0)), len(0) {}
 
 String::String(String &&original) CORE_NOTHROW: String() {
     swap(original.value, value);
@@ -576,14 +576,6 @@ gbool String::isTitleCase() const {
 
 Object &String::clone() const {
     try { return *new String(*this); } catch (...) { throw MemoryError(); }
-}
-
-void String::set(const Object &obj) {
-    if (this == &obj)
-        return;
-    if (!dynamic_cast<String const *>(&obj))
-        throw CastError();
-    *this = (String const &) obj;
 }
 
 gint countChars(gbyte const b[], gint length) {

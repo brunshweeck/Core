@@ -69,13 +69,6 @@ Object &CharBuffer::clone() const {
     return *new CharBuffer(markValue(), position(), limit(), capacity(), _buffer, _offset);
 }
 
-void CharBuffer::set(const Object &obj) {
-    if (!dynamic_cast<CharBuffer const *>(&obj)) {}
-    CharBuffer const &b = (const CharBuffer &) obj;
-    _buffer = b._buffer;
-    _offset = b._offset;
-}
-
 CharBuffer::CharBuffer(gint capacity) : Buffer(capacity), _offset(0) {
     try {
         _buffer = new gchar[capacity + 1];

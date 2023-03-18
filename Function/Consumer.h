@@ -194,13 +194,6 @@ public:
     }
 
 private:
-    void set(const Object &obj) override {
-        if (!dynamic_cast<Consumer<T> const *>(&obj))
-            throw CastError();
-        *this = (Consumer<T> const &) obj;
-    }
-
-private:
     class Manager : public Object {
     public:
         virtual void launch(T t) const {}
@@ -220,9 +213,6 @@ private:
         Object &clone() const override {
             return EMPTY;
         }
-
-    protected:
-        void set(const Object &obj) override {}
     };
 
     template<class _Func>

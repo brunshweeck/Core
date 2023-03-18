@@ -102,11 +102,6 @@ public:
 
         try { return *new DoublyComparator(*this, c); } catch (...) { throw MemoryError(); }
     }
-
-private:
-    void set(const Object &obj) override {
-
-    }
 };
 
 

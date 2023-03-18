@@ -11,10 +11,6 @@ CORE_FAST static i64 E_MASK = (i64) 0b011111111111000000000000000000000000000000
 
 CORE_FAST static i64 M_MASK = (i64) 0b0000000000001111111111111111111111111111111111111111111111111111;
 
-Double::Double() : Double(0.0) {}
-
-Double::Double(f64 v) : value(v) {}
-
 gint Double::intValue() const {
     return (i32) value;
 }
@@ -96,12 +92,6 @@ gint Double::compare(f64 x, f64 y) {
 
 Double Double::valueOf(f64 f) {
     return f;
-}
-
-void Double::set(const Object &obj) {
-    Double const *d = dynamic_cast<Double const *>(&obj);
-    if (!d) {}
-    value = d->value;
 }
 
 f64 const Double::INF = Double::fromLongBits(E_MASK);

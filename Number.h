@@ -6,7 +6,7 @@
 #define CORE_NUMBER_H
 
 
-#include "Comparable.h"
+#include "String.h"
 
 class Number : public Object {
 public:
@@ -44,15 +44,18 @@ public:
      * Compares this instance with literal number
      * \param v literal number
      */
-    template<class T,
-            Class<gbool>::Require<!Class<T>::isNumber()> = true,
-            class S = typename Class<T>::NIVR,
-            class U = typename Class<S>::Object>
-    gbool equals(T &&v) const {
-        return equals(U((T &&) v));
+    template<class T, CORE_TEMPLATE_REQUIRE_PRIMITIVE(Object, T, Obj,)>
+    gbool equals(T v) const {
+        Obj o = v;
+        glong l = longValue();
+        gdouble d = doubleValue();
+        if (Class<T>::isNumber()) {
+            if (d == (gdouble) l)
+                return l == v;
+            return d == (gdouble) v;
+        }
+        return false;
     }
-
-    String toString() const override;
 };
 
 #endif //CORE_NUMBER_H

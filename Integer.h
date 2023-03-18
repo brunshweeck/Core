@@ -5,10 +5,8 @@
 #ifndef CORE_INTEGER_H
 #define CORE_INTEGER_H
 
-
 #include "Number.h"
-#include "Comparable.h"
-#include "Hashable.h"
+#include "String.h"
 
 /**
  * The Integer class wraps a value of the primitive type int in an object.
@@ -22,13 +20,13 @@ public:
     /**
      * Construct new Integer instance
      */
-    CORE_IMPLICIT Integer();
+    CORE_FAST Integer() {};
 
     /**
      * Construct new Integer instance and initialize with gint value
      * \param v 32 bits signed integer
      */
-    CORE_IMPLICIT Integer(gint v);
+    CORE_FAST Integer(gint v): value(v) {};
 
     /**
      * Return value of this instance as int
@@ -60,11 +58,9 @@ public:
      * Compares this instance with literal number
      * \param v literal number
      */
-    template<class T,
-            Class<gbool>::Require<Class<T>::isNumber()> = true,
-            class S = typename Class<T>::NIVR, class U = typename Class<S>::Object>
-    gbool equals(T &&v) const {
-        return equals(U((T &&) v));
+    template<class T, CORE_TEMPLATE_REQUIRE_PRIMITIVE(Object, T, Obj,)>
+    CORE_FAST gbool equals(T v) const {
+        return value == v;
     }
 
     /**
@@ -135,16 +131,6 @@ public:
      * \throw ValueError if specified string not respect grammar or value represented out of range [MIN;MAX]
      */
     static Integer decode(String const& str);
-
-protected:
-    /**
-     * Set Integer value
-     * \param obj integer instance
-     * \throw CastError if specified object is not Long instance
-     */
-    void set(const Object &obj) override;
-
-public:
 
     /**
      * Compares value numerically
@@ -254,7 +240,7 @@ public:
     static glong hash(gint i);
 
 private:
-    gint value;
+    gint value = 0;
 };
 
 

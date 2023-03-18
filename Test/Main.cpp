@@ -10,11 +10,6 @@
 #include "../Collections/TreeMap.h"
 
 int main() {
-    std::map<int, int> m;
-    for (const auto &item: m) {
-        //
-    }
-    m.end();
-    TreeMap<Integer, Integer> i = {};
+    LinkedList<Integer> linkedList = {};
     return 0;
 }

@@ -8,17 +8,25 @@
 
 #include "ValueError.h"
 
+/**
+ * Thrown to indicate that map key not found
+ */
 class KeyError : public ValueError {
 public:
     /**
      * Construct new key error
      */
-    KeyError();
+    KeyError() : ValueError("Key Not found") {}
 
     /**
      * Construct new key error
      */
-    CORE_EXPLICIT KeyError(Object const &key);
+    CORE_EXPLICIT KeyError(Object const &key): ValueError("Key not found: " + key.toString()) {}
+
+    /**
+     * Return copy of this object
+     */
+    Object &clone() const override;
 
 };
 

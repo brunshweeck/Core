@@ -64,9 +64,6 @@ public:
 
     gint offset() const override;
 
-protected:
-    void set(const Object &obj) override;
-
 private:
     Class<gchar>::Pointer _buffer;
     gint _offset;

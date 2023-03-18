@@ -13,7 +13,7 @@ class Iterable2 {
 public:
     CORE_TEMPLATE_REQUIREMENT(T);
 
-    virtual /**
+    /**
      * Returns an iterator over elements of type
      */
     virtual Iterator<T> &&iterator() = 0;

@@ -6,31 +6,8 @@
 #include "MemoryError.h"
 #include "Integer.h"
 
-CodingError::CodingError() : IOError() {}
-
-CodingError::CodingError(const String &message) : IOError(message) {}
-
-const String &CodingError::message() const {
-    return IOError::message();
-}
-
-gbool CodingError::equals(const Object &obj) const {
-    if (this == &obj)
-        return true;
-    if (!Class<CodingError>::hasInstance(obj))
-        return false;
-    CodingError const &error = (CodingError const &) obj;
-    return message() == error.message();
-}
-
 Object &CodingError::clone() const {
     try { return *new CodingError(message()); } catch (...) { throw MemoryError(); }
-}
-
-String CodingError::toString() const {
-    if (message().isEmpty())
-        return "CodingError";
-    return "CodingError: " + message();
 }
 
 CodingError CodingError::underflow() {

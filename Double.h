@@ -7,7 +7,7 @@
 
 
 #include "Number.h"
-#include "Hashable.h"
+#include "String.h"
 
 /**
  * The Double class wraps a value of the primitive type double (gdouble) in an object.
@@ -15,21 +15,21 @@
  * In addition, this class provides several methods for converting a double
  * to a String and a String to a double, as well as other constants and methods
  * useful when dealing with a double.
- * (-1)^s x 1.M x 2^(e-1023) if e != 0
- * (-1)^s x 0.M x 2^-1022 if e == 0
+ * (-1)^Sign x 1.Mantissa x 2^(Exponent - 1023) if Exponent != 0
+ * (-1)^Sign x 0.Mantissa x 2^-1022 if Exponent == 0
  */
-class Double final: public Number, public Comparable<Double>, public Hashable {
+class Double final : public Number, public Comparable<Double>, public Hashable {
 public:
     /**
      * Construct new instance of Double
      */
-    CORE_IMPLICIT Double();
+    CORE_FAST Double() {};
 
     /**
      * Construct new instance of Double and initialize with gdouble
      * \param v 64 bits floating number
      */
-    CORE_IMPLICIT Double(gdouble v);
+    CORE_FAST Double(gdouble v) : value(v) {};
 
     /**
      * Return value of this instance as int after narrowing
@@ -121,12 +121,9 @@ public:
      * Compares this instance with value
      * \param v literal number
      */
-    template<class T,
-            Class<gbool>::Require<!Class<T>::isNumber()> = true,
-            class S = typename Class<T>::NIVR,
-            class U = typename Class<S>::Object>
-    gbool equals(T &&v) const {
-        return equals(U((T &&) v));
+    template<class T, CORE_TEMPLATE_REQUIRE_PRIMITIVE(Object, T, Obj,)>
+    CORE_FAST gbool equals(T v) const {
+        return value == v;
     }
 
     /**
@@ -138,12 +135,12 @@ public:
     /**
      * Return value of this instance as long
      */
-    operator gdouble () const;
+    operator gdouble() const;
 
     /**
      * Return value of this instance as double
      */
-    operator gdouble& ();
+    operator gdouble &();
 
     /**
      * Compares two double value numerically
@@ -203,14 +200,11 @@ public:
 
     static glong hash(gdouble d);
 
-    static gdouble parseDouble(String const& str);
+    static gdouble parseDouble(String const &str);
 
-    static Double valueOf(String const& str);
+    static Double valueOf(String const &str);
 
     static gint signum(gdouble d);
-
-protected:
-    void set(const Object &obj) override;
 
 private:
     gdouble value;

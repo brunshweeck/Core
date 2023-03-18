@@ -8,19 +8,26 @@
 
 #include "Error.h"
 
-class ValueError: public Error {
+/**
+ * Thrown to indicate illegal argument value
+ */
+class ValueError : public Error {
 public:
-    ValueError();
+    /**
+     * Construct new instance of Value error
+     */
+    ValueError() {}
 
-    CORE_EXPLICIT ValueError(const String &message);
+    /**
+     * Construct new instance of Value error
+     * \param message description message
+     */
+    CORE_EXPLICIT ValueError(String message) : Error((String &&) message) {}
 
-    const String &message() const override;
-
-    gbool equals(const Object &obj) const override;
-
+    /**
+     * Return copy of this object
+     */
     Object &clone() const override;
-
-    String toString() const override;
 };
 
 

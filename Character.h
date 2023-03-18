@@ -5,27 +5,31 @@
 #ifndef CORE_CHARACTER_H
 #define CORE_CHARACTER_H
 
-#include "Object.h"
-#include "Comparable.h"
-#include "Integer.h"
-#include "Hashable.h"
+#include "String.h"
 
 /**
- *
- *
+ * The Character class wraps a value of the primitive
+ * type gchar in an object. An object of class
+ * Character contains a single field whose type is gchar.
+ * <p>
+ * In addition, this class provides a large number of static methods for
+ * determining a character's category (lowercase letter, digit, etc.)
+ * and for converting characters from uppercase to lowercase and vice
+ * versa.
+ * </p>
  */
 class Character final : public Object, public Comparable<Character>, public Hashable {
 public:
     /**
      * Construct new instance of Character
      */
-    CORE_IMPLICIT Character();
+    CORE_FAST Character() {}
 
     /**
      * Construct new instance of Character and initialize
      * \param v primitive utf16 character
      */
-    CORE_IMPLICIT Character(gchar v);
+    CORE_FAST Character(gchar v) : value(v) {}
 
     /**
      * Construct new instance of Character and initialize with two bytes of utf16 character
@@ -1988,17 +1992,45 @@ public:
      */
     gbool equals(const Object &obj) const override;
 
+    /**
+     * Determines whether the specified character (Unicode code point)
+     * is in the supplementary character range.
+     * \param c the character (Unicode code point) to be tested
+     */
     static gbool isSupplementary(gint c);
 
+    /**
+     * Determines whether the specified character (Unicode code point)
+     * is in the Basic Multilingual Plane (BMP).
+     * Such code points can be represented using a single gchar.
+     * \param c the character (Unicode code point) to be tested
+     */
     static gbool isBMP(gint c);
 
+    /**
+     * Returns a String object representing the specified character (Unicode code point).
+     * The result is a string of length 1 or 2, consisting solely of the specified codePoint.
+     * \param ch character (Unicode code point) to be converted
+     */
     static String toString(gint ch);
 
+    /**
+     * Split this character to character that compose it
+     */
     String decompose() const;
 
+    /**
+     * Split specified character (Unicode code point) to character that compose it
+     * \param ch chaarcter to be split
+     */
     static String decompose(gint ch);
 
+    /**
+     * Return hash code of this character
+     */
     glong hash() const override;
+
+    static glong hash(gchar c);
 
     CORE_FAST static gchar MIN = u'\u0000';
 
@@ -2008,21 +2040,14 @@ public:
 
     CORE_FAST static gint MIN_SUPPLEMENTARY = 0x10000;
 
-protected:
-    /**
-     * Set value of this instance with specified object
-     */
-    CORE_DEPRECATED void set(Object const &obj) override;
-
 private:
     static const String UCD00;
     static const String UCD01;
     static const String UCD02;
     static const String UCD03;
     static const String UCD04;
-    static const String UCD05;
 
-    gchar value;
+    gchar value = '\u0000';
 };
 
 
