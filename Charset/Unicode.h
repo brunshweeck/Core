@@ -15,10 +15,11 @@ public:
         BIG = 2,
         LITTLE = 4
     };
+
     /**
      * Construct new Unicode charset
      */
-    CORE_EXPLICIT Unicode(const String &name);
+    CORE_EXPLICIT Unicode() {}
 
     /**
      * Tells whether or not this charset contains the given charset.

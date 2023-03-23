@@ -3,30 +3,12 @@
 //
 
 #include "UTF16BE.h"
-#include "../String.h"
-#include "../CodingError.h"
 #include "../Character.h"
-
-UTF16BE::UTF16BE() : Unicode("UTF-16BE") {
-    encoderReplacement[0] = (gbyte) 0xff;
-    encoderReplacement[1] = (gbyte) 0xfd;
-    encoderReplacement[2] = (gbyte) 0;
-    encoderReplacement[3] = (gbyte) 0;
-    encoderReplacement[4] = (gbyte) 0;
-}
 
 UTF16BE UTF16BE::INSTANCE{};
 
 String UTF16BE::name() const {
     return "UTF-16BE";
-}
-
-Charset::ErrorAction UTF16BE::malformedAction() const {
-    return Charset::malformedAction();
-}
-
-Charset::ErrorAction UTF16BE::unmappableAction() const {
-    return Charset::unmappableAction();
 }
 
 Charset::CoderResult UTF16BE::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
@@ -42,7 +24,7 @@ Charset::CoderResult UTF16BE::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
                         return CoderResult::UNDERFLOW;
                     gchar c2 = decode(src.get() & 0xff, src.get() & 0xff);
                     if (!Character::isLowSurrogate(c2)) {
-                        errorLength = 4;
+                        CODING_ERROR_LENGTH = 4;
                         return CoderResult::MALFORMED;
                     }
                     if (dst.remaining() < 2)
@@ -52,7 +34,7 @@ Charset::CoderResult UTF16BE::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
                     dst.put(c2);
                     continue;
                 }
-                errorLength = 2;
+                CODING_ERROR_LENGTH = 2;
                 return Charset::CoderResult::MALFORMED;
             }
             if (!dst.hasRemaining())
@@ -91,13 +73,13 @@ Charset::CoderResult UTF16BE::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                         uc = Character::joinSurrogates(c, d);
                     } else {
                         uc = -1;
-                        errorLength = 1;
+                        CODING_ERROR_LENGTH = 1;
                         cr = Charset::CoderResult::MALFORMED;
                     }
                 }
             } else {
                 uc = -1;
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 cr = Charset::CoderResult::MALFORMED;
             }
             if (uc < 0)
@@ -121,22 +103,6 @@ gfloat UTF16BE::averageCharsPerByte() const {
 
 gfloat UTF16BE::averageBytesPerChar() const {
     return 2;
-}
-
-CharBuffer UTF16BE::decode(ByteBuffer &in) {
-    return Charset::decode(in);
-}
-
-ByteBuffer UTF16BE::encode(CharBuffer &in) {
-    return Charset::encode(in);
-}
-
-String UTF16BE::toString() const {
-    return Charset::toString();
-}
-
-gbool UTF16BE::contains(const Charset &cs) const {
-    return Unicode::contains(cs);
 }
 
 Object &UTF16BE::clone() const {

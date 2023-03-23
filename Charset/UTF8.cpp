@@ -2,82 +2,71 @@
 // Created by brunshweeck on 26/02/2023.
 //
 #include "UTF8.h"
-#include "../String.h"
 #include "../Character.h"
 
-gbool UTF8::isNotContinuation(gint b) {
+CORE_FAST static gbool isNotContinuation(gint b) {
     return (b & 0xc0) != 0x80;
 }
 
-gbool UTF8::isMalformed3(gint b1, gint b2, gint b3) {
+//  [E0]     [A0..BF] [80..BF]
+//  [E1..EF] [80..BF] [80..BF]
+CORE_FAST static gbool isMalformed3(gint b1, gint b2, gint b3) {
     return (b1 == (gbyte) 0xe0 && (b2 & 0xe0) == 0x80) ||
            (b2 & 0xc0) != 0x80 || (b3 & 0xc0) != 0x80;
 }
 
-gbool UTF8::isMalformed3(gint b1, gint b2) {
-    return (b1 == (gbyte) 0xe0 && (b2 & 0xe0) == 0x80) ||
-           (b2 & 0xc0) != 0x80;
+// only used when there is only one byte left in src buffer
+CORE_FAST static gbool isMalformed3(gint b1, gint b2) {
+    return (b1 == (gbyte) 0xe0 && (b2 & 0xe0) == 0x80) || (b2 & 0xc0) != 0x80;
 }
 
-gbool UTF8::isMalformed4(gint b2, gint b3, gint b4) {
-    return (b2 & 0xc0) != 0x80 || (b3 & 0xc0) != 0x80 ||
-           (b4 & 0xc0) != 0x80;
+//  [F0]     [90..BF] [80..BF] [80..BF]
+//  [F1..F3] [80..BF] [80..BF] [80..BF]
+//  [F4]     [80..8F] [80..BF] [80..BF]
+//  only check 80-be range here, the [0xf0,0x80...] and [0xf4,0x90-...]
+//  will be checked by Character.isSupplementaryCodePoint(uc)
+CORE_FAST static gbool isMalformed4(gint b2, gint b3, gint b4) {
+    return (b2 & 0xc0) != 0x80 || (b3 & 0xc0) != 0x80 || (b4 & 0xc0) != 0x80;
 }
 
-gbool UTF8::isMalformed4(gint b1, gint b2) {
-    return (b1 == 0xf0 && (b2 < 0x90 || b2 > 0xbf)) ||
-           (b1 == 0xf4 && (b2 & 0xf0) != 0x80) ||
-           (b2 & 0xc0) != 0x80;
+// only used when there is less than 4 bytes left in src buffer.
+// both b1 and b2 should be "& 0xff" before passed in.
+CORE_FAST static gbool isMalformed4(gint b1, gint b2) {
+    return (b1 == 0xf0 && (b2 < 0x90 || b2 > 0xbf)) || (b1 == 0xf4 && (b2 & 0xf0) != 0x80) || (b2 & 0xc0) != 0x80;
 }
 
-gbool UTF8::isMalformed4(gint b3) {
+// tests if b1 and b2 are malformed as the first 2 bytes of a
+// legal`4-byte utf-8 byte sequence.
+// only used when there is less than 4 bytes left in src buffer,
+// after isMalformed4 has been invoked.
+CORE_FAST static gbool isMalformed4(gint b3) {
     return (b3 & 0xc0) != 0x80;
 }
 
 String UTF8::name() const {
-    return "UTF8";
+    return "UTF-8";
 }
-
-UTF8::UTF8() : Unicode(u"UTF-8") {}
 
 UTF8 UTF8::INSTANCE{};
 
-Charset::ErrorAction UTF8::malformedAction() const {
-    return Charset::ErrorAction::REPORT;
-}
-
-Charset::ErrorAction UTF8::unmappableAction() const {
-    return ErrorAction::REPORT;
-}
-
-static Charset::CoderResult xflow(Buffer &src, gint srcPos, gint srcLim, Buffer &dst, gint dstPos, gint length) {
-    src.position(srcPos - src.offset());
-    dst.position(dstPos - dst.offset());
-    return length == 0 || srcLim - srcPos < length ? Charset::CoderResult::UNDERFLOW :
-           Charset::CoderResult::OVERFLOW;
-}
-
 static Charset::CoderResult xflow(Buffer &src, gint mark, gint length) {
     src.position(mark);
-    return length == 0 || src.remaining() < length ? Charset::CoderResult::UNDERFLOW :
-           Charset::CoderResult::OVERFLOW;
+    return length == 0 || src.remaining() < length ? Charset::CoderResult::UNDERFLOW : Charset::CoderResult::OVERFLOW;
 }
 
-static gint len = 0;
-gint &Charset::errorLength = len;
-
+static gint *len = nullptr;
 
 static Charset::CoderResult malformedN(ByteBuffer &src, gint nb) {
-    len = 0;
+    *len = 0;
     switch (nb) {
         case 1:
         case 2:                    // always 1
-            len = 1;
+            *len = 1;
             return Charset::CoderResult::MALFORMED;
         case 3: {
             gint b1 = src.get();
             gint b2 = src.get();    // no need to lookup b3
-            len = ((b1 == (gbyte) 0xe0 && (b2 & 0xe0) == 0x80 || (b2 & 0xc0) != 0x80) ? 1 : 2);
+            *len = ((b1 == (gbyte) 0xe0 && (b2 & 0xe0) == 0x80 || (b2 & 0xc0) != 0x80) ? 1 : 2);
             return Charset::CoderResult::MALFORMED;
         }
         case 4:  // we don't care the speed here
@@ -86,17 +75,17 @@ static Charset::CoderResult malformedN(ByteBuffer &src, gint nb) {
             gint b2 = src.get() & 0xff;
             if (b1 > 0xf4 || (b1 == 0xf0 && (b2 < 0x90 || b2 > 0xbf)) || (b1 == 0xf4 && (b2 & 0xf0) != 0x80) ||
                 (b2 & 0xc0) != 0x80) {
-                len = 1;
+                *len = 1;
                 return Charset::CoderResult::MALFORMED;
             }
             if ((src.get() & 0xc0) != 0x80) {
-                len = 2;
+                *len = 2;
             } else
-                len = 3;
+                *len = 3;
             return Charset::CoderResult::MALFORMED;
         }
         default:
-            len = 0;
+            *len = 0;
             return Charset::CoderResult::MALFORMED;
     }
 }
@@ -106,14 +95,6 @@ static void updatePositions(Buffer &src, gint sp, Buffer &dst, gint dp) {
     dst.position(dp - dst.offset());
 }
 
-static Charset::CoderResult malformed(ByteBuffer &src, gint sp, CharBuffer &dst, gint dp, gint nb) {
-    src.position(sp - src.offset());
-    Charset::CoderResult cr = malformedN(src, nb);
-    updatePositions(src, sp, dst, dp);
-    return cr;
-}
-
-
 static Charset::CoderResult malformed(ByteBuffer &src, gint mark, gint nb) {
     src.position(mark);
     Charset::CoderResult cr = malformedN(src, nb);
@@ -121,19 +102,14 @@ static Charset::CoderResult malformed(ByteBuffer &src, gint mark, gint nb) {
     return cr;
 }
 
-static Charset::CoderResult malformedForLength(ByteBuffer &src, gint sp, CharBuffer &dst, gint dp, gint malformedNB) {
-    updatePositions(src, sp, dst, dp);
-    len = malformedNB;
-    return Charset::CoderResult::MALFORMED;
-}
-
 static Charset::CoderResult malformedForLength(ByteBuffer &src, gint mark, gint malformedNB) {
     src.position(mark);
-    len = malformedNB;
+    *len = malformedNB;
     return Charset::CoderResult::MALFORMED;
 }
 
 Charset::CoderResult UTF8::decodeLoop(ByteBuffer &in, CharBuffer &out) {
+    len = &CODING_ERROR_LENGTH;
     gint mark = in.position();
     gint limit = in.limit();
     while (mark < limit) {
@@ -238,7 +214,7 @@ Charset::CoderResult UTF8::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                 if (!src.hasRemaining()) {
                     cr = Charset::CoderResult::UNDERFLOW;
                     uc = -1;
-                    errorLength = 1;
+                    CODING_ERROR_LENGTH = 1;
                 } else {
                     gchar d = src.get();
                     if (Character::isLowSurrogate(c)) {
@@ -246,13 +222,13 @@ Charset::CoderResult UTF8::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                         cr = Charset::CoderResult::UNDERFLOW;
                     } else {
                         uc = -1;
-                        errorLength = 1;
+                        CODING_ERROR_LENGTH = 1;
                         cr = Charset::CoderResult::MALFORMED;
                     }
                 }
             } else {
                 uc = -1;
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 cr = Charset::CoderResult::MALFORMED;
             }
             if (uc < 0) {
@@ -290,13 +266,5 @@ gfloat UTF8::averageBytesPerChar() const {
 
 Object &UTF8::clone() const {
     return INSTANCE;
-}
-
-CharBuffer UTF8::decode(ByteBuffer &in) {
-    return Charset::decode(in);
-}
-
-ByteBuffer UTF8::encode(CharBuffer &in) {
-    return Charset::encode(in);
 }
 

@@ -5,19 +5,23 @@
 #ifndef CORE_ITERABLE_H
 #define CORE_ITERABLE_H
 
+#include "Collections/Iterator2.h"
 #include "Object.h"
-#include "Collections/Iterator.h"
-#include "Iterable2.h"
 
-template<class T>
+
+/**
+ * The iterable class represent any object that support each operation
+ * \tparam E item value type
+ */
+template<class E>
 class Iterable {
 public:
-    CORE_TEMPLATE_REQUIREMENT(T)
+    CORE_TEMPLATE_REQUIREMENT(E)
 
     /**
      * Returns an iterator over elements of type
      */
-    virtual Iterator<T const>&& iterator() const = 0;
+    virtual Iterator<E> &iterator() = 0;
 
     /**
      * Performs the given action for each element of the Iterable
@@ -27,11 +31,12 @@ public:
      * caller.
      * \param action The action to be performed for each element
      */
-     virtual void forEach(Consumer<T const&> const& action) const {
-         iterator().forEach(action);
-     }
-
+    virtual void forEach(Consumer<E &> const &action) {
+        Iterator<E> &it = iterator();
+        while (it.hasNext())
+            action.accept(it.next());
+    }
 };
 
 
-#endif //CORE_ITERABLE_H
+#endif//CORE_ITERABLE_H

@@ -9,15 +9,13 @@
 #include "Unicode.h"
 
 class UTF16 final : public Unicode {
-private:
-    CORE_EXPLICIT UTF16();
+    UTF16() {
+        REPLACEMENT_BYTES[0] = 0xff;
+        REPLACEMENT_BYTES[1] = 0xfd;
+    };
 
 public:
     String name() const override;
-
-    ErrorAction malformedAction() const override;
-
-    ErrorAction unmappableAction() const override;
 
     CoderResult decodeLoop(ByteBuffer &in, CharBuffer &out) override;
 
@@ -27,14 +25,6 @@ public:
 
     gfloat averageBytesPerChar() const override;
 
-    CharBuffer decode(ByteBuffer &in) override;
-
-    ByteBuffer encode(CharBuffer &in) override;
-
-    String toString() const override;
-
-    gbool contains(const Charset &cs) const override;
-
     Object &clone() const override;
 
     virtual Endian currentByteOrder() const;
@@ -43,12 +33,16 @@ public:
 
     static UTF16 INSTANCE;
 
+    /**
+     * Return current byte order
+     * It must be call it before any coding operation with this instance
+     */
     void reset();
 
 private:
     gchar decode(int b1, int b2) const;
 
-    void put(gchar c, ByteBuffer& dst) const;
+    void put(gchar c, ByteBuffer &dst) const;
 
     Endian _byteOrder;
 };

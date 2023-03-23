@@ -13,7 +13,7 @@ template<class T>
 class NaturalOrderComparator final : public Comparator<T> {
 private:
     CORE_TEMPLATE_REQUIREMENT(T)
-    CORE_REQUIRE(Class<Comparator<T>>::template isSuper<T>(), "Natural ordering require comparable type");
+    CORE_REQUIRE(Class<Comparable<T>>::template isSuper<T>(), "Natural ordering require comparable type");
 
     CORE_FAST NaturalOrderComparator() = default;
 

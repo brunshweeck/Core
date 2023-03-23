@@ -5,18 +5,18 @@
 #ifndef CORE_BICONSUMER_H
 #define CORE_BICONSUMER_H
 
-#include "../Object.h"
-#include "BiFunctional.h"
-#include "../MemoryError.h"
 #include "../CastError.h"
 #include "../Long.h"
+#include "../MemoryError.h"
 #include "../ValueError.h"
+#include "BiFunctional.h"
+
 
 /**
  * Binary Consumer
  */
 template<class T, class U>
-class BiConsumer : public Object, public BiFunctional<T, U> {
+class BiConsumer : public Object, public BiFunctional<T, U, Void> {
 public:
     /**
      * Construct new empty Binary Consumer
@@ -29,12 +29,14 @@ public:
      * \throw ValueError If specified action function is null
      */
     template<class _BiFunc,
-            Class<gbool>::Require<Class<_BiFunc>::isFunction() && Class<_BiFunc>::template isCallable<T, U>()> = true>
-    CORE_IMPLICIT BiConsumer(_BiFunc &&biFunc): manager(nullptr) {
+             Class<gbool>::Require<Class<_BiFunc>::isFunction() && Class<_BiFunc>::template isCallable<T, U>()> = true>
+    CORE_IMPLICIT BiConsumer(_BiFunc &&biFunc) : manager(nullptr) {
         CORE_REQUIRE(!Class<_BiFunc>::isMember(), "Binary Function must be used with binary class member");
         if (biFunc == nullptr)
             throw ValueError("Illegal action");
-        try { manager = new BiFunctionManager<_BiFunc>((_BiFunc &&) biFunc); } catch (...) { throw MemoryError(); }
+        try {
+            manager = new BiFunctionManager<_BiFunc>((_BiFunc &&) biFunc);
+        } catch (...) { throw MemoryError(); }
     }
 
     /**
@@ -43,11 +45,23 @@ public:
      * \param target function member caller
      */
     template<class _BiFunc, class Target,
-            Class<gbool>::Require<
-                    Class<_BiFunc>::isMember() && Class<_BiFunc>::template isCallable<Target, T, U>()> = true>
-    CORE_EXPLICIT BiConsumer(_BiFunc &&biFunc, Target &&target): manager(nullptr) {
-        try { manager = new BiMethodManager<_BiFunc, Target>((_BiFunc &&) biFunc, (Target &&) target); }
-        catch (...) { throw MemoryError(); }
+             Class<gbool>::Require<
+                     Class<_BiFunc>::isMember() && Class<_BiFunc>::template isCallable<Target, T, U>()> = true>
+    CORE_EXPLICIT BiConsumer(_BiFunc &&biFunc, Target &&target) : manager(nullptr) {
+        try {
+            manager = new BiMethodManager<_BiFunc, Target>((_BiFunc &&) biFunc, (Target &&) target);
+        } catch (...) { throw MemoryError(); }
+    }
+
+    template<class _1, class _2, class _3, class _4, class _5, class _6 = T, class _7 = U>
+    CORE_EXPLICIT BiConsumer(_1 (_2::*biFunc)(_3, _4), _5 &&target) {
+        using _BiFunc = decltype(biFunc);
+        using Target = decltype(target);
+        CORE_FAST gbool requirement = Class<_BiFunc>::template isCallable<Target, T, U>();
+        CORE_REQUIRE(requirement, "Support Binary Function Member");
+        try {
+            manager = new BiMethodManager<_BiFunc, Target>((_BiFunc &&) biFunc, (_5 &&) target);
+        } catch (...) { throw MemoryError(); }
     }
 
     /**
@@ -55,10 +69,12 @@ public:
      * \param biFunc binary function
      */
     template<class _BiFunc,
-            Class<gbool>::Require<Class<_BiFunc>::isClass() && !Class<Object>::isSuper<_BiFunc>() &&
-                                  Class<_BiFunc>::template isCallable<T, U>()> = true>
-    CORE_IMPLICIT BiConsumer(_BiFunc &&biFunc): manager(nullptr) {
-        try { manager = new BiLambdaManager<_BiFunc>((_BiFunc &&) biFunc); } catch (...) { throw MemoryError(); }
+             Class<gbool>::Require<Class<_BiFunc>::isClass() && !Class<Object>::isSuper<_BiFunc>() &&
+                                   Class<_BiFunc>::template isCallable<T, U>()> = true>
+    CORE_IMPLICIT BiConsumer(_BiFunc &&biFunc) : manager(nullptr) {
+        try {
+            manager = new BiLambdaManager<_BiFunc>((_BiFunc &&) biFunc);
+        } catch (...) { throw MemoryError(); }
     }
 
     /**
@@ -73,7 +89,7 @@ public:
      * Construct new Binary Consumer with action of other Consumer
      * \param c binary consumer
      */
-    CORE_IMPLICIT BiConsumer(BiConsumer &&c) CORE_NOTHROW: manager(nullptr) {
+    CORE_IMPLICIT BiConsumer(BiConsumer &&c) CORE_NOTHROW : manager(nullptr) {
         manager = c.manager == nullptr || c.manager == &EMPTY ? &EMPTY : c.manager;
         c.manager = &EMPTY;
     }
@@ -129,21 +145,29 @@ public:
     }
 
     Object &clone() const override {
-        try { return *new BiConsumer(*this); } catch (...) { throw MemoryError(); }
+        try {
+            return *new BiConsumer(*this);
+        } catch (...) { throw MemoryError(); }
     }
 
-    ~BiConsumer() override = default;
+    virtual ~BiConsumer() {
+        if (manager != nullptr && manager != &EMPTY) {
+            delete manager;
+            manager = nullptr;
+        }
+    }
 
     String toString() const override {
         if (manager == nullptr || manager == &EMPTY)
-            return "<BiConsumer[?]>";
+            return "<BiConsumer>";
         return "<BiConsumer" + manager->toString() + ">";
     }
 
 private:
     class BiManager : public Object {
     public:
-        virtual void launch(T t, U u) const {}
+        virtual void launch(T t, U u) const { /* ... */
+        }
 
         gbool equals(const Object &obj) const override {
             if (this == &obj)
@@ -181,7 +205,9 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new BiFunctionManager(*this); } catch (...) { throw MemoryError(); }
+            try {
+                return *new BiFunctionManager(*this);
+            } catch (...) { throw MemoryError(); }
         }
 
         String toString() const override {
@@ -212,11 +238,13 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new BiMethodManager(*this); } catch (...) { throw MemoryError(); }
+            try {
+                return *new BiMethodManager(*this);
+            } catch (...) { throw MemoryError(); }
         }
 
         String toString() const override {
-            return "[action: object@" + Long::toHexString(&target) + " - method$" + Long::toHexString((glong) &func) +
+            return "[action: object@" + Long::toHexString((glong)&target) + " - method$" + Long::toHexString((glong) &func) +
                    "]";
         }
 
@@ -244,12 +272,13 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new BiLambdaManager(*this); } catch (...) { throw MemoryError(); }
+            try {
+                return *new BiLambdaManager(*this);
+            } catch (...) { throw MemoryError(); }
         }
 
         String toString() const override {
-            return (!Class<typename Class<_BiFunc>::NIVR>::template isConstruct<_BiFunc>() ?
-                    "[action: lambda$" : "[action: object@") + Long::toHexString((glong) &func) + "]";
+            return (!Class<typename Class<_BiFunc>::NIVR>::template isConstruct<_BiFunc>() ? "[action: lambda$" : "[action: object@") + Long::toHexString((glong) &func) + "]";
         }
 
     private:
@@ -257,12 +286,36 @@ private:
     };
 
     static BiManager EMPTY;
-    typename Class<BiManager>::Pointer manager;
-
+    typename Class<BiManager>::Pointer manager = &EMPTY;
 };
+
+#if __cpp_deduction_guides > 201565
+BiConsumer()->BiConsumer<Object, Object>;
+
+template<class T, class U, class R>
+BiConsumer(BiFunctional<T, U, R> const &) -> BiConsumer<T, U>;
+
+
+template<class T, class U>
+BiConsumer(BiConsumer<T, U> const &) -> BiConsumer<T, U>;
+
+template<class T, class U>
+BiConsumer(BiConsumer<T, U> &&) -> BiConsumer<T, U>;
+
+template<class T, class U, class R>
+BiConsumer(R (*)(T, U)) -> BiConsumer<
+        typename Class<T>::template Conditional<Class<Object>::template isSuper<T>(), typename Class<T>::Object>,
+        typename Class<U>::template Conditional<Class<Object>::template isSuper<U>(), typename Class<U>::Object>>;
+
+template<class T, class U, class R, class V, class W>
+BiConsumer(R (V::*)(T, U), W &&) -> BiConsumer<
+        typename Class<T>::template Conditional<Class<Object>::template isSuper<T>(), typename Class<T>::Object>,
+        typename Class<U>::template Conditional<Class<Object>::template isSuper<U>(), typename Class<U>::Object>>;
+
+#endif//
 
 template<class T, class U>
 typename BiConsumer<T, U>::BiManager BiConsumer<T, U>::EMPTY = {};
 
 
-#endif //CORE_BICONSUMER_H
+#endif//CORE_BICONSUMER_H

@@ -3,11 +3,12 @@
 //
 
 #include "Error.h"
-#include "MemoryError.h"
-#include "Collections/CharArray.h"
-#include "IO/CharBuffer.h"
-#include "IO/ByteBuffer.h"
 #include "Charset/UTF8.h"
+#include "Collections/CharArray.h"
+#include "IO/ByteBuffer.h"
+#include "IO/CharBuffer.h"
+#include "MemoryError.h"
+
 
 String Error::message() const {
     return _message;
@@ -25,7 +26,9 @@ gbool Error::equals(const Object &obj) const {
 }
 
 Object &Error::clone() const {
-    try { return *new Error(message()); } catch (...) { throw MemoryError(); }
+    try {
+        return *new Error(message());
+    } catch (...) { throw MemoryError(); }
 }
 
 String Error::toString() const {
@@ -37,20 +40,17 @@ const char *Error::what() const noexcept {
     CharArray chars = toString().chars();
     CharBuffer in = (CharBuffer) chars;
     ByteBuffer out = UTF8::INSTANCE
-            .onMalformed(Charset::ErrorAction::REPLACE)
-            .onUnmapped(Charset::ErrorAction::REPLACE)
-            .encode(in);
+                             .onMalformed(Charset::ErrorAction::REPLACE)
+                             .onUnmapped(Charset::ErrorAction::REPLACE)
+                             .encode(in);
     gint i = 0;
     for (char &c: buffer) {
         if (i < 10)
             c = '\b';
-        else if (i < 512)
-            if (!out.hasRemaining())
-                break;
-            else
-                c = out.get();
-        else
+        else if (i == 512 || !out.hasRemaining())
             break;
+        else
+            c = out.get();
         i += 1;
     }
     buffer[i] = 0;

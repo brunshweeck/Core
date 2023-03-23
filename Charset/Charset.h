@@ -13,26 +13,41 @@
 
 class Charset : public Object, public Comparable<Charset> {
 protected:
-
-    /**
-     * Initializes a new charset with the given canonical name
-     * \param name canonical name
-     */
-    CORE_EXPLICIT Charset(String name);
-
     /**
      * Replacement used by decode method. must End With byte 0x00
-     * By default is 0x0
+     * By default is '?'
      */
-    gbyte encoderReplacement[5] = {(gbyte) '?', 0x00, 0x00, 0x0, 0x0};
+    gbyte REPLACEMENT_BYTES[8];
 
     /**
      * Replacement used by encode method. End With null character ('\u0000')
-     * By default is "\u0000"
+     * By default is "\ufffd"
      */
-    gchar decoderReplacement[3] = {(gchar) 0xFFFD, '\u0000', '\u0000'};
+    gchar REPLACEMENT_CHARS[4];
+
+    static gint CODING_ERROR_LENGTH;
 
 public:
+    /**
+     * Initializes a new charset
+     */
+    Charset() {
+        // default replacement used by encoder '?'
+        REPLACEMENT_BYTES[0] = 0x3f;
+        REPLACEMENT_BYTES[1] =
+        REPLACEMENT_BYTES[2] =
+        REPLACEMENT_BYTES[3] =
+        REPLACEMENT_BYTES[5] =
+        REPLACEMENT_BYTES[6] =
+        REPLACEMENT_BYTES[7] = 0x00;
+
+        // default replacement used by decoder '\ufffd'
+        REPLACEMENT_CHARS[0] = 0xfffd;
+        REPLACEMENT_CHARS[1] =
+        REPLACEMENT_CHARS[2] =
+        REPLACEMENT_CHARS[3] = 0x0000;
+    }
+
     /**
      * Returns this charset's canonical name.
      */
@@ -56,13 +71,6 @@ public:
         OVERFLOW,
         MALFORMED,
         UNMAPPABLE,
-    };
-
-    enum class State : gbyte {
-        RESET,
-        CODING,
-        FINISH,
-        FLUSHED,
     };
 
     enum class ErrorAction {
@@ -110,15 +118,18 @@ public:
      * byte buffer into a newly-allocated character buffer.
      * \param in The input byte buffer
      */
-    virtual CharBuffer decode(ByteBuffer &in);
+    CharBuffer decode(ByteBuffer &in);
 
     /**
      * Convenience method that encodes the remaining content of a single input
      * character buffer into a newly-allocated byte buffer.
      * \param in The input character buffer
      */
-    virtual ByteBuffer encode(CharBuffer &in);
+    ByteBuffer encode(CharBuffer &in);
 
+    /**
+     * Return string representation of this object
+     */
     String toString() const override;
 
     /**
@@ -159,27 +170,11 @@ public:
 
     virtual Charset &onUnmapped(ErrorAction action);
 
-    /**
-     * Return instance of charset corresponding with specified charset name
-     * \param charset name of charset
-     * \throw KeyError if specified charset name not found
-     */
-    static Charset &forName(String const &charset);
-
-
-
-    CoderResult flush(Buffer const &buffer);
-
-    void reset();
-
-    State state = State::RESET;
-
+private:
     CoderResult encode(CharBuffer &in, ByteBuffer &out, bool endOfInput);
 
     CoderResult decode(ByteBuffer &in, CharBuffer &out, gbool endOfInput);
-
-protected:
-    static gint &errorLength;
+//ERROR LENGTH
 };
 
 

@@ -9,15 +9,13 @@
 #include "Unicode.h"
 
 class UTF16BE final : public Unicode {
-private:
-    CORE_EXPLICIT UTF16BE();
+    UTF16BE() {
+        REPLACEMENT_BYTES[0] = 0xff;
+        REPLACEMENT_BYTES[1] = 0xfd;
+    };
 
 public:
     String name() const override;
-
-    ErrorAction malformedAction() const override;
-
-    ErrorAction unmappableAction() const override;
 
     CoderResult decodeLoop(ByteBuffer &in, CharBuffer &out) override;
 
@@ -26,14 +24,6 @@ public:
     gfloat averageCharsPerByte() const override;
 
     gfloat averageBytesPerChar() const override;
-
-    CharBuffer decode(ByteBuffer &in) override;
-
-    ByteBuffer encode(CharBuffer &in) override;
-
-    String toString() const override;
-
-    gbool contains(const Charset &cs) const override;
 
     Object &clone() const override;
 

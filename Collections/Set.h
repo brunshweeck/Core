@@ -11,7 +11,9 @@
 template<class E>
 class Set : public Collection<E> {
 public:
-    gbool add(const E &obj) override = 0;
+    gbool add(const E &obj) override {
+        throw StateError("Unsupported operation");
+    }
 
     gbool addAll(const Collection<E> &c) override {
         return Collection<E>::addAll(c);
@@ -55,22 +57,26 @@ public:
         Collection<E>::forEach(action);
     }
 
-    gbool equals(const Object &obj) const override = 0;
-
-    Object &clone() const override = 0;
-
     String toString() const override {
         return Collection<E>::toString();
     }
 
-    /**
+    virtual /**
      * Return temporal set containing intersection of this instance with specified set
      * \param set
      */
-    Set &interSet(Set const &set) const = 0;
-
-    Iterator<const E> &&iterator() const override = 0;
+    Set &interSet(Set const &set) const {
+        throw StateError("Unsupported operation");
+    };
 };
 
+#if __cpp_deduction_guides > 201565
+
+Set() -> Set<Object>;
+
+template<class E>
+Set(Collection<E> const &) -> Set<E>;
+
+#endif
 
 #endif //CORE_SET_H

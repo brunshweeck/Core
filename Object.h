@@ -46,6 +46,12 @@ public:
      * \param obj object to be compared
      */
     virtual gbool operator!=(Object const& obj) const;
+
+protected:
+    template<class T>
+    static gbool isPerfectlyInstanceOf(Object const& o) {
+        return typeid(T) == typeid(o);
+    }
 };
 
 #endif //CORE_OBJECT_H

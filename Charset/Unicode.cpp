@@ -3,12 +3,9 @@
 //
 
 #include "Unicode.h"
-#include "../String.h"
 #include "UTF8.h"
 #include "UTF16.h"
 #include "UTF32.h"
-
-Unicode::Unicode(const String &name) : Charset(name) {}
 
 gbool Unicode::contains(const Charset &cs) const {
     return dynamic_cast<UTF8 const *>(&cs) != nullptr

@@ -3,8 +3,8 @@
 //
 
 #include "MS1251.h"
-#include "../String.h"
 #include "../Character.h"
+
 static gchar bytesToChar[] =
         u"\u0402\u0403\u201A\u0453\u201E\u2026\u2020\u2021"       // 0x80 - 0x87
         "\u20AC\u2030\u0409\u2039\u040A\u040C\u040B\u040F"       // 0x88 - 0x8f
@@ -40,7 +40,6 @@ static gchar bytesToChar[] =
         "\u0078\u0079\u007A\u007B\u007C\u007D\u007E\u007F";      // 0x78 - 0x7f
 static gchar charToBytes[0x500] = u"";
 static gchar charToBytes_indexes[0x100] = u"";
-static gchar charToBytes_NR[0] = {};
 static CORE_FAST gchar UNMAPPABLE_DECODING = 0xFFFD;
 static CORE_FAST gint UNMAPPABLE_ENCODING = 0xFFFD;
 
@@ -67,8 +66,6 @@ static gint initC2B() {
 
 static gint _ = initC2B();
 
-MS1251::MS1251() : Charset("Windows-1251") {}
-
 MS1251 MS1251::INSTANCE{};
 
 String MS1251::name() const {
@@ -85,7 +82,7 @@ Charset::CoderResult MS1251::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
         while (src.hasRemaining()) {
             gchar c = decode(src.get());
             if (c == UNMAPPABLE_DECODING) {
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 return Charset::CoderResult::UNMAPPABLE;
             }
             if (!dst.hasRemaining())
@@ -121,21 +118,21 @@ Charset::CoderResult MS1251::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                                 cr = Charset::CoderResult::UNDERFLOW;
                             } else {
                                 uc = -1;
-                                errorLength = 1;
+                                CODING_ERROR_LENGTH = 1;
                                 cr = Charset::CoderResult::MALFORMED;
                             }
                         }
                     } else {
                         uc = -1;
-                        errorLength = 1;
+                        CODING_ERROR_LENGTH = 1;
                         cr = Charset::CoderResult::MALFORMED;
                     }
                     if (uc < 0)
                         return cr;
-                    errorLength = uc > 0xFFFF ? 2 : 1;
+                    CODING_ERROR_LENGTH = uc > 0xFFFF ? 2 : 1;
                     return Charset::CoderResult::UNMAPPABLE;
                 }
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 return CoderResult::UNMAPPABLE;
             }
             if (!dst.hasRemaining())
@@ -159,7 +156,7 @@ gfloat MS1251::averageBytesPerChar() const {
 }
 
 gbool MS1251::contains(const Charset &cs) const {
-    return dynamic_cast<MS1251 const *>(&cs) || name().equals("US-ASCII");
+    return Class<MS1251>::hasInstance(cs) || name().equals("US-ASCII");
 }
 
 Object &MS1251::clone() const {
@@ -173,24 +170,3 @@ gint MS1251::encode(gchar ch) {
         return UNMAPPABLE_ENCODING;
     return charToBytes[index + (ch & 0xff)];
 }
-
-Charset::ErrorAction MS1251::malformedAction() const {
-    return Charset::malformedAction();
-}
-
-Charset::ErrorAction MS1251::unmappableAction() const {
-    return Charset::unmappableAction();
-}
-
-CharBuffer MS1251::decode(ByteBuffer &in) {
-    return Charset::decode(in);
-}
-
-ByteBuffer MS1251::encode(CharBuffer &in) {
-    return Charset::encode(in);
-}
-
-String MS1251::toString() const {
-    return Charset::toString();
-}
-

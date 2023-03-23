@@ -8,8 +8,7 @@
 #include "Charset.h"
 
 class MS1252 final : public Charset {
-private:
-    CORE_EXPLICIT MS1252();
+    MS1252() {}
 
 public:
     String name() const override;
@@ -23,16 +22,6 @@ public:
     gfloat averageBytesPerChar() const override;
 
     gbool contains(const Charset &cs) const override;
-
-    ErrorAction malformedAction() const override;
-
-    ErrorAction unmappableAction() const override;
-
-    CharBuffer decode(ByteBuffer &in) override;
-
-    ByteBuffer encode(CharBuffer &in) override;
-
-    String toString() const override;
 
     Object &clone() const override;
 

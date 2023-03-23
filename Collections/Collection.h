@@ -5,17 +5,15 @@
 #ifndef CORE_COLLECTION_H
 #define CORE_COLLECTION_H
 
-#include "../String.h"
-#include "../Integer.h"
-#include "../Function/Consumer.h"
 #include "../Break.h"
 #include "../Function/Predicate.h"
+#include "../Integer.h"
+#include "../Iterable2.h"
 #include "../StateError.h"
-#include "Iterator.h"
-#include "../Iterable.h"
+
 
 template<class E>
-class Collection : public Object, public Iterable<E> {
+class Collection : public Object, public Iterable2<E> {
 public:
     CORE_TEMPLATE_REQUIREMENT(E)
 
@@ -24,7 +22,7 @@ public:
      * \param obj object to be add from this collection
      */
     virtual gbool add(E const &obj) {
-        throw StateError("Unsupported Operation");
+        throw StateError("Add Operation is not support by this collection");
     }
 
     /**
@@ -32,7 +30,7 @@ public:
      * \param c collection containing elements to add from this collection
      */
     virtual gbool addAll(Collection<E> const &c) {
-        Iterator<E const> &&it = iterator();
+        Iterator2<E> &it = this->iterator2();
         gbool ok = false;
         while (it.hasNext()) {
             ok = true;
@@ -46,7 +44,7 @@ public:
      * \param obj object to be removed
      */
     virtual gbool remove(E const &obj) {
-        throw StateError("Unsupported Operation");
+        throw StateError("Remove Operation is not supported by this collection");
     };
 
     /**
@@ -54,7 +52,7 @@ public:
      * \param c collection containing elements to remove from this collection
      */
     virtual gbool removeAll(Collection<E> const &c) {
-        Iterator<E const> &&it = iterator();
+        Iterator2<E> &it = this->iterator2();
         gbool ok = false;
         while (it.hasNext()) {
             if (c.contains(it.next())) {
@@ -70,7 +68,7 @@ public:
      * \param p the predicate
      */
     virtual gbool removeIf(Predicate<E const &> const &p) {
-        Iterator<E const> &&it = iterator();
+        Iterator2<E> &it = this->iterator2();
         gbool ok = false;
         while (it.hasNext()) {
             if (p.test(it.next())) {
@@ -86,7 +84,7 @@ public:
      * \param obj object to search
      */
     virtual gbool contains(E const &obj) const {
-        Iterator<E const> &&it = iterator();
+        Iterator2<E> &it = this->iterator2();
         while (it.hasNext())
             if (obj.equals(it.next()))
                 return true;
@@ -102,7 +100,7 @@ public:
             return !isEmpty();
         if (c.isEmpty() || isEmpty())
             return false;
-        Iterator<E const> &&it = c.iterator();
+        Iterator2<E> &it = c.iterator2();
         gbool ok = false;
         while (it.hasNext()) {
             if (contains(it.next())) {
@@ -118,7 +116,7 @@ public:
      * \param c collection containing element to not remove
      */
     virtual gbool retainAll(Collection<E> const &c) {
-        Iterator<E const> &&it = iterator();
+        Iterator2<E> &it = this->iterator2();
         gbool ok = false;
         while (it.hasNext()) {
             if (!c.contains(it.next())) {
@@ -133,7 +131,7 @@ public:
      * Remove all of element from this collection
      */
     virtual void clear() {
-        Iterator<E const> &&it = iterator();
+        Iterator2<E> &it = this->iterator2();
         while (it.hasNext()) {
             it.next();
             it.remove();
@@ -156,7 +154,7 @@ public:
         if (isEmpty())
             return "[]";
         String string = "[";
-        Iterator<E const> &&it = iterator();
+        Iterator2<E> &it = this->iterator2();
         while (it.hasNext()) {
             string += it.next().toString();
             if (it.hasNext())
@@ -165,18 +163,14 @@ public:
         string += "]";
         return string;
     }
-
-    Iterator<const E> &&iterator() const override = 0;
-
-    void forEach(const Consumer<const E &> &action) const override {
-        Iterable<E>::forEach(action);
-    }
-
 };
 
 #if __cpp_deduction_guides > 201565
-Collection() -> Collection<Object>;
-template<class E> Collection(Collection<E> const &) -> Collection<E>;
-#endif //
+Collection()->Collection<Object>;
 
-#endif //CORE_COLLECTION_H
+template<class E>
+Collection(Collection<E> const &) -> Collection<E>;
+
+#endif//
+
+#endif//CORE_COLLECTION_H

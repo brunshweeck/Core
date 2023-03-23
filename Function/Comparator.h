@@ -5,7 +5,6 @@
 #ifndef CORE_COMPARATOR_H
 #define CORE_COMPARATOR_H
 
-#include "../Object.h"
 #include "../MemoryError.h"
 
 /**
@@ -30,7 +29,9 @@ public:
      * Indicates whether some other object is equal to this comparator.
      * \param obj object to be compared
      */
-    gbool equals(const Object &obj) const override = 0;
+    gbool equals(const Object &obj) const override {
+        return Object::equals(obj);
+    }
 
     /**
      * Returns a comparator that imposes the reverse ordering of this comparator
@@ -56,7 +57,7 @@ public:
             }
 
             Comparator<T> &reverse() const override {
-                return self;
+                return (Comparator<T> &) self.clone();
             }
 
             Object &clone() const override {
@@ -102,7 +103,15 @@ public:
 
         try { return *new DoublyComparator(*this, c); } catch (...) { throw MemoryError(); }
     }
+
 };
 
+#if __cpp_deduction_guides > 201565
+Comparator() -> Comparator<Object>;
+
+template<class T>
+Comparator(Comparator<T> const&) -> Comparator<T>;
+
+#endif //
 
 #endif //CORE_COMPARATOR_H

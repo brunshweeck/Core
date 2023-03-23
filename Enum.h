@@ -144,4 +144,17 @@ private:
 template<class E>
 String (*Enum<E>::alias)(E) = nullptr;
 
+#if __cpp_deduction_guides > 201565
+
+template<class E>
+Enum(E) -> Enum<E>;
+
+template<class E>
+Enum(Enum<E> const&) -> Enum<E>;
+
+template<class E>
+Enum(Enum<E> &&) -> Enum<E>;
+
+#endif 
+
 #endif //CORE_ENUM_H

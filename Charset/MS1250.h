@@ -9,8 +9,7 @@
 #include "Charset.h"
 
 class MS1250 final : public Charset {
-private:
-    CORE_EXPLICIT MS1250();
+    MS1250() {}
 
 public:
     String name() const override;
@@ -26,16 +25,6 @@ public:
     gbool contains(const Charset &cs) const override;
 
     Object &clone() const override;
-
-    CharBuffer decode(ByteBuffer &in) override;
-
-    ByteBuffer encode(CharBuffer &in) override;
-
-    ErrorAction malformedAction() const override;
-
-    ErrorAction unmappableAction() const override;
-
-    String toString() const override;
 
     static MS1250 INSTANCE;
 

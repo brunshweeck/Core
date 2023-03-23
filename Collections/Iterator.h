@@ -11,14 +11,13 @@
 #include "../Function/Consumer.h"
 
 /**
- * \tparam E value type
+ * The Iterator2 class is used to each collection item
+ * \tparam E item value type
  */
 template<class E>
 class Iterator : public Object {
 public:
-    CORE_TEMPLATE_REQUIRE_UNREFERENCED(E);
-    CORE_TEMPLATE_REQUIRE_NON_VOLATILE(E);
-    CORE_TEMPLATE_REQUIRE_OBJECT(E);
+    CORE_TEMPLATE_REQUIREMENT(E);
 
     /**
      * Return true if iterator has more items
@@ -39,28 +38,24 @@ public:
     }
 
     /**
-     * Return true if specified object equals to this iterator
-     * \param obj object to be compared
-     */
-    gbool equals(const Object &obj) const override = 0;
-
-    /**
-     * Return copy of this object
-     */
-    Object &clone() const override = 0;
-
-    /**
      * Performs the given action for each remaining element until all elements
      * have been processed or the action throws an exception.  Actions are
      * performed in the order of iteration, if that order is specified.
      * Exceptions thrown by the action are relayed to the caller.
      * \param action The action to be performed for each element
      */
-    virtual void forEach(Consumer<E&> const& action) const {
+    virtual void forEach(Consumer<E&> const& action) {
         while (hasNext())
             action.accept(next());
     }
 };
 
+#if __cpp_deduction_guides > 201565
+Iterator() -> Iterator<Object>;
+
+template<class E>
+Iterator(Iterator<E> const&) -> Iterator<E>;
+
+#endif //
 
 #endif //CORE_ITERATOR_H

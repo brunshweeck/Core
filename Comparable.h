@@ -34,5 +34,12 @@ public:
     virtual gint compareTo(T const &obj) const = 0;
 };
 
+#if __cpp_deduction_guides > 201565
+Comparable() -> Comparable<Object>;
+
+template<class T>
+Comparable(Comparable<T> const&) -> Comparable<T>;
+
+#endif //
 
 #endif //CORE_COMPARABLE_H

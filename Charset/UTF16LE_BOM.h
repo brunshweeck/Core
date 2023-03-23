@@ -9,15 +9,13 @@
 #include "Unicode.h"
 
 class UTF16LE_BOM final : public Unicode {
-private:
-    CORE_EXPLICIT UTF16LE_BOM();
+    UTF16LE_BOM() {
+        REPLACEMENT_BYTES[0] = 0xfd;
+        REPLACEMENT_BYTES[1] = 0xff;
+    }
 
 public:
     String name() const override;
-
-    ErrorAction malformedAction() const override;
-
-    ErrorAction unmappableAction() const override;
 
     CoderResult decodeLoop(ByteBuffer &in, CharBuffer &out) override;
 
@@ -27,17 +25,10 @@ public:
 
     gfloat averageBytesPerChar() const override;
 
-    CharBuffer decode(ByteBuffer &in) override;
-
-    ByteBuffer encode(CharBuffer &in) override;
-
-    String toString() const override;
-
-    gbool contains(const Charset &cs) const override;
-
     Object &clone() const override;
 
     static UTF16LE_BOM INSTANCE;
+
     CORE_FAST static gchar BYTE_ORDER_MASK = 0xfffe;
 
 private:

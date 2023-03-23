@@ -2,11 +2,9 @@
 #include "Charset.h"
 #include "../Character.h"
 #include "../MemoryError.h"
-#include "../StateError.h"
 #include "../Enum.h"
-#include "UTF8.h"
 
-Charset::Charset(String name) {}
+gint Charset::CODING_ERROR_LENGTH = 0;
 
 gint Charset::compareTo(const Charset &obj) const {
     return name().compareToIgnoreCase(obj.name());
@@ -35,19 +33,7 @@ static gint _initEnumNames() {
         }
         return "";
     };
-    Enum<Charset::State>::alias = [](Charset::State s) -> String {
-        switch (s) {
-            case Charset::State::RESET:
-                return "RESET";
-            case Charset::State::CODING:
-                return "CODING";
-            case Charset::State::FINISH:
-                return "FINISH";
-            case Charset::State::FLUSHED:
-                return "FLUSHED";
-        }
-        return "";
-    };
+
     Enum<Charset::ErrorAction>::alias = [](Charset::ErrorAction action) -> String {
         switch (action) {
             case Charset::ErrorAction::IGNORE:
@@ -59,6 +45,7 @@ static gint _initEnumNames() {
         }
         return "";
     };
+
     return 0;
 }
 
@@ -71,8 +58,6 @@ CharBuffer Charset::decode(ByteBuffer &in) {
         return out;
     for (;;) {
         CoderResult cr = in.hasRemaining() ? decode(in, out, true) : CoderResult::UNDERFLOW;
-        if (cr == CoderResult::UNDERFLOW)
-            cr = flush(out);
         if (cr == CoderResult::UNDERFLOW)
             break;
         if (cr == CoderResult::OVERFLOW) {
@@ -90,32 +75,17 @@ CharBuffer Charset::decode(ByteBuffer &in) {
             case CoderResult::OVERFLOW:
                 throw CodingError::overflow();
             case CoderResult::MALFORMED:
-                throw CodingError::malformed(errorLength);
+                throw CodingError::malformed(CODING_ERROR_LENGTH);
             case CoderResult::UNMAPPABLE:
-                throw CodingError::unmappable(errorLength);
+                throw CodingError::unmappable(CODING_ERROR_LENGTH);
         }
     }
     out.flip();
     return out;
 }
 
-Charset::CoderResult Charset::flush(Buffer const &) {
-    if (state == State::FINISH)
-        state = State::FLUSHED;
-    return CoderResult::UNDERFLOW;
-}
-
-void Charset::reset() {
-    state = State::RESET;
-    errorLength = 0;
-}
-
 Charset::CoderResult Charset::decode(ByteBuffer &in, CharBuffer &out, gbool endOfInput) {
-    _;
-    State newState = endOfInput ? State::FINISH : State::CODING;
-    if (state != State::RESET && state != State::CODING && !(endOfInput && state == State::FINISH))
-        throw StateError("Current = " + Enum<State>::toString(state) + ", New = " + Enum<State>::toString(newState));
-    state = newState;
+    _ = 5;
     for (;;) {
         CoderResult cr;
         cr = decodeLoop(in, out);
@@ -123,31 +93,30 @@ Charset::CoderResult Charset::decode(ByteBuffer &in, CharBuffer &out, gbool endO
             return cr;
         if (cr == CoderResult::UNDERFLOW) {
             if (endOfInput && in.hasRemaining()) {
-                errorLength = in.remaining();
+                CODING_ERROR_LENGTH = in.remaining();
                 cr = CoderResult::MALFORMED;
-            }
-            else
+            } else
                 return cr;
         }
         ErrorAction action = ErrorAction::REPORT;
         if (cr == CoderResult::MALFORMED) {
             action = malformedAction();
-        } else if(cr == CoderResult::UNMAPPABLE)
+        } else if (cr == CoderResult::UNMAPPABLE)
             action = unmappableAction();
         else
             assert(false);
         if (action == ErrorAction::REPORT)
             return cr;
         if (action == ErrorAction::REPLACE) {
-            gint length = decoderReplacement[2] ? 3 :
-                          decoderReplacement[1] ? 2 : 1;
+            gint length = REPLACEMENT_CHARS[2] ? 3 :
+                          REPLACEMENT_CHARS[1] ? 2 : 1;
             if (out.remaining() < length)
                 return CoderResult::OVERFLOW;
             for (int i = 0; i < length; ++i)
-                out.put(decoderReplacement[i]);
+                out.put(REPLACEMENT_CHARS[i]);
         }
         if (action == ErrorAction::IGNORE || action == ErrorAction::REPLACE) {
-            in.position(in.position() + errorLength);
+            in.position(in.position() + CODING_ERROR_LENGTH);
             continue;
         }
         assert(false);
@@ -160,11 +129,9 @@ ByteBuffer Charset::encode(CharBuffer &in) {
     ByteBuffer out = ByteBuffer(n);
     if (n == 0 && in.remaining() == 0)
         return out;
-    reset();
+    CODING_ERROR_LENGTH = 0;
     for (;;) {
         CoderResult cr = in.hasRemaining() ? encode(in, out, true) : CoderResult::UNDERFLOW;
-        if (cr == CoderResult::UNDERFLOW)
-            cr = flush(out);
         if (cr == CoderResult::UNDERFLOW)
             break;
         if (cr == CoderResult::OVERFLOW) {
@@ -181,9 +148,9 @@ ByteBuffer Charset::encode(CharBuffer &in) {
             case CoderResult::OVERFLOW:
                 throw CodingError::overflow();
             case CoderResult::MALFORMED:
-                throw CodingError::malformed(errorLength);
+                throw CodingError::malformed(CODING_ERROR_LENGTH);
             case CoderResult::UNMAPPABLE:
-                throw CodingError::malformed(errorLength);
+                throw CodingError::malformed(CODING_ERROR_LENGTH);
             default:
                 throw CodingError();
         }
@@ -193,12 +160,7 @@ ByteBuffer Charset::encode(CharBuffer &in) {
 }
 
 Charset::CoderResult Charset::encode(CharBuffer &in, ByteBuffer &out, bool endOfInput) {
-    _;
-    State newState = endOfInput ? State::FINISH : State::CODING;
-    if (state != State::RESET && state != State::CODING && !(endOfInput && state == State::FINISH)) {
-        throw StateError("Current = " + Enum<State>::toString(state) + ", New = " + Enum<State>::toString(newState));
-    }
-    state = newState;
+    _ = 8;
     for (;;) {
         CoderResult cr;
         cr = encodeLoop(in, out);
@@ -206,10 +168,9 @@ Charset::CoderResult Charset::encode(CharBuffer &in, ByteBuffer &out, bool endOf
             return cr;
         if (cr == CoderResult::UNDERFLOW) {
             if (endOfInput && in.hasRemaining()) {
-                errorLength = in.remaining();
+                CODING_ERROR_LENGTH = in.remaining();
                 cr = CoderResult::MALFORMED;
-            }
-            else
+            } else
                 return cr;
         }
         ErrorAction action = ErrorAction::REPORT;
@@ -222,17 +183,17 @@ Charset::CoderResult Charset::encode(CharBuffer &in, ByteBuffer &out, bool endOf
         if (action == ErrorAction::REPORT)
             return cr;
         if (action == ErrorAction::REPLACE) {
-            gint length = encoderReplacement[4] ? 5 :
-                          encoderReplacement[3] ? 4 :
-                          encoderReplacement[2] ? 3 :
-                          encoderReplacement[1] ? 2 : 1;
+            gint length = REPLACEMENT_BYTES[4] ? 5 :
+                          REPLACEMENT_BYTES[3] ? 4 :
+                          REPLACEMENT_BYTES[2] ? 3 :
+                          REPLACEMENT_BYTES[1] ? 2 : 1;
             if (out.remaining() < length)
                 return CoderResult::OVERFLOW;
             for (int i = 0; i < length; ++i)
-                out.put(encoderReplacement[i]);
+                out.put(REPLACEMENT_BYTES[i]);
         }
         if (action == ErrorAction::IGNORE || action == ErrorAction::REPLACE) {
-            in.position(in.position() + errorLength);
+            in.position(in.position() + CODING_ERROR_LENGTH);
             continue;
         }
         assert(false);
@@ -256,121 +217,172 @@ String Charset::toString() const {
     return name();
 }
 
-class PrivateCharset final : public Charset {
+class CustomizableCharset : public Charset {
 public:
-    PrivateCharset(ErrorAction action, CoderResult result, Charset &charset) :
-            Charset(charset.name()), action(action), result(result), charset(charset) {}
+    CORE_FAST static gint MALFORMED_REPORT_MASK = 0;
+    CORE_FAST static gint MALFORMED_REPLACE_MASK = 1;
+    CORE_FAST static gint MALFORMED_IGNORE_MASK = 2;
+    CORE_FAST static gint UNMAPPED_REPORT_MASK = 3;
+    CORE_FAST static gint UNMAPPED_REPLACE_MASK = 4;
+    CORE_FAST static gint UNMAPPED_IGNORE_MASK = 5;
+    gint mask = 0;
+    Charset *cs = nullptr;
+
+    CustomizableCharset(ErrorAction a, CoderResult cr, Charset const &charset) {
+        cs = Class<CustomizableCharset>::hasInstance(charset) ?
+             ((CustomizableCharset const &) charset).cs : &(Charset &) charset;
+        if (!Class<Charset>::hasInstance(*this->cs))
+            throw MemoryError("It not cloneable charset object");
+        if (cr == Charset::CoderResult::MALFORMED)
+            switch (a) {
+                case ErrorAction::IGNORE:
+                    mask = 1 << MALFORMED_IGNORE_MASK;
+                    break;
+                case ErrorAction::REPORT:
+                    mask = 1 << MALFORMED_REPORT_MASK;
+                    break;
+                case ErrorAction::REPLACE:
+                    mask = 1 << MALFORMED_REPLACE_MASK;
+                    break;
+            }
+        else
+            switch (a) {
+                case ErrorAction::IGNORE:
+                    mask = 1 << UNMAPPED_IGNORE_MASK;
+                    break;
+                case ErrorAction::REPORT:
+                    mask = 1 << UNMAPPED_REPORT_MASK;
+                    break;
+                case ErrorAction::REPLACE:
+                    mask = 1 << UNMAPPED_REPLACE_MASK;
+                    break;
+            }
+
+    }
 
     String name() const override {
-        return charset.name();
+        return cs->name();
     }
 
     ErrorAction malformedAction() const override {
-        if (result == Charset::CoderResult::MALFORMED)
-            return action;
-        return charset.malformedAction();
+        return
+                (mask >> MALFORMED_REPORT_MASK) & 1 ? ErrorAction::REPORT :
+                (mask >> MALFORMED_REPLACE_MASK) & 1 ? ErrorAction::REPLACE : ErrorAction::IGNORE;
     }
 
     ErrorAction unmappableAction() const override {
-        if (result == Charset::CoderResult::UNMAPPABLE)
-            return action;
-        return charset.malformedAction();
+        return
+                (mask >> UNMAPPED_REPORT_MASK) & 1 ? ErrorAction::REPORT :
+                (mask >> UNMAPPED_REPLACE_MASK) & 1 ? ErrorAction::REPLACE : ErrorAction::IGNORE;
     }
 
     CoderResult decodeLoop(ByteBuffer &src, CharBuffer &dst) override {
-        return charset.decodeLoop(src, dst);
+        return cs->decodeLoop(src, dst);
     }
 
     CoderResult encodeLoop(CharBuffer &src, ByteBuffer &dst) override {
-        return charset.encodeLoop(src, dst);
+        return cs->encodeLoop(src, dst);
     }
 
     gfloat averageCharsPerByte() const override {
-        return charset.averageCharsPerByte();
+        return cs->averageCharsPerByte();
     }
 
     gfloat averageBytesPerChar() const override {
-        return charset.averageBytesPerChar();
-    }
-
-    CharBuffer decode(ByteBuffer &in) override {
-        return Charset::decode(in);
-    }
-
-    ByteBuffer encode(CharBuffer &in) override {
-        return Charset::encode(in);
+        return cs->averageBytesPerChar();
     }
 
     String toString() const override {
-        return Charset::toString();
+        return cs->toString();
     }
 
     gint compareTo(const Charset &obj) const override {
-        return charset.compareTo(obj);
+        return cs->compareTo(obj);
     }
 
     gbool equals(const Object &obj) const override {
-        return charset.equals(obj);
+        return cs->equals(obj);
     }
 
-    gbool contains(const Charset &cs) const override {
-        return charset.contains(cs);
+    gbool contains(const Charset &charset) const override {
+        return cs->contains(charset);
     }
 
     gbool canEncode(gchar c) const override {
-        return Charset::canEncode(c);
+        return cs->canEncode(c);
     }
 
-    Charset &onMalformed(ErrorAction errorAction) override {
-        if (errorAction == malformedAction())
+    Charset &onMalformed(ErrorAction action) override {
+        if (action == malformedAction())
             return *this;
-        if (errorAction == action && result == Charset::CoderResult::MALFORMED)
-            return *this;
-        return Charset::onMalformed(errorAction);
+        switch (unmappableAction()) {
+            case ErrorAction::IGNORE:
+                mask = 1 << UNMAPPED_IGNORE_MASK;
+                break;
+            case ErrorAction::REPORT:
+                mask = 1 << UNMAPPED_REPORT_MASK;
+                break;
+            case ErrorAction::REPLACE:
+                mask = 1 << UNMAPPED_REPLACE_MASK;
+                break;
+        }
+        switch (action) {
+            case ErrorAction::IGNORE:
+                mask |= 1 << MALFORMED_IGNORE_MASK;
+                break;
+            case ErrorAction::REPORT:
+                mask |= 1 << MALFORMED_REPORT_MASK;
+                break;
+            case ErrorAction::REPLACE:
+                mask |= 1 << MALFORMED_REPLACE_MASK;
+                break;
+        }
+        return *this;
     }
 
-    Charset &onUnmapped(ErrorAction errorAction) override {
-        if (errorAction == unmappableAction())
+    Charset &onUnmapped(ErrorAction action) override {
+        if (action == unmappableAction())
             return *this;
-        if (result == Charset::CoderResult::UNMAPPABLE && action == errorAction)
-            return *this;
-        return Charset::onUnmapped(errorAction);
+        switch (malformedAction()) {
+            case ErrorAction::IGNORE:
+                mask = 1 << MALFORMED_IGNORE_MASK;
+                break;
+            case ErrorAction::REPORT:
+                mask = 1 << MALFORMED_REPORT_MASK;
+                break;
+            case ErrorAction::REPLACE:
+                mask = 1 << MALFORMED_REPLACE_MASK;
+                break;
+        }
+        switch (action) {
+            case ErrorAction::IGNORE:
+                mask |= 1 << UNMAPPED_IGNORE_MASK;
+                break;
+            case ErrorAction::REPORT:
+                mask |= 1 << UNMAPPED_REPORT_MASK;
+                break;
+            case ErrorAction::REPLACE:
+                mask |= 1 << UNMAPPED_REPLACE_MASK;
+                break;
+        }
+        return *this;
     }
 
     Object &clone() const override {
-        try {
-            return *new PrivateCharset(action, result, charset);
-        } catch (...) {
-            throw MemoryError();
-        }
+        try { return *new CustomizableCharset(*this); } catch (...) { throw MemoryError(); }
     }
-
-private:
-    ErrorAction action;
-    CoderResult result;
-    Charset &charset;
 };
 
 Charset &Charset::onMalformed(ErrorAction action) {
     if (action == malformedAction())
         return *this;
-    try {
-        return *new PrivateCharset(action, CoderResult::MALFORMED, *this);
-    } catch (...) {
-        throw MemoryError();
-    }
+    try { return *new CustomizableCharset(action, CoderResult::MALFORMED, *this); }
+    catch (...) { throw MemoryError(); }
 }
 
 Charset &Charset::onUnmapped(ErrorAction action) {
     if (action == unmappableAction())
         return *this;
-    try {
-        return *new PrivateCharset(action, CoderResult::UNMAPPABLE, *this);
-    } catch (...) {
-        throw MemoryError();
-    }
-}
-
-Charset &Charset::forName(const String &charset) {
-    return UTF8::INSTANCE;
+    try { return *new CustomizableCharset(action, CoderResult::UNMAPPABLE, *this); }
+    catch (...) { throw MemoryError(); }
 }

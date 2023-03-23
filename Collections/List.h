@@ -9,7 +9,7 @@
 #include "ListIterator.h"
 
 template<class E>
-class List : public Collection<E>, public Iterable2<E> {
+class List : public Collection<E>, public Iterable<E> {
 public:
     CORE_TEMPLATE_REQUIREMENT(E)
 
@@ -17,7 +17,11 @@ public:
      * Append specified object from the this list
      * \param obj object to be add from this collection
      */
-    gbool add(const E &obj) override = 0;
+    gbool add(const E &obj) override {
+        gint index = this->size();
+        add(index, obj);
+        return true;
+    }
 
     /**
      * Inserts the specified element at the specified position in this list
@@ -31,7 +35,8 @@ public:
      * \param c collection containing elements to add from this list
      */
     gbool addAll(const Collection<E> &c) override {
-        return addAll(size(), c);
+        gint index = this->size();
+        return addAll(index, c);
     }
 
     /**
@@ -40,12 +45,6 @@ public:
      * \param c collection containing elements to be added to this list
      */
     virtual gbool addAll(gint index, Collection<E> const &c) = 0;
-
-    /**
-     * Remove first occurrence of specified object from this list
-     * \param obj object to be removed
-     */
-    gbool remove(const E &obj) override = 0;
 
     /**
      * Removes the element at the specified position in this list if and only if this element equals to specified value.
@@ -59,79 +58,6 @@ public:
      * \param index the position if element to be removed
      */
     virtual E &removeAt(gint index) = 0;
-
-    /**
-     * Remove all of element of this list that are contained in specified collection
-     * \param c collection containing elements to remove from this collection
-     */
-    gbool removeAll(const Collection<E> &c) override {
-        return Collection<E>::removeAll(c);
-    }
-
-    /**
-     * Remove all elements of this collection that satisfy the giving predicate
-     * \param p The filter
-     */
-    gbool removeIf(const Predicate<const E &> &p) override {
-        return Collection<E>::removeIf(p);
-    }
-
-    /**
-     * Return true if this list contains specified value
-     * \param obj object to search
-     */
-    gbool contains(const E &obj) const override {
-        return Collection<E>::contains(obj);
-    }
-
-    /**
-     * Return true if all of element of specified collection are contained into this list
-     * \param c collection containing element to search
-     */
-    gbool containsAll(const Collection<E> &c) const override {
-        return Collection<E>::containsAll(c);
-    }
-
-    /**
-     * Remove all element from this list that are not contained into specified collection
-     * \param c collection containing element to not remove
-     */
-    gbool retainAll(const Collection<E> &c) override {
-        return Collection<E>::retainAll(c);
-    }
-
-    /**
-     * Remove all of element from this collection
-     */
-    void clear() override = 0;
-
-    /**
-     * Return true if list have not element
-     */
-    gbool isEmpty() const override {
-        return Collection<E>::isEmpty();
-    }
-
-    /**
-     * Return number of element from this list
-     */
-    gint size() const override = 0;
-
-    /**
-     * Performed action to each all of element of this collection
-     * \param action performed action
-     */
-    void forEach(const Consumer<const E &> &action) const override {
-        Collection<E>::forEach(action);
-    }
-
-    /**
-     * Performed action to each all of element of this collection
-     * \param action performed action
-     */
-    void forEach(const Consumer<E &> &action) override {
-        Iterable2<E>::forEach(action);
-    }
 
     /**
      * Returns the element at the specified position in this list.
@@ -152,7 +78,7 @@ public:
      * \param index the position of element
      * \param obj
      */
-    virtual E& set(gint index, E const &obj) = 0;
+    virtual E &set(gint index, E const &obj) = 0;
 
     /**
      * Returns the position of the first occurrence of the specified element in this list,
@@ -187,50 +113,36 @@ public:
     }
 
     /**
-     * Return string representation of this object
+     * Returns an iterator over elements of type
      */
-    String toString() const override {
-        if (isEmpty())
-            return "[]";
-        String s = "[";
-        gint i = 0;
-        gint limit = size();
-        forEach([&s, &i, limit](E const &obj) -> void {
-            i = i + 1;
-            if (i < limit) {
-                s += obj.toString() + ", ";
-            } else {
-                s += obj.toString() + "]";
-            }
-        });
-        return s;
+    ListIterator2<E> &iterator2() override = 0;
+
+    /**
+     * Returns an iterator over elements of type
+     */
+    ListIterator2<E> &iterator2() const override = 0;
+
+    /**
+     * Returns an iterator over elements of type
+     */
+    virtual ListIterator<E> &iterator() = 0;
+
+    virtual ListIterator2<E> &begin() const {
+        return this->iterator2();
     }
-
-    /**
-     * Returns an iterator over elements of type
-     */
-    ListIterator<const E> &&iterator() const override = 0;
-
-    /**
-     * Returns an iterator over elements of type
-     */
-    virtual ListIterator<E> &&iterator() = 0;
-
-    /**
-     * Return true if this list equals to specified object
-     * \param obj object to be compared
-     */
-    gbool equals(const Object &obj) const override = 0;
-
-    /**
-     * Return copy of this object
-     */
-    Object &clone() const override = 0;
+    
+    virtual ListIterator<E> &begin() {
+        return this->iterator();
+    }
 };
 
 #if __cpp_deduction_guides > 201565
-List() -> List<Object>;
-template<class E> List(Collection<E> const &) -> List<E>;
-#endif //
 
-#endif //CORE_LIST_H
+List()->List<Object>;
+
+template<class E>
+List(Collection<E> const &) -> List<E>;
+
+#endif//
+
+#endif//CORE_LIST_H

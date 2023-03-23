@@ -168,7 +168,7 @@ public:
      * \param _4 fiftieth character
      * \param _5 sixth character
      * \param _6 seventh character
-     * \param _7 height character
+     * \param _7 eight character
      */
     static CharArray of(gchar _0, gchar _1, gchar _2, gchar _3, gchar _4, gchar _5, gchar _6, gchar _7);
 
@@ -181,7 +181,7 @@ public:
      * \param _4 fiftieth character
      * \param _5 sixth character
      * \param _6 seventh character
-     * \param _7 height character
+     * \param _7 eight character
      * \param _8 ninth character
      */
     static CharArray of(gchar _0, gchar _1, gchar _2, gchar _3, gchar _4, gchar _5, gchar _6, gchar _7, gchar _8);
@@ -195,7 +195,7 @@ public:
      * \param _4 fiftieth character
      * \param _5 sixth character
      * \param _6 seventh character
-     * \param _7 height character
+     * \param _7 eight character
      * \param _8 ninth character
      * \param _9 tenth character
      */
@@ -211,7 +211,7 @@ public:
      * \param _4 fiftieth character
      * \param _5 sixth character
      * \param _6 seventh character
-     * \param _7 height character
+     * \param _7 eight character
      * \param _8 ninth character
      * \param _9 tenth character
      * \param otherChars...

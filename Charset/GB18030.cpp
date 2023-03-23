@@ -3,7 +3,6 @@
 //
 
 #include "GB18030.h"
-#include "../String.h"
 #include "../Character.h"
 
 static CORE_FAST gint GB18030_SINGLE_BYTE = 1;
@@ -16,20 +15,10 @@ static gint getGB18030(gshort const outerIndex[], String const innerEncoderIndex
     return innerEncoderIndex[offset >> 12].charAt((offset & 0xfff) + (ch & 0xff));
 }
 
-GB18030::GB18030() : Charset("GB18030") {}
-
 GB18030 GB18030::INSTANCE{};
 
 String GB18030::name() const {
-    return "GB18030";
-}
-
-Charset::ErrorAction GB18030::malformedAction() const {
-    return Charset::malformedAction();
-}
-
-Charset::ErrorAction GB18030::unmappableAction() const {
-    return Charset::unmappableAction();
+    return "GB-18030";
 }
 
 Charset::CoderResult GB18030::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
@@ -44,7 +33,7 @@ Charset::CoderResult GB18030::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
             if ((byte1 & (gbyte) 0x80) == 0) { // US-ASCII range
                 currentState = GB18030_SINGLE_BYTE;
             } else if (byte1 < 0x81 || byte1 > 0xfe) {
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 return CoderResult::MALFORMED;
             } else { // Either 2 or 4 gbyte sequence follows
                 if (src.remaining() < 1)
@@ -53,7 +42,7 @@ Charset::CoderResult GB18030::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
                 inputSize = 2;
 
                 if (byte2 < 0x30) {
-                    errorLength = 1;
+                    CODING_ERROR_LENGTH = 1;
                     return CoderResult::MALFORMED;
                 } else if (byte2 >= 0x30 && byte2 <= 0x39) {
                     currentState = GB18030_FOUR_BYTE;
@@ -63,7 +52,7 @@ Charset::CoderResult GB18030::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
 
                     byte3 = src.get() & 0xFF;
                     if (byte3 < 0x81 || byte3 > 0xfe) {
-                        errorLength = 3;
+                        CODING_ERROR_LENGTH = 3;
                         return CoderResult::MALFORMED;
                     }
 
@@ -71,11 +60,11 @@ Charset::CoderResult GB18030::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
                     inputSize = 4;
 
                     if (byte4 < 0x30 || byte4 > 0x39) {
-                        errorLength = 4;
+                        CODING_ERROR_LENGTH = 4;
                         return CoderResult::MALFORMED;
                     }
                 } else if (byte2 == 0x7f || byte2 == 0xff || (byte2 < 0x40)) {
-                    errorLength = 2;
+                    CODING_ERROR_LENGTH = 2;
                     return CoderResult::MALFORMED;
                 } else
                     currentState = GB18030_DOUBLE_BYTE;
@@ -112,7 +101,7 @@ Charset::CoderResult GB18030::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
                         // Supplemental UCS planes handled via surrogates
                     else if (offset >= 0x2E248 && offset < 0x12E248) {
                         if (offset >= 0x12E248) {
-                            errorLength = 4;
+                            CODING_ERROR_LENGTH = 4;
                             return CoderResult::MALFORMED;
                         }
                         offset -= 0x1e248;
@@ -122,7 +111,7 @@ Charset::CoderResult GB18030::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
                         dst.put((gchar) ((offset - 0x10000) / 0x400 + 0xD800));
                         dst.put((gchar) ((offset - 0x10000) % 0x400 + 0xDC00));
                     } else {
-                        errorLength = inputSize;
+                        CODING_ERROR_LENGTH = inputSize;
                         return CoderResult::MALFORMED;
                     }
             }
@@ -137,9 +126,9 @@ Charset::CoderResult GB18030::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
 
 Charset::CoderResult GB18030::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
     struct Surrogate {
-        CORE_IMPLICIT Surrogate(gint &errorLength) : errorLength(errorLength) {}
+        CORE_IMPLICIT Surrogate(gint &CODING_ERROR_LENGTH) : CODING_ERROR_LENGTH(CODING_ERROR_LENGTH) {}
 
-        gint &errorLength;
+        gint &CODING_ERROR_LENGTH;
         gint isPair = false;
         Charset::CoderResult error = Charset::CoderResult::UNDERFLOW;
         gint character = 0;
@@ -156,12 +145,12 @@ Charset::CoderResult GB18030::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                     isPair = true;
                     return character;
                 }
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 error = Charset::CoderResult::MALFORMED;
                 return -1;
             }
             if (Character::isLowSurrogate(c)) {
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 error = Charset::CoderResult::MALFORMED;
                 return -1;
             }
@@ -170,7 +159,7 @@ Charset::CoderResult GB18030::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
             return character;
         }
     };
-    Surrogate sgp{errorLength};
+    Surrogate sgp{CODING_ERROR_LENGTH};
     gint condensedKey = 0;
     gint hiByte = 0, loByte = 0;
     currentState = GB18030_DOUBLE_BYTE;
@@ -190,7 +179,7 @@ Charset::CoderResult GB18030::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
             } else if (c <= 0xA4C6 || c >= 0xE000) {
                 gint outByteVal = getGB18030(encoderIndex1, encoderIndex2, c);
                 if (outByteVal == 0xFFFD) {
-                    errorLength = 1;
+                    CODING_ERROR_LENGTH = 1;
                     return CoderResult::UNMAPPABLE;
                 }
 
@@ -256,18 +245,6 @@ gfloat GB18030::averageBytesPerChar() const {
     return 4.0f;
 }
 
-CharBuffer GB18030::decode(ByteBuffer &in) {
-    return Charset::decode(in);
-}
-
-ByteBuffer GB18030::encode(CharBuffer &in) {
-    return Charset::encode(in);
-}
-
-String GB18030::toString() const {
-    return Charset::toString();
-}
-
 gbool GB18030::contains(const Charset &cs) const {
     return ((cs.name().equals("US-ASCII"))
             || (cs.name().equals("GBK"))
@@ -321,10 +298,6 @@ gbool GB18030::contains(const Charset &cs) const {
             || (cs.name().equals("x-ISO-2022-CN-GB"))
             || (cs.name().equals("x-Johab"))
             || (dynamic_cast<GB18030 const *>(&cs)));
-}
-
-gbool GB18030::canEncode(gchar c) const {
-    return Charset::canEncode(c);
 }
 
 Object &GB18030::clone() const {

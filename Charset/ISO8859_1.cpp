@@ -5,20 +5,11 @@
 #include "ISO8859_1.h"
 #include "../String.h"
 #include "../Character.h"
-ISO8859_1::ISO8859_1() : Charset("ISO-8859-1") {}
 
 ISO8859_1 ISO8859_1::INSTANCE{};
 
 String ISO8859_1::name() const {
     return "ISO-8859-1";
-}
-
-Charset::ErrorAction ISO8859_1::malformedAction() const {
-    return Charset::malformedAction();
-}
-
-Charset::ErrorAction ISO8859_1::unmappableAction() const {
-    return Charset::unmappableAction();
 }
 
 Charset::CoderResult ISO8859_1::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
@@ -52,18 +43,18 @@ Charset::CoderResult ISO8859_1::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
             }
             if (Character::isHighSurrogate(c)){
                 if(src.hasRemaining()){
-                    errorLength = 1;
+                    CODING_ERROR_LENGTH = 1;
                     return CoderResult::MALFORMED;
                 }
                 gchar d = src.get();
                 if (Character::isLowSurrogate(d)){
-                    errorLength = 2;
+                    CODING_ERROR_LENGTH = 2;
                     return CoderResult::UNMAPPABLE;
                 }
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 return CoderResult::MALFORMED;
             }
-            errorLength = 1;
+            CODING_ERROR_LENGTH = 1;
             return CoderResult::MALFORMED;
         }
         return CoderResult::UNDERFLOW;
@@ -81,24 +72,8 @@ gfloat ISO8859_1::averageBytesPerChar() const {
     return 1.0f;
 }
 
-CharBuffer ISO8859_1::decode(ByteBuffer &in) {
-    return Charset::decode(in);
-}
-
-ByteBuffer ISO8859_1::encode(CharBuffer &in) {
-    return Charset::encode(in);
-}
-
-String ISO8859_1::toString() const {
-    return Charset::toString();
-}
-
 gbool ISO8859_1::contains(const Charset &cs) const {
     return dynamic_cast<ISO8859_1 const *>(&cs);
-}
-
-gbool ISO8859_1::canEncode(gchar c) const {
-    return Charset::canEncode(c);
 }
 
 Object &ISO8859_1::clone() const {

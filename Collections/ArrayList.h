@@ -5,22 +5,22 @@
 #ifndef CORE_ARRAYLIST_H
 #define CORE_ARRAYLIST_H
 
-
-#include "List.h"
+#include "../Break.h"
 #include "../IndexError.h"
 #include "../MemoryError.h"
-#include "../Break.h"
+#include "List.h"
 
 template<class E>
 class ArrayList : public List<E> {
 private:
     using Element = typename Class<E>::Pointer;
+    using Node = typename Class<Element>::Pointer;
 
     CORE_FAST static gint DEFAULT_CAPACITY = 10;
 
     Element UNINITIALIZED = nullptr;
 
-    typename Class<Element>::Pointer data = {};
+    Node data = {};
 
     gint len = 0;
 
@@ -33,7 +33,8 @@ private:
     class Maker<U, true> {
     public:
         static U &copyOf(U const &obj) {
-            return (U &) ((Object &) obj).clone();
+            Object const &o = obj;
+            return (U &) o.clone();
         }
     };
 
@@ -135,8 +136,9 @@ public:
         checkIndex(index, len + 1);
         if (len == capacity)
             resize();
-        arrayCopy(data, index, data, index + 1, len - index);
+        copy(data, index, data, index + 1, len - index);
         data[index] = &Maker<E>::copyOf(obj);
+        len = len + 1;
     }
 
     gbool addAll(const Collection<E> &c) override {
@@ -151,7 +153,7 @@ public:
             copy(a.data, 0, data, len, a.len);
             len += a.len;
         } else {
-            Iterator<E const> &&it = c.iterator();
+            Iterator2<E> &it = c.iterator2();
             if (Class<List<E>>::hasInstance(c))
                 while (it.hasNext()) {
                     data[len] = (Element) &it.next();
@@ -185,7 +187,7 @@ public:
             copy(a.data, 0, data, index, a.len);
             len += a.len;
         } else {
-            Iterator<E const> &&it = c.iterator();
+            Iterator2<E> &it = c.iterator2();
             if (Class<List<E>>::hasInstance(c))
                 while (it.hasNext()) {
                     data[index] = (Element) &it.next();
@@ -232,7 +234,8 @@ public:
             clear();
             return true;
         }
-        gint i, j;
+        gint i;
+        gint j;
         for (i = j = 0; i < len; ++i)
             if (!c.contains(*data[i])) {
                 data[j] = data[i];
@@ -246,7 +249,8 @@ public:
     gbool removeIf(const Predicate<const E &> &p) override {
         if (isEmpty())
             return false;
-        gint i, j;
+        gint i;
+        gint j;
         for (i = j = 0; i < len; ++i)
             if (!p.test(*data[i])) {
                 data[j] = data[i];
@@ -278,7 +282,8 @@ public:
     }
 
     gbool retainAll(const Collection<E> &c) override {
-        gint i, j;
+        gint i;
+        gint j;
         for (i = j = 0; i < len; ++i)
             if (c.contains(*data[i])) {
                 data[j] = data[i];
@@ -304,12 +309,16 @@ public:
 
     void forEach(Consumer<E const &> const &action) const override {
         for (gint i = 0, limit = len; i < limit && limit == len; ++i)
-            try { action.accept(get(i)); } catch (Break const &) { break; }
+            try {
+                action.accept(get(i));
+            } catch (Break const &) { break; }
     }
 
     void forEach(const Consumer<E &> &action) override {
         for (gint i = 0, limit = len; i < limit && limit == len; ++i)
-            try { action.accept(get(i)); } catch (Break const &) { break; }
+            try {
+                action.accept(get(i));
+            } catch (Break const &) { break; }
     }
 
     E &get(gint index) override {
@@ -322,7 +331,7 @@ public:
         return *data[index];
     }
 
-    const E &set(gint index, const E &obj) override {
+    E &set(gint index, const E &obj) override {
         checkIndex(index, len);
         Element oldValue = data[index];
         data[index] = &Maker<E>::copyOf(obj);
@@ -330,12 +339,14 @@ public:
     }
 
     gint indexOf(const E &obj) const override {
-        for (gint i = 0, limit = len; i < limit; ++i) if (obj.equals(get(i))) return i;
+        for (gint i = 0, limit = len; i < limit; ++i)
+            if (obj.equals(get(i))) return i;
         return -1;
     }
 
     gint lastIndexOf(const E &obj) const override {
-        for (gint i = len - 1; i >= 0; --i) if (obj.equals(get(i))) return i;
+        for (gint i = len - 1; i >= 0; --i)
+            if (obj.equals(get(i))) return i;
         return -1;
     }
 
@@ -364,32 +375,214 @@ public:
         return containsAll(arrayList);
     }
 
+
     Object &clone() const override {
-        try { return *new ArrayList(*this); } catch (...) { throw MemoryError(); }
+        try {
+            return *new ArrayList(*this);
+        } catch (...) { throw MemoryError(); }
     }
 
-    ~ArrayList() override {
+    virtual ~ArrayList() {
         fillNull(data, 0, capacity);
         delete[] data;
         len = 0;
         data = nullptr;
     };
-private:
-    template<class U>
-    class Itr: public Iterator<U> {
-        gint nextIndex;
-        gint lastReturned = -1;
-        friend ArrayList;
 
+private:
+    class Itr : public ListIterator<E> {
+    public:
+        ArrayList<E> &src;
+        gint cursor = 0;
+        gint oldIndex = -1;
+
+        CORE_EXPLICIT Itr(ArrayList<E> &src, gint srcBegin) : src(src), cursor(srcBegin) {}
+
+        gbool hasNext() const override {
+            return cursor < src.len;
+        }
+
+        E &next() override {
+            if (!hasNext())
+                throw StateError("No such item");
+            oldIndex = cursor;
+            cursor += 1;
+            return *src.data[oldIndex];
+        }
+
+        gint nextIndex() override {
+            return cursor;
+        }
+
+        gbool hasPrevious() const override {
+            return cursor != 0;
+        }
+
+        E &previous() override {
+            gint i = cursor - 1;
+            if (i < 0 || i >= src.len)
+                throw StateError("No such item");
+            oldIndex = cursor = i;
+            return *src.data[oldIndex];
+        }
+
+        gint previousIndex() override {
+            return cursor - 1;
+        }
+
+        void remove() override {
+            if (oldIndex < 0)
+                throw StateError("No such item");
+            src.removeAt(oldIndex);
+            cursor = oldIndex;
+            oldIndex = -1;
+        }
+
+        void set(const E &obj) override {
+            if (oldIndex >= src.len || oldIndex < 0)
+                throw StateError("No such item");
+            src.set(oldIndex, obj);
+        }
+
+        void add(const E &obj) override {
+            src.add(cursor, obj);
+            cursor += 1;
+            oldIndex = -1;
+        }
+
+        gbool equals(const Object &obj) const override {
+            if (!Object::equals(obj))
+                return false;
+            if (!Class<Itr>::hasInstance(obj))
+                return false;
+            Itr const &itr = (Itr const &) obj;
+            return &src == &itr.src && itr.cursor == cursor;
+        }
+
+        Object &clone() const override {
+            try {
+                return *new Itr(src, cursor);
+            } catch (...) { throw MemoryError(); }
+        }
+
+        void forEach(const Consumer<E &> &action) override {
+            gint i = cursor;
+            if (i < src.len) {
+                for (; i < src.len; i++)
+                    action.accept(src.get(i));
+                cursor = i;
+                oldIndex = i - 1;
+            }
+        }
+    };
+
+    class Itr2 : public ListIterator2<E> {
+    public:
+        ArrayList<E> &src = nullptr;
+        gint cursor = 0;
+        gint oldIndex = -1;
+        gint isReadOnly = false;
+
+        CORE_EXPLICIT Itr2(ArrayList<E> &src, gint srcBegin, gbool isReadOnly) : src(src), cursor(srcBegin), isReadOnly(isReadOnly) {}
+
+        gbool hasNext() const override {
+            return cursor < src.len;
+        }
+
+        gbool hasPrevious() const override {
+            return cursor != 0;
+        }
+
+        E const &next() override {
+            if (!hasNext())
+                throw StateError("No such item");
+            oldIndex = cursor;
+            cursor += 1;
+            return *src.data[oldIndex];
+        }
+
+        E const &previous() override {
+            gint i = cursor - 1;
+            if (i < 0 || i >= src.len)
+                throw StateError("No such item");
+            oldIndex = cursor = i;
+            return *src.data[oldIndex];
+        }
+
+        gint nextIndex() const override {
+            return cursor;
+        }
+
+        gint previousIndex() const override {
+            return cursor - 1;
+        }
+
+        void remove() override {
+            if (isReadOnly)
+                throw StateError("Remove operation is not supported by read-only ArrayList");
+            if (oldIndex < 0)
+                throw StateError("No such item");
+            src.removeAt(oldIndex);
+            cursor = oldIndex;
+            oldIndex = -1;
+        }
+
+        void set(const E &obj) override {
+            if (isReadOnly)
+                throw StateError("Set operation is not supported by read-only ArrayList");
+            if (oldIndex >= src.len || oldIndex < 0)
+                throw StateError("No such item");
+            src.set(oldIndex, obj);
+        }
+
+        void add(const E &obj) override {
+            if (isReadOnly)
+                throw StateError("Add operation is not supported by read-only ArrayList");
+            src.add(cursor, obj);
+            cursor += 1;
+            oldIndex = -1;
+        }
+
+        gbool equals(const Object &obj) const override {
+            if (!Object::equals(obj))
+                return false;
+            if (!Class<Itr>::hasInstance(obj))
+                return false;
+            Itr2 const &itr = (Itr2 const &) obj;
+            return &src == &itr.src && itr.cursor == cursor;
+        }
+
+        Object &clone() const override {
+            try {
+                return *new Itr2(src, cursor, isReadOnly);
+            } catch (...) { throw MemoryError(); }
+        }
+
+        void forEach(const Consumer<E const &> &action) override {
+            gint i = cursor;
+            if (i < src.len) {
+                for (; i < src.len; i++)
+                    action.accept(src.get(i));
+                cursor = i;
+                oldIndex = i - 1;
+            }
+        }
     };
 
 public:
-    Iterator<const E> &&iterator() const override {
-        return Itr<E const>((ArrayList<E> &) *this);
+    ListIterator2<E> &iterator2() const override {
+        Itr2 it = Itr2((ArrayList<E> &) *this, 0, true);
+        return Maker<Itr2>::copyOf(it);
     }
 
-    Iterator<E> &&iterator() override {
-        return Itr<E>(*this);
+    ListIterator2<E> &iterator2() override {
+        Itr2 it = Itr2(*this, 0, false);
+        return Maker<Itr2>::copyOf(it);
+    }
+
+    ListIterator<E> &iterator() override {
+        Itr it = Itr(*this, 0);
+        return Maker<Itr>::copyOf(it);
     }
 
 private:
@@ -404,15 +597,15 @@ private:
             else if (minLength < Integer::MAX - 8)
                 return minLength;
             else
-                return minLength;
+                return Integer::MAX - 8;
         }
     }
 
     void resize(gint minCapacity) {
         if (capacity > 0 && data != nullptr) {
             gint newCapacity = newLength(capacity, minCapacity - capacity, capacity >> 1);
-            Element *obj = new Element[newCapacity];
-            arrayCopy(data, 0, obj, 0, len);
+            Node obj = new Element[newCapacity];
+            copy(data, 0, obj, 0, len);
             fillNull(data, 0, len);
             UNINITIALIZED = obj[0];
             delete[] data;
@@ -420,7 +613,7 @@ private:
             capacity = newCapacity;
         } else {
             gint newCapacity = minCapacity < 10 ? 10 : minCapacity;
-            Element *obj = new Element[newCapacity];
+            Node obj = new Element[newCapacity];
             fillNull(data, 0, newCapacity);
             UNINITIALIZED = obj[0];
             delete[] data;
@@ -446,9 +639,13 @@ private:
 };
 
 #if __cpp_deduction_guides > 201565
-ArrayList() -> ArrayList<Object>;
-ArrayList(gint) -> ArrayList<Object>;
-template<class E> ArrayList(Collection<E> const &) -> ArrayList<E>;
-#endif //
+ArrayList()->ArrayList<Object>;
 
-#endif //CORE_ARRAYLIST_H
+ArrayList(gint)->ArrayList<Object>;
+
+template<class E>
+ArrayList(Collection<E> const &) -> ArrayList<E>;
+
+#endif//
+
+#endif//CORE_ARRAYLIST_H

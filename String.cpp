@@ -606,7 +606,7 @@ gint countChars(gbyte const b[], gint length) {
 gint decode_literal_string(gbyte const src[], gint srcLen, gbyte dst[], gint dstLen) {
     gint i;
     gint j = 0;
-    for (i = 0; i < srcLen; j = nextIndex) {
+    for (i = 0; i < srcLen && j < dstLen; j = nextIndex) {
         gbyte b1 = src[i];
         if (b1 >= 0) {
             put(dst, j, b1);

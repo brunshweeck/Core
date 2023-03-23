@@ -6,9 +6,10 @@
 #define CORE_TREEMAP_H
 
 
-#include "OrderedMap.h"
 #include "../Function/NaturalOrderComparator.h"
 #include "../KeyError.h"
+#include "OrderedMap.h"
+
 
 /**
  * A Red-Black tree based navigable map
@@ -21,15 +22,15 @@ private:
     CORE_TEMPLATE_REQUIREMENT(K)
     CORE_TEMPLATE_REQUIREMENT(V)
 
-    CORE_FAST static gbool RED = false;
-    CORE_FAST static gbool BLACK = true;
-
     template<class T, gbool = Class<T>::isAbstract() || !Class<T>::template isConstruct<T const &>()>
     class Maker;
 
     class Entry;
 
     using Node = typename Class<TreeMap<K, V>::Entry>::Pointer;
+
+    template<class _K, class _V>
+    using AbstractEntry = typename Map<_K, _V>::Entry;
 
     template<class T>
     class Maker<T, true> {
@@ -43,30 +44,36 @@ private:
     class Maker<T, false> {
     public:
         static T &copyOf(T const &obj) {
-            try { return *new T(obj); } catch (std::bad_alloc const &) { throw MemoryError(); }
+            if (Object::isPerfectlyInstanceOf<T>(obj))
+                try {
+                    return *new T(obj);
+                } catch (std::bad_alloc const &) { throw MemoryError(); }
+            else {
+                Object const &o = obj;
+                return (T &) o.clone();
+            }
         }
     };
 
     class Entry : public Map<K, V>::Entry {
+    public:
         K const &_key;
         V *_value;
         Node left = nullptr;
         Node right = nullptr;
         Node parent = nullptr;
-        gbool color = BLACK;
-    public:
         /**
          * Construct new entry
          * \param key
          * \param value
          * \param parent (nullable value)
          */
-        CORE_EXPLICIT Entry(const K &key, V &value, Node parent) : _key(key), _value(value), parent(parent) {}
+        CORE_EXPLICIT Entry(const K &key, V &value, Node parent) : _key(key), _value(&value), parent(parent) {}
 
         /**
          * Return key of this entry
          */
-        const K &key() override {
+        const K &key() const override {
             return _key;
         }
 
@@ -90,7 +97,7 @@ private:
          */
         V &setValue(const V &obj) override {
             V &old = *_value;
-            if (this != &obj)
+            if (_value != &obj)
                 _value = &Maker<V>::copyOf(obj);
             return old;
         }
@@ -114,7 +121,9 @@ private:
          * Return copy of this entry
          */
         Object &clone() const override {
-            try { return *new Entry(*this); } catch (...) { throw MemoryError(); }
+            try {
+                return *new Entry(*this);
+            } catch (...) { throw MemoryError(); }
         }
 
         /**
@@ -127,6 +136,7 @@ private:
 
     class Values : public Collection<V> {
         TreeMap<K, V> &self;
+
     public:
         CORE_EXPLICIT Values(TreeMap<K, V> &self) : self(self) {}
 
@@ -134,8 +144,12 @@ private:
             return self.len;
         }
 
-        Iterator<const V> &&iterator() const override {
-            //
+        Iterator2<V> &iterator2() const override {
+            return (ValuesItr2 &) ValuesItr2(self).clone();
+        }
+
+        Iterator2<V> &iterator2() override {
+            return (ValuesItr2 &) ValuesItr2(self).clone();
         }
 
         gbool contains(const V &obj) const override {
@@ -143,9 +157,9 @@ private:
         }
 
         gbool remove(const V &obj) override {
-            for (Node node = checkNode(root); node != nullptr; node = checkSuccessor(node)) {
+            for (Node node = self.checkFirstNode(); node != nullptr; node = self.checkSuccessor(node)) {
                 if (obj.equals(node->value())) {
-                    removeInTree(node->parent, node->key());
+                    self.removeInTree(node->parent == nullptr ? self.root : node->parent, node->key());
                     return true;
                 }
             }
@@ -155,10 +169,17 @@ private:
         void clear() override {
             self.clear();
         }
+
+        Object &clone() const override {
+            try {
+                return *new Values(self);
+            } catch (...) { throw MemoryError(); }
+        }
     };
 
     class Keys : public Set<K> {
-        TreeMap<K, V>& self;
+        TreeMap<K, V> &self;
+
     public:
         CORE_EXPLICIT Keys(TreeMap<K, V> &self) : self(self) {}
 
@@ -174,23 +195,37 @@ private:
             return self.len;
         }
 
-        Iterator<const K> &&iterator() const override {
-            //
+        Iterator2<K> &iterator2() const override {
+            return (KeysItr2 &) KeysItr2(self).clone();
+        }
+        Iterator2<K> &iterator2() override {
+            return (KeysItr2 &) KeysItr2(self).clone();
+        }
+
+        Object &clone() const override {
+            try {
+                return *new Keys(self);
+            } catch (...) { throw MemoryError(); }
         }
     };
 
-    class Entries : public Set<typename Map<K, V>::Entry> {
-        TreeMap<K, V>& self;
+    class Entries : public Set<AbstractEntry<K, V>> {
+        TreeMap<K, V> &self;
+
     public:
         CORE_EXPLICIT Entries(TreeMap<K, V> &self) : self(self) {}
 
-        Iterator<const typename Map<K, V>::Entry> &&iterator() const override {
-            //
+        Iterator2<AbstractEntry<K, V>> &iterator2() const override {
+            return (Iterator2<AbstractEntry<K, V>> &) EntriesItr2(self).clone();
+        }
+
+        Iterator2<AbstractEntry<K, V>> &iterator2() override {
+            return (Iterator2<AbstractEntry<K, V>> &) EntriesItr2(self).clone();
         }
 
         gbool contains(const typename Map<K, V>::Entry &obj) const override {
-            Node node = checkNode(obj.key());
-            if(node != nullptr)
+            Node node = self.checkNode(obj.key());
+            if (node != nullptr)
                 return testEquality(obj.value(), node->value());
             return false;
         }
@@ -201,6 +236,170 @@ private:
 
         gint size() const override {
             return self.len;
+        }
+
+        Object &clone() const override {
+            try {
+                return *new Entries(self);
+            } catch (...) { throw MemoryError(); }
+        }
+    };
+
+    template<class U>
+    class Itr : public Iterator<U> {
+    public:
+        TreeMap &self;
+        Node successor = nullptr;
+        Node lastNode = nullptr;
+
+        CORE_EXPLICIT Itr(TreeMap &self) : self(self) {}
+
+        gbool hasNext() const override {
+            return successor != nullptr;
+        }
+
+        void remove() override {
+            if (lastNode == nullptr)
+                throw StateError("No such item");
+            if(lastNode->parent == nullptr)
+                self.removeInTree(self.root, lastNode->key());
+            else
+                self.removeInTree(lastNode->parent, lastNode->key());
+            lastNode = nullptr;
+        }
+
+        Node nextEntry() {
+            if (!hasNext())
+                throw StateError("No such item");
+            lastNode = successor;
+            successor = self.checkSuccessor(successor);
+            return lastNode;
+        }
+
+        gbool equals(const Object &obj) const override {
+            if (this == &obj)
+                return true;
+            if (!Class<Itr>::hasInstance(obj))
+                return false;
+            Itr const &it = (Itr const &) obj;
+            return &it.self == &self && it.successor == successor;
+        }
+    };
+
+    template<class U>
+    class Itr2 : public Iterator2<U> {
+    public:
+        TreeMap &self;
+        Node successor = nullptr;
+        Node lastNode = nullptr;
+
+        CORE_EXPLICIT Itr2(TreeMap &self) : self(self) {}
+
+        gbool hasNext() const override {
+            return successor != nullptr;
+        }
+
+        void remove() override {
+            if (lastNode == nullptr)
+                throw StateError("No such item");
+            if(lastNode->parent == nullptr)
+                self.removeInTree(self.root, lastNode->key());
+            else
+                self.removeInTree(lastNode->parent, lastNode->key());
+            lastNode = nullptr;
+        }
+
+        Node nextEntry() {
+            if (!hasNext())
+                throw StateError("No such item");
+            lastNode = successor;
+            successor = self.checkSuccessor(successor);
+            return lastNode;
+        }
+
+        gbool equals(const Object &obj) const override {
+            if (this == &obj)
+                return true;
+            if (!Class<Itr2>::hasInstance(obj))
+                return false;
+            Itr2 const &it = (Itr2 const &) obj;
+            return &it.self == &self && it.successor == successor;
+        }
+    };
+
+    class KeysItr2 : public Itr2<K> {
+    public:
+        CORE_EXPLICIT KeysItr2(TreeMap &self) : Itr2<K>(self) {}
+
+        const K &next() override {
+            return this->nextEntry()->key();
+        }
+
+        gbool equals(const Object &obj) const override {
+            return Itr2<K>::equals(obj) && Class<KeysItr2>::hasInstance(obj);
+        }
+
+        Object &clone() const override {
+            try {
+                return *new KeysItr2(Itr2<K>::self);
+            } catch (...) { throw MemoryError(); }
+        }
+    };
+
+    class ValuesItr2 : public Itr2<V> {
+    public:
+        CORE_EXPLICIT ValuesItr2(TreeMap &self) : Itr2<V>(self) {}
+
+        const V &next() override {
+            return this->nextEntry()->value();
+        }
+
+        gbool equals(const Object &obj) const override {
+            return Itr2<V>::equals(obj) && Class<ValuesItr2>::hasInstance(obj);
+        }
+
+        Object &clone() const override {
+            try {
+                return *new ValuesItr2(Itr2<V>::self);
+            } catch (...) { throw MemoryError(); }
+        }
+    };
+
+    class EntriesItr : public Itr<AbstractEntry<K, V>> {
+    public:
+        CORE_EXPLICIT EntriesItr(TreeMap &self) : Itr<AbstractEntry<K, V>>(self) {}
+
+        AbstractEntry<K, V> &next() override {
+            return *this->nextEntry();
+        }
+
+        gbool equals(const Object &obj) const override {
+            return Itr<AbstractEntry<K, V>>::equals(obj) && Class<EntriesItr2>::hasInstance(obj);
+        }
+
+        Object &clone() const override {
+            try {
+                return *new EntriesItr(Itr<AbstractEntry<K, V>>::self);
+            } catch (...) { throw MemoryError(); }
+        }
+    };
+
+    class EntriesItr2 : public Itr2<AbstractEntry<K, V>> {
+    public:
+        CORE_EXPLICIT EntriesItr2(TreeMap &self) : Itr2<AbstractEntry<K, V>>(self) {}
+
+        AbstractEntry<K, V> &next() override {
+            return *Itr2<AbstractEntry<K, V>>::nextEntry();
+        }
+
+        gbool equals(const Object &obj) const override {
+            return Itr2<AbstractEntry<K, V>>::equals(obj) && Class<EntriesItr2>::hasInstance(obj);
+        }
+
+        Object &clone() const override {
+            try {
+                return *new EntriesItr2(this->self);
+            } catch (...) { throw MemoryError(); }
         }
     };
 
@@ -217,8 +416,8 @@ public:
      * Constructs a new, empty tree map, using the natural ordering of its key.
      * All keys inserted into the map must implement the comparable class
      */
-    template<class _ = K, Class<gbool>::Require<Class<Comparable<K>>::template isSuper<_>()> = true>
-    CORE_IMPLICIT TreeMap(): cmp(NaturalOrderComparator<K>::INSTANCE) {}
+    template<class = K /*, Class<gbool>::Require<Class<Comparable<K>>::template isSuper<_>()> = true*/>
+    CORE_IMPLICIT TreeMap() : cmp(NaturalOrderComparator<K>::INSTANCE) {}
 
     /**
      * Constructs a new, empty tree map, ordered according to the given comparator.
@@ -233,10 +432,10 @@ public:
      * \param m the map whose mappings are to be placed in this map
      */
     template<class _K, class _V,
-            Class<gbool>::Require<Class<K>::template isSuper<_K>()> = true,
-            Class<gbool>::Require<Class<V>::template isSuper<_V>()> = true,
-            Class<gbool>::Require<Class<Comparable<_K>>::template isSuper<_K>()> = true>
-    CORE_EXPLICIT TreeMap(Map<_K, _V> const &m): cmp(NaturalOrderComparator<K>::INSTANCE) {
+             Class<gbool>::Require<Class<K>::template isSuper<_K>()> = true,
+             Class<gbool>::Require<Class<V>::template isSuper<_V>()> = true,
+             Class<gbool>::Require<Class<Comparable<_K>>::template isSuper<_K>()> = true>
+    CORE_EXPLICIT TreeMap(Map<_K, _V> const &m) : cmp(NaturalOrderComparator<K>::INSTANCE) {
         addAll(m);
     }
 
@@ -248,22 +447,36 @@ public:
      *          and whose comparator is to be used to sort this map
      */
     template<class _K, class _V,
-            Class<gbool>::Require<Class<K>::template isSuper<_K>()> = true,
-            Class<gbool>::Require<Class<V>::template isSuper<_V>()> = true>
-    CORE_EXPLICIT TreeMap(OrderedMap<_K, _V> const &m): cmp(m.comparator()) {
+             Class<gbool>::Require<Class<K>::template isSuper<_K>()> = true,
+             Class<gbool>::Require<Class<V>::template isSuper<_V>()> = true>
+    CORE_EXPLICIT TreeMap(OrderedMap<_K, _V> const &m) : cmp(m.comparator()) {
         addAll(m);
     }
 
-    CORE_IMPLICIT TreeMap(TreeMap<K, V> const &m) {}
+    CORE_IMPLICIT TreeMap(TreeMap<K, V> const &m) : TreeMap((OrderedMap<K, V> const &) m) {}
 
-    CORE_IMPLICIT TreeMap(TreeMap<K, V> &&m) {}
+    CORE_IMPLICIT TreeMap(TreeMap<K, V> &&m) {
+        swap(root, m.root);
+        swap(len, m.len);
+    }
 
-    TreeMap &operator=(TreeMap<K, V> const &m) {}
+    TreeMap &operator=(TreeMap<K, V> const &m) {
+        if (this != &m) {
+            addAll(m);
+        }
+        return *this;
+    }
 
-    TreeMap &operator=(TreeMap<K, V> &&m) CORE_NOTHROW {}
+    TreeMap &operator=(TreeMap<K, V> &&m) CORE_NOTHROW {
+        if (this != &m) {
+            swap(root, m.root);
+            swap(len, m.len);
+        }
+        return *this;
+    }
 
     V &add(const K &key, const V &value) override {
-        return addInTree(root, Maker<K>::copyOf(key), Maker<V>::copyOf(value));
+        return addInTree(key, value, true);
     }
 
     void addAll(const Map<K, V> &m) override {
@@ -273,10 +486,10 @@ public:
                 root = copyOfTree(map.root);
                 len = map.len;
             } else {
-                Iterator<typename Map<K, V>::Entry const> &&it = m.iterator();
+                Iterator2<AbstractEntry<K, V>> &it = m.iterator2();
                 while (it.hasNext()) {
                     typename Map<K, V>::Entry const &entry = it.next();
-                    addInTree(root, entry.key(), entry.value());
+                    add(entry.key(), entry.value());
                 }
             }
         }
@@ -286,8 +499,17 @@ public:
         return removeInTree(root, key);
     }
 
+    /**
+     * Removes the entry for the specified key only if it is currently mapped to the specified value.
+     */
     gbool remove(const K &key, const V &value) override {
-        return 0;
+        Node node = checkNode(key);
+        if (node == nullptr)
+            return false;
+        if (!value.equals(node->value()))
+            return false;
+        removeInTree(node->parent == nullptr ? root : node->parent, key);
+        return true;
     }
 
     const V &get(const K &key) const override {
@@ -318,7 +540,7 @@ public:
         return *node;
     }
 
-    void forEach(const BiConsumer<const K &, const V &> &action) const override {
+    void forEach(const BiConsumer<K const &, const V &> &action) const override {
         gint oldSize = len;
         for (Node node = checkFirstNode(); node != nullptr; node = checkSuccessor(node)) {
             action.accept(node->key(), node->value());
@@ -327,7 +549,7 @@ public:
         }
     }
 
-    void forEach(const BiConsumer<const K &, V &> &action) override {
+    void forEach(const BiConsumer<K const &, V &> &action) override {
         gint oldSize = len;
         for (Node node = checkFirstNode(); node != nullptr; node = checkSuccessor(node)) {
             action.accept(node->key(), node->value());
@@ -359,10 +581,117 @@ public:
     }
 
     Object &clone() const override {
-        try { return *new TreeMap<K, V>(*this); } catch (...) { throw MemoryError(); }
+        try {
+            return *new TreeMap<K, V>(*this);
+        } catch (...) { throw MemoryError(); }
     }
 
-    //
+    gbool equals(const Object &obj) const override {
+        if (this == &obj)
+            return true;
+        if (!Class<TreeMap>::hasInstance(obj))
+            return false;
+        TreeMap const &m = (TreeMap const &) m;
+        if (len != m.len)
+            return false;
+        for (Node node = checkFirstNode(); node != nullptr; node = checkSuccessor(node))
+            if (!m.contains(node->key(), node->value()))
+                return false;
+        return true;
+    }
+
+    const V &getOrDefault(const K &key, const V &defaultValue) const override {
+        Node node = checkNode(key);
+        if (node == nullptr)
+            return defaultValue;
+        return node->value();
+    }
+
+    V &getOrDefault(const K &key, V &defaultValue) override {
+        Node node = checkNode(key);
+        if (node == nullptr)
+            return defaultValue;
+        return node->value();
+    }
+
+    gbool isEmpty() const override {
+        return len != 0;
+    }
+
+    gbool contains(const K &key, const V &value) const override {
+        Node node = checkNode(key);
+        if (node == nullptr)
+            return false;
+        return value.equals(node->value());
+    }
+
+    String toString() const override {
+        if (isEmpty())
+            return "{}";
+        String string = "{";
+        Node node = checkFirstNode();
+        Node node1 = nullptr;
+        for (; node != nullptr; node = node1) {
+            node1 = checkSuccessor(node);
+            string += node->key().toString() + ": " + node->value().toString();
+            if (node1 != nullptr)
+                string += ", ";
+        }
+        string += "}";
+        return string;
+    }
+
+    Iterator2<AbstractEntry<K, V>> &iterator2() const override {
+        try {
+            return *new EntriesItr2((TreeMap &) *this);
+        } catch (...) { throw MemoryError(); }
+    }
+
+    Iterator2<AbstractEntry<K, V>> &iterator2() override {
+        try {
+            return *new EntriesItr2(*this);
+        } catch (...) { throw MemoryError(); }
+    }
+
+    Iterator<AbstractEntry<K, V>> &iterator() override {
+        try {
+            return *new EntriesItr(*this);
+        } catch (...) { throw MemoryError(); }
+    }
+
+    void clear() override {
+        Node node = checkFirstNode();
+        Node node1 = nullptr;
+        while(node != nullptr){
+            node1 = checkSuccessor(node);
+            removeInTree(node->parent == nullptr ? root : node->parent, node->key());
+            node = node1;
+        }
+    }
+
+    Set<K> &keys() const override {
+        try {
+            return *new Keys((TreeMap &) *this);
+        } catch (...) { throw MemoryError(); }
+    }
+
+    Collection<V> &values() const override {
+        try {
+            return *new Values((TreeMap &) *this);
+        } catch (...) { throw MemoryError(); }
+    }
+
+    Set<AbstractEntry<K, V>> &entries() const override {
+        try {
+            return *new Entries((TreeMap &) *this);
+        } catch (...) { throw MemoryError(); }
+    }
+
+    virtual ~TreeMap() {
+        clear();
+        root = nullptr;
+        len = 0;
+    }
 
 protected:
     /**
@@ -397,11 +726,10 @@ protected:
                 Node node1 = node;
                 node = node->parent;
                 while (node != nullptr) {
-                    if (node1 != node->rigth)
+                    if (node1 != node->right)
                         break;
                     node1 = node;
                     node = node->parent;
-                    break;
                 }
                 return node;
             }
@@ -436,6 +764,32 @@ protected:
     }
 
     /**
+     * Return Parent of specified key in this map
+     */
+    Node checkAncestor(Node src, K const &key, gint &contains, gint &pos) {
+        contains = false;
+        Node node = src;
+        Node node1 = nullptr;
+        pos = 0;
+        while (node != nullptr) {
+            gint res = cmp.compare(key, node->key());
+            if (res < 0) {
+                node1 = node;
+                pos = 1;
+                node = node->left;
+            } else if (res > 0) {
+                node1 = node;
+                pos = 2;
+                node = node->right;
+            } else {
+                contains = true;
+                break;
+            }
+        }
+        return node1;
+    }
+
+    /**
      * Return first node of this map
      */
     Node checkFirstNode() const {
@@ -464,77 +818,59 @@ protected:
         return obj1.equals(obj2);
     }
 
-    V &addInTree(Node dst, K const &k, V &v) {
-        if (root == nullptr) {
-            try { root = new Entry(k, v); } catch (...) { throw MemoryError(); }
+    V &addInTree(K const &k, V const &v, gbool copy = false) {
+        gint searchSatus;
+        gint leftOrRight = 0;
+        Node node = checkAncestor(root, k, searchSatus, leftOrRight);
+        if (searchSatus == 0) {
+            Node newNode = copy ? new Entry(Maker<K>::copyOf(k), Maker<V>::copyOf(v), node) : new Entry(k, (V &) v, node);
+            (leftOrRight == 0 ? root : leftOrRight == 1 ? node->left
+                                                        : node->right) = newNode;
             len += 1;
-            return root->value();
-        } else
-            while (true) {
-                gint res = cmp.compare(k, dst->key());
-                if (res < 0) {
-                    if (dst->left == nullptr) {
-                        try { dst->left = new Entry(k, v); } catch (...) { throw MemoryError(); }
-                        len += 1;
-                        return dst->right->value();
-                    } else
-                        dst = dst->left;
-                } else if (res > 0) {
-                    if (dst->right == nullptr) {
-                        try { dst->right = new Entry(k, v); } catch (...) { throw MemoryError(); }
-                        len += 1;
-                        return dst->right->value();
-                    } else
-                        dst = dst->right;
-                } else {
-                    return dst->setValue(v);
-                }
-            }
-
+            return newNode->value();
+        } else {
+            Node oldNode = leftOrRight == 0 ? root : leftOrRight == 1 ? node->left
+                                                                      : node->right;
+            V &oldValue = oldNode->value();
+            if (copy)
+                oldNode->setValue(v);
+            else
+                oldNode->_value = &(V &) v;
+            return oldValue;
+        }
     }
 
     V &removeInTree(Node src, K const &k) {
-        while (src != nullptr) {
-            gint res = cmp.compare(k, src->key());
-            if (res < 0) {
-                src = src->left;
-            } else if (res > 0) {
-                src = src->right;
-            } else {
-                len -= 1;
-                Node parent = src->parent;
-                Node left = src->left;
-                Node right = src->right;
-                left->parent = right->parent = nullptr;
-                if (parent != nullptr) {
-                    if (src == parent->left) {
-                        if (right != nullptr) {
-                            parent->left = right;
-                            right->parent = parent;
-                            linkNode(right, left);
-                        } else {
-                            parent->left = left;
-                        }
-                    } else {
-                        if (right != nullptr) {
-                            parent->right = right;
-                            right->parent = parent;
-                            linkNode(right, left);
-                        } else {
-                            parent->right = left;
-                        }
-                    }
-                } else {
-                    linkNode(nullptr, right);
-                    linkNode(root, left);
-                }
-                V &oldValue = src->_value;
-                src->left = src->parent = src->right = nullptr;
-                delete src;
-                return oldValue;
-            }
+        gint searchStatus;
+        gint leftOrRight;
+        Node node = checkAncestor(src, k, searchStatus, leftOrRight);
+        if (searchStatus == 0)
+            throw KeyError(k);
+        Node oldNode = leftOrRight == 1 ? node->left : leftOrRight == 2 ? node->right
+                                                                        : root;
+        Node left = nullptr;
+        Node right = nullptr;
+        swap(left, oldNode->left);
+        swap(right, oldNode->right);
+        oldNode->parent = nullptr;
+        (leftOrRight == 0 ? root : leftOrRight == 1 ? node->left
+                                                    : node->right) = right;
+        if (right != nullptr) {
+            right->parent = node;
+            node = right;
         }
-        throw KeyError(k);
+        if (left != nullptr) {
+            Node node1 = checkAncestor(node, left->key(), searchStatus, leftOrRight);
+            if (searchStatus == 1)
+                throw StateError("InternalError");
+            (leftOrRight == 0 ? root : leftOrRight == 1 ? node->left
+                                                        : node->right) = left;
+        }
+        len -= 1;
+        V &oldValue = oldNode->value();
+        oldNode->_value = nullptr;
+        delete oldNode;
+        return oldValue;
     }
 
     void linkNode(Node dst, Node src) {
@@ -562,17 +898,49 @@ protected:
     }
 
     Node copyOfTree(Node src) {
+        if (src == nullptr)
+            return nullptr;
         Node dst;
-        try { dst = new Entry(src->key(), src->value()); } catch (...) { throw MemoryError(); }
+        // copy of root
+        try {
+            dst = new Entry(src->key(), src->value(), nullptr);
+        } catch (...) { throw MemoryError(); }
+        // copy left of root
+        dst->left = copyOfTree(src->left);
+        if (dst->left != nullptr)
+            dst->left->parent = dst;
         Node node = dst;
-        while (src != nullptr) {
-            node->left = copyOfTree(src->left);
-            try { node->right = new Entry(src->key(), src->value()); } catch (...) { throw MemoryError(); }
+        // goto root linked successor (right of root)
+        while ((src = src->right) != nullptr) {
+            // copy right of root
+            try {
+                node->right = new Entry(src->key(), src->value(), node);
+            } catch (...) { throw MemoryError(); }
             node = node->right;
-            src = src->right;
+            // restart operation
+            node->left = copyOfTree(src->left);
         }
+    }
+
+    template<class T, class U>
+    static void swap(T &t, U &u) {
+        T t2 = t;
+        t = u;
+        u = t2;
     }
 };
 
+#if __cpp_deduction_guides > 201565
 
-#endif //CORE_TREEMAP_H
+TreeMap()->TreeMap<Object, Object>;
+
+template<class K, class V>
+TreeMap(Map<K, V> const &) -> TreeMap<K, V>;
+
+template<class K>
+TreeMap(Comparator<K> const &) -> TreeMap<K, Object>;
+
+#endif
+
+
+#endif//CORE_TREEMAP_H

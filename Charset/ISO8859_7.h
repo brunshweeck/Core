@@ -8,9 +8,8 @@
 
 #include "Charset.h"
 
-class ISO8859_7 final: public Charset {
-private:
-    CORE_EXPLICIT ISO8859_7();
+class ISO8859_7 final : public Charset {
+    ISO8859_7() {}
 
 public:
     String name() const override;
@@ -27,15 +26,7 @@ public:
 
     gfloat averageBytesPerChar() const override;
 
-    CharBuffer decode(ByteBuffer &in) override;
-
-    ByteBuffer encode(CharBuffer &in) override;
-
-    String toString() const override;
-
     gbool contains(const Charset &cs) const override;
-
-    gbool canEncode(gchar c) const override;
 
     Object &clone() const override;
 

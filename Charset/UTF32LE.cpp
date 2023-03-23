@@ -3,29 +3,13 @@
 //
 
 #include "UTF32LE.h"
-#include "../String.h"
 #include "../Character.h"
 
-UTF32LE::UTF32LE() : Unicode("UTF-32LE") {
-    encoderReplacement[0] = (gbyte) 0xfd;
-    encoderReplacement[1] = (gbyte) 0xff;
-    encoderReplacement[2] = (gbyte) 0;
-    encoderReplacement[3] = (gbyte) 0;
-    encoderReplacement[4] = (gbyte) 0;
-}
 
 UTF32LE UTF32LE::INSTANCE{};
 
 String UTF32LE::name() const {
     return "UTF-32LE";
-}
-
-Charset::ErrorAction UTF32LE::malformedAction() const {
-    return Charset::malformedAction();
-}
-
-Charset::ErrorAction UTF32LE::unmappableAction() const {
-    return Charset::unmappableAction();
 }
 
 Charset::CoderResult UTF32LE::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
@@ -48,7 +32,7 @@ Charset::CoderResult UTF32LE::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
                 dst.put(Character::highSurrogate(cp));
                 dst.put(Character::lowSurrogate(cp));
             } else {
-                errorLength = 4;
+                CODING_ERROR_LENGTH = 4;
                 return CoderResult::MALFORMED;
             }
         }
@@ -79,11 +63,11 @@ Charset::CoderResult UTF32LE::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                     mark += 2;
                     put(Character::joinSurrogates(c, low), dst);
                 } else {
-                    errorLength = 1;
+                    CODING_ERROR_LENGTH = 1;
                     return CoderResult::MALFORMED;
                 }
             } else {
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 return CoderResult::MALFORMED;
             }
         }
@@ -100,26 +84,6 @@ gfloat UTF32LE::averageCharsPerByte() const {
 
 gfloat UTF32LE::averageBytesPerChar() const {
     return 4.0f;
-}
-
-CharBuffer UTF32LE::decode(ByteBuffer &in) {
-    return Charset::decode(in);
-}
-
-ByteBuffer UTF32LE::encode(CharBuffer &in) {
-    return Charset::encode(in);
-}
-
-String UTF32LE::toString() const {
-    return Charset::toString();
-}
-
-gbool UTF32LE::canEncode(gchar c) const {
-    return Charset::canEncode(c);
-}
-
-gbool UTF32LE::contains(const Charset &cs) const {
-    return Unicode::contains(cs);
 }
 
 Object &UTF32LE::clone() const {

@@ -5,16 +5,7 @@
 #include "UTF32.h"
 #include "UTF32LE_BOM.h"
 #include "UTF32BE_BOM.h"
-#include "../String.h"
 #include "../Character.h"
-
-UTF32::UTF32() : Unicode("UTF-32"), _byteOrder((Endian)(AUTO << 4 | BIG)) {
-    encoderReplacement[0] = (gbyte) 0;
-    encoderReplacement[1] = (gbyte) 0;
-    encoderReplacement[2] = (gbyte) 0xff;
-    encoderReplacement[3] = (gbyte) 0xfd;
-    encoderReplacement[4] = (gbyte) 0;
-}
 
 UTF32 UTF32::INSTANCE{};
 
@@ -47,14 +38,6 @@ void UTF32::reset() {
 
 String UTF32::name() const {
     return "UTF-32";
-}
-
-Charset::ErrorAction UTF32::malformedAction() const {
-    return Charset::malformedAction();
-}
-
-Charset::ErrorAction UTF32::unmappableAction() const {
-    return Charset::unmappableAction();
 }
 
 Charset::CoderResult UTF32::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
@@ -91,7 +74,7 @@ Charset::CoderResult UTF32::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
                 dst.put(Character::highSurrogate(cp));
                 dst.put(Character::lowSurrogate(cp));
             } else {
-                errorLength = 4;
+                CODING_ERROR_LENGTH = 4;
                 return CoderResult::MALFORMED;
             }
         }
@@ -122,11 +105,11 @@ Charset::CoderResult UTF32::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                     mark += 2;
                     put(Character::joinSurrogates(c, low), dst);
                 } else {
-                    errorLength = 1;
+                    CODING_ERROR_LENGTH = 1;
                     return CoderResult::MALFORMED;
                 }
             } else {
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 return CoderResult::MALFORMED;
             }
         }
@@ -143,26 +126,6 @@ gfloat UTF32::averageCharsPerByte() const {
 
 gfloat UTF32::averageBytesPerChar() const {
     return 4.0f;
-}
-
-CharBuffer UTF32::decode(ByteBuffer &in) {
-    return Charset::decode(in);
-}
-
-ByteBuffer UTF32::encode(CharBuffer &in) {
-    return Charset::encode(in);
-}
-
-String UTF32::toString() const {
-    return Charset::toString();
-}
-
-gbool UTF32::canEncode(gchar c) const {
-    return Charset::canEncode(c);
-}
-
-gbool UTF32::contains(const Charset &cs) const {
-    return Unicode::contains(cs);
 }
 
 Object &UTF32::clone() const {

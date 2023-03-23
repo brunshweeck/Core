@@ -7,7 +7,7 @@
 
 #define CORE_FAST constexpr
 #define CORE_EXPLICIT explicit
-#define CORE_IMPLICIT
+#define CORE_IMPLICIT explicit(false)
 #define CORE_WARNINGS(WARN) [[WARN]]
 #define CORE_DEPRECATED [[deprecated]]
 #define CORE_NODISCARD [[nodiscard]]
@@ -49,7 +49,7 @@ using gdouble = f64;
 #define CORE_TEMPLATE_REQUIRE_MUTABLE(E) CORE_REQUIRE(!Class<E>::isImmutable(), u"Immutable type not permitted")
 #define CORE_TEMPLATE_REQUIRE_UNREFERENCED(E) CORE_REQUIRE(!Class<E>::isReference(), u"Reference type not permitted")
 #define CORE_TEMPLATE_REQUIRE_NON_VOLATILE(E) CORE_REQUIRE(!Class<E>::isVolatile(), u"Volatile type not permitted")
-#define CORE_TEMPLATE_REQUIRE_OBJECT(E) CORE_REQUIRE(Class<Object>::isSuper<E>(), u"Only type deriving from Object are supported")
+#define CORE_TEMPLATE_REQUIRE_OBJECT(E) CORE_REQUIRE(Class<Object>::template isSuper<E>(), u"Only type deriving from Object are supported")
 
 #define CORE_TEMPLATE_REQUIREMENT(E) \
     CORE_TEMPLATE_REQUIRE_MUTABLE(E);     \

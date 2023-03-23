@@ -156,7 +156,7 @@ public:
      * \example gint const
      */
     CORE_FAST static gbool isImmutable() {
-        return core::Class::Constant<T>::V;
+        return core::Class::Constant<Unreferenced>::V;
     }
 
     /**

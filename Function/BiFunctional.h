@@ -5,7 +5,7 @@
 #ifndef CORE_BIFUNCTIONAL_H
 #define CORE_BIFUNCTIONAL_H
 
-#include "../Object.h"
+#include "../String.h"
 
 /**
  * Functional represent all object callable with two arguments and returning value
@@ -31,13 +31,14 @@ protected:
      * * If R is Abstract -> _R = Class<R>::Reference
      */
     using _R = typename Class<_2>::template Conditional<
-            Class<_2>::isNumber() ||
-            Class<_2>::isBoolean() ||
-            Class<_2>::isCharacter() ||
-            Class<_1>::template isSame<Void>(),
+            !Class<R>::isReference() && (
+                    Class<_2>::isNumber() ||
+                    Class<_2>::isBoolean() ||
+                    Class<_2>::isCharacter() ||
+                    Class<_1>::template isSame<Void>()),
             typename Class<R>::template Conditional<
                     Class<R>::isReference() ||
-                    !Class<R>::isAbstract()>
+                    !Class<R>::isAbstract(), typename Class<R>::Reference>
     >;
 
 public:
@@ -49,5 +50,12 @@ public:
     virtual _R operator()(T t, U u) const = 0;
 };
 
+#if __cpp_deduction_guides > 201565
+BiFunctional() -> BiFunctional<Object, Object>;
+
+template<class T, class U, class R>
+BiFunctional(BiFunctional<T, U, R> const&) -> BiFunctional<T, U, R>;
+
+#endif //
 
 #endif //CORE_BIFUNCTIONAL_H

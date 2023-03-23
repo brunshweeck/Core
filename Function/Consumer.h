@@ -5,12 +5,13 @@
 #ifndef CORE_CONSUMER_H
 #define CORE_CONSUMER_H
 
-#include "../Object.h"
-#include "Functional.h"
-#include "../ValueError.h"
-#include "../MemoryError.h"
 #include "../CastError.h"
 #include "../Long.h"
+#include "../MemoryError.h"
+#include "../Object.h"
+#include "../ValueError.h"
+#include "Functional.h"
+
 
 template<class T>
 class Consumer : public Object, public Functional<T, Void> {
@@ -26,8 +27,8 @@ public:
      * \throw ValueError if action function is null
      */
     template<class _Func,
-            Class<gbool>::Require<Class<_Func>::isFunction() && Class<_Func>::template isCallable<T>()> = true>
-    CORE_IMPLICIT Consumer(_Func &&func): manager(nullptr) {
+             Class<gbool>::Require<Class<_Func>::isFunction() && Class<_Func>::template isCallable<T>()> = true>
+    CORE_IMPLICIT Consumer(_Func &&func) : manager(nullptr) {
         if (!func)
             throw ValueError("Invalid function");
         try {
@@ -43,10 +44,23 @@ public:
      * \param target function member caller
      */
     template<class _Func, class Target,
-            Class<gbool>::Require<Class<_Func>::isMember() && Class<_Func>::template isCallable<Target, T>()> = true>
-    CORE_EXPLICIT Consumer(_Func &&func, Target &&target): manager(nullptr) {
+             Class<gbool>::Require<Class<_Func>::isMember() && Class<_Func>::template isCallable<Target, T>()> = true>
+    CORE_EXPLICIT Consumer(_Func &&func, Target &&target) : manager(nullptr) {
         try {
             manager = new MethodManager<_Func, Target>((_Func &&) func, (Target &&) target);
+        } catch (...) {
+            throw MemoryError();
+        }
+    }
+
+    template<class _1, class _2, class _3, class _4, class _5 = T>
+    CORE_EXPLICIT Consumer(_1 (_2::*func)(_3), _4 &&target) {
+        using _Func = decltype(func);
+        using Target = decltype(target);
+        CORE_FAST gbool requirement = Class<_Func>::template isCallable<Target, T>();
+        CORE_REQUIRE(requirement, "Support Unary Function Member");
+        try {
+            manager = new MethodManager<_Func, Target>((_Func &&) func, (_4 &&) target);
         } catch (...) {
             throw MemoryError();
         }
@@ -57,10 +71,10 @@ public:
      * \param func lambda function
      */
     template<class _Func,
-            Class<gbool>::Require<Class<_Func>::isClass() &&
-                                  !Class<Object>::isSuper<_Func>() &&
-                                  Class<_Func>::template isCallable<T>()> = true>
-    CORE_IMPLICIT Consumer(_Func &&func): manager(nullptr) {
+             Class<gbool>::Require<Class<_Func>::isClass() &&
+                                   !Class<Object>::isSuper<_Func>() &&
+                                   Class<_Func>::template isCallable<T>()> = true>
+    CORE_IMPLICIT Consumer(_Func &&func) : manager(nullptr) {
         try {
             manager = new LambdaManager<_Func>((_Func &&) func);
         } catch (...) {
@@ -83,8 +97,7 @@ public:
      * Construct new consumer with action of other consumer
      * \param c consumer
      */
-    CORE_IMPLICIT Consumer(Consumer<T> &&c) CORE_NOTHROW: manager(nullptr) {
-        manager = c.manager;
+    CORE_IMPLICIT Consumer(Consumer<T> &&c) CORE_NOTHROW : manager(c.manager) {
         c.manager = &EMPTY;
     }
 
@@ -93,11 +106,11 @@ public:
      * \param c consumer
      */
     template<class _T,
-            Class<gbool>::Require<Class<_T>::template isSuper<T>()> = true>
-    CORE_IMPLICIT Consumer(Consumer<_T> const &c): manager(nullptr) {
+             Class<gbool>::Require<Class<_T>::template isSuper<T>()> = true>
+    CORE_IMPLICIT Consumer(Consumer<_T> const &c) : manager(nullptr) {
         if (!c.manager || &c == &Consumer<_T>::EMPTY_ACTION)
             manager = &EMPTY;
-        else if (c.manager->isEmpty() || c.manager == &EMPTY)
+        if (c.manager->isEmpty() && manager != &EMPTY)
             manager = &EMPTY;
         else
             manager = &(Manager &) c.manager->clone();
@@ -132,7 +145,7 @@ public:
      * \throw c consumer
      */
     template<class _T,
-            Class<gbool>::Require<Class<_T>::template isSuper<T>()> = true>
+             Class<gbool>::Require<Class<_T>::template isSuper<T>()> = true>
     Consumer &operator=(Consumer<_T> const &c) {
         if (this != &c) {
             if (manager != &EMPTY)
@@ -180,7 +193,9 @@ public:
      * Return copy of this consumer
      */
     Object &clone() const override {
-        try { return *new Consumer<T>(*this); } catch (...) { throw MemoryError(); }
+        try {
+            return *new Consumer<T>(*this);
+        } catch (...) { throw MemoryError(); }
     }
 
     /**
@@ -188,15 +203,23 @@ public:
      * \return consumer{action: ...}
      */
     String toString() const override {
-        if (!manager == nullptr || manager == &EMPTY)
+        if (manager == nullptr || manager == &EMPTY)
             return u"consumer" + EMPTY.toString();
         return u"consumer" + manager->toString();
+    }
+
+    virtual ~Consumer() {
+        if (manager != nullptr && manager != &EMPTY)
+            delete manager;
+        manager = nullptr;
     }
 
 private:
     class Manager : public Object {
     public:
-        virtual void launch(T t) const {}
+        virtual void launch(T t) const {
+            /* ... */
+        }
 
         String toString() const override {
             return u"{action: EMPTY}";
@@ -237,7 +260,9 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new FunctionManager(func); } catch (...) { throw MemoryError(); }
+            try {
+                return *new FunctionManager(func);
+            } catch (...) { throw MemoryError(); }
         }
 
     private:
@@ -247,8 +272,7 @@ private:
     template<class _Func, class Target>
     class MethodManager final : public Manager {
     public:
-        CORE_EXPLICIT MethodManager(_Func &&func, Target &&target) :
-                func((_Func &&) func), target((Target &&) target) {}
+        CORE_EXPLICIT MethodManager(_Func &&func, Target &&target) : func((_Func &&) func), target((Target &&) target) {}
 
         void launch(T t) const override {
             (target.*func)(t);
@@ -268,7 +292,9 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new MethodManager(*this); } catch (...) { throw MemoryError(); }
+            try {
+                return *new MethodManager(*this);
+            } catch (...) { throw MemoryError(); }
         }
 
     private:
@@ -280,6 +306,7 @@ private:
     class LambdaManager final : public Manager {
     private:
         using _Fn = typename Class<_Func>::NIVR;
+
     public:
         CORE_EXPLICIT LambdaManager(_Func &&func) : func((_Func &&) func) {}
 
@@ -288,8 +315,7 @@ private:
         }
 
         String toString() const override {
-            return (!Class<_Fn>::template isConstruct<_Func>() ?
-                    u"{action: lambda$" : u"{action: object@") + Long::toUnsignedString((glong) &func, 16) + u"}";
+            return (!Class<_Fn>::template isConstruct<_Func>() ? u"{action: lambda$" : u"{action: object@") + Long::toUnsignedString((glong) &func, 16) + u"}";
         }
 
         gbool equals(const Object &obj) const override {
@@ -301,7 +327,9 @@ private:
         }
 
         Object &clone() const override {
-            try { return *new LambdaManager(*this); } catch (...) { throw MemoryError(); }
+            try {
+                return *new LambdaManager(*this);
+            } catch (...) { throw MemoryError(); }
         }
 
     private:
@@ -311,11 +339,32 @@ private:
     static Manager EMPTY;
 
     typename Class<Manager>::Pointer manager = &EMPTY;
-
 };
+
+#if __cpp_deduction_guides > 201565
+Consumer()->Consumer<Object>;
+
+template<class T, class R>
+Consumer(Functional<T, R> const &) -> Consumer<T>;
+
+template<class T>
+Consumer(Consumer<T> const &) -> Consumer<T>;
+
+template<class T>
+Consumer(Consumer<T> &&) -> Consumer<T>;
+
+template<class T, class R>
+Consumer(R (*)(T)) -> Consumer<
+        typename Class<T>::template Conditional<Class<Object>::template isSuper<T>(), typename Class<T>::Object>>;
+
+template<class T, class R, class U, class V>
+Consumer(R (U::*)(T), V &&) -> Consumer<
+        typename Class<T>::template Conditional<Class<Object>::template isSuper<T>(), typename Class<T>::Object>>;
+
+#endif//
 
 template<class T>
 typename Consumer<T>::Manager Consumer<T>::EMPTY = Manager{};
 
 
-#endif //CORE_CONSUMER_H
+#endif//CORE_CONSUMER_H

@@ -1,0 +1,532 @@
+[
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Boolean.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Boolean.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Boolean.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Break.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Break.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Break.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Byte.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Byte.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Byte.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\CastError.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\CastError.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\CastError.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Character.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Character.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Character.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\Charset.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\Charset.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\Charset.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\GB18030.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\GB18030.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\GB18030.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\GB18030_00.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\GB18030_00.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\GB18030_00.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\GB18030_01.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\GB18030_01.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\GB18030_01.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\GB18030_02.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\GB18030_02.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\GB18030_02.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\GB18030_03.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\GB18030_03.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\GB18030_03.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\IBM437.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM437.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM437.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\IBM737.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM737.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM737.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\IBM775.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM775.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM775.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\IBM850.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM850.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM850.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\IBM852.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM852.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM852.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\IBM855.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM855.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM855.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\IBM857.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM857.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM857.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\IBM858.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM858.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM858.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\IBM862.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM862.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM862.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\IBM866.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM866.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM866.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\IBM874.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM874.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\IBM874.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\ISO8859_1.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_1.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_1.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\ISO8859_13.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_13.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_13.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\ISO8859_15.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_15.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_15.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\ISO8859_16.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_16.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_16.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\ISO8859_2.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_2.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_2.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\ISO8859_4.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_4.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_4.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\ISO8859_5.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_5.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_5.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\ISO8859_7.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_7.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_7.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\ISO8859_9.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_9.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\ISO8859_9.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\MS1250.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1250.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1250.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\MS1251.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1251.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1251.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\MS1252.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1252.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1252.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\MS1253.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1253.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1253.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\MS1254.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1254.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1254.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\MS1255.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1255.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1255.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\MS1256.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1256.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1256.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\MS1257.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1257.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1257.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\MS1258.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1258.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS1258.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\MS874.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS874.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\MS874.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\US_ASCII.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\US_ASCII.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\US_ASCII.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\UTF16.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF16.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF16.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\UTF16BE.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF16BE.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF16BE.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\UTF16BE_BOM.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF16BE_BOM.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF16BE_BOM.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\UTF16LE.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF16LE.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF16LE.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\UTF16LE_BOM.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF16LE_BOM.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF16LE_BOM.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\UTF32.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF32.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF32.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\UTF32BE.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF32BE.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF32BE.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\UTF32BE_BOM.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF32BE_BOM.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF32BE_BOM.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\UTF32LE.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF32LE.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF32LE.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\UTF32LE_BOM.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF32LE_BOM.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF32LE_BOM.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\UTF8.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF8.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\UTF8.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Charset\\Unicode.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\Unicode.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Charset\\Unicode.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\CodingError.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\CodingError.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\CodingError.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\ArrayList.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\ArrayList.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\ArrayList.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\CharArray.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\CharArray.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\CharArray.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\Collection.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\Collection.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\Collection.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\HashMap.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\HashMap.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\HashMap.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\Iterator.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\Iterator.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\Iterator.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\Iterator2.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\Iterator2.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\Iterator2.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\LinkedList.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\LinkedList.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\LinkedList.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\List.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\List.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\List.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\ListIterator.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\ListIterator.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\ListIterator.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\Map.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\Map.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\Map.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\OrderedMap.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\OrderedMap.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\OrderedMap.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\Set.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\Set.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\Set.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Collections\\TreeMap.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\TreeMap.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Collections\\TreeMap.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Core.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Core.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Core.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Double.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Double.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Double.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Error.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Error.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Error.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Float.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Float.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Float.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Function\\BiConsumer.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\BiConsumer.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\BiConsumer.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Function\\BiFunctional.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\BiFunctional.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\BiFunctional.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Function\\Comparator.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\Comparator.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\Comparator.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Function\\Consumer.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\Consumer.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\Consumer.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Function\\NaturalOrderComparator.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\NaturalOrderComparator.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\NaturalOrderComparator.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Function\\Predicate.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\Predicate.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Function\\Predicate.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Hashable.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Hashable.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Hashable.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\IO\\Buffer.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\IO\\Buffer.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\IO\\Buffer.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\IO\\ByteBuffer.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\IO\\ByteBuffer.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\IO\\ByteBuffer.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\IO\\CharBuffer.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\IO\\CharBuffer.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\IO\\CharBuffer.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\IOError.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\IOError.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\IOError.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\IndexError.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\IndexError.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\IndexError.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Integer.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Integer.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Integer.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Iterable.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Iterable.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Iterable.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Iterable2.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Iterable2.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Iterable2.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\KeyError.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\KeyError.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\KeyError.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Long.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Long.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Long.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\MemoryError.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\MemoryError.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\MemoryError.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Number.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Number.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Number.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Object.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Object.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Object.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Short.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Short.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Short.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\StateError.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\StateError.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\StateError.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\String.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\String.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\String.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\UCD00.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD00.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD00.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\UCD01.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD01.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD01.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\UCD02.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD02.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD02.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\UCD03.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD03.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD03.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\UCD04.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD04.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD04.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\UCD05.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD05.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\UCD05.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\ValueError.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\ValueError.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\ValueError.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\Void.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Void.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Void.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\extern\\DoublyByte.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\extern\\DoublyByte.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\extern\\DoublyByte.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -DCore_EXPORTS -g -std=gnu++20 -o CMakeFiles\\Core.dir\\extern\\SingleByte.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\extern\\SingleByte.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\extern\\SingleByte.cpp"
+},
+{
+  "directory": "C:/Users/brunshweeck/CLionProjects/Core/build/Debug",
+  "command": "C:\\msys64\\mingw64\\bin\\g++.exe -g -std=gnu++20 -o CMakeFiles\\Main.dir\\Test\\Main.cpp.obj -c C:\\Users\\brunshweeck\\CLionProjects\\Core\\Test\\Main.cpp",
+  "file": "C:\\Users\\brunshweeck\\CLionProjects\\Core\\Test\\Main.cpp"
+}
+]

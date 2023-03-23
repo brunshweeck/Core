@@ -44,7 +44,7 @@ protected:
                     Class<_1>::template isSame<Void>()),
             typename Class<R>::template Conditional<
                     Class<R>::isReference() ||
-                    !Class<R>::isAbstract(), Class<R>::Reference>
+                    !Class<R>::isAbstract(), typename Class<R>::Reference>
     >;
 
 public:

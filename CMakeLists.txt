@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 
 project(Core LANGUAGES CXX ASM)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(CMAKE_BUILD_RPATH "build/Debug")
@@ -16,7 +16,7 @@ file(GLOB CORE
         IO/*.cpp IO/*.h
         )
 
-add_library(Core SHARED ${CORE})
+add_library(Core SHARED ${CORE} Collections/HashMap.cpp Collections/HashMap.h)
 
 add_executable(Main Test/Main.cpp)
 

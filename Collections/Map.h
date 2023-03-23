@@ -31,7 +31,7 @@ public:
      * map prevents it from being stored in this map
      */
     virtual void addAll(Map<K, V> const &m) {
-        Iterator<Entry const> &&it = m.iterator();
+        Iterator2<Entry> &it = m.iterator2();
         while (it.hasNext()) {
             Entry const &entry = it.next();
             add(entry.key(), entry.value());
@@ -58,13 +58,13 @@ public:
      * Returns a Set view of the keys contained in this map.
      * The set is backed by the map, so changes to the map are reflected in the set, and vice-versa.
      */
-    virtual Set<K> &&keys() const = 0;
+    virtual Set<K> &keys() const = 0;
 
     /**
      * Returns a Collection view of the values contained in this map.
      * The collection is backed by the map, so changes to the map are reflected in the collection, and vice-versa.
      */
-    virtual Collection<V> &&values() const = 0;
+    virtual Collection<V> &values() const = 0;
 
     /**
      * A map entry (key-value pair). The Entry may be unmodifiable, or the
@@ -75,7 +75,7 @@ public:
         /**
          * Return key of this entry
          */
-        virtual K const &key() = 0;
+        virtual K const &key() const = 0;
 
         /**
          * Return value of this entry
@@ -110,15 +110,10 @@ public:
         }
 
         /**
-         * Return copy of this entry
-         */
-        Object &clone() const override = 0;
-
-        /**
          * Return string representation of this entry
          */
         String toString() const override {
-            return key() + ": " + value();
+            return key().toString() + ": " + value().toString();
         }
     };
 
@@ -126,13 +121,7 @@ public:
      * Returns a Set view of the mappings contained in this map.
      * The set is backed by the map, so changes to the map are reflected in the set, and vice-versa.
      */
-    virtual Set<Map<K, V>::Entry> &&entries() const = 0;
-
-    /**
-     * Compares the specified object with this map for equality.
-     * \param obj object to be compared
-     */
-    gbool equals(const Object &obj) const override = 0;
+    virtual Set<Map<K, V>::Entry> &entries() const = 0;
 
     /**
      * Returns the value to which the specified key is mapped
@@ -177,7 +166,7 @@ public:
      * \param action The action to be performed for each entry
      */
     virtual void forEach(BiConsumer<K const &, V const &> const &action) const {
-        Iterator<Entry const> &&it = iterator();
+        Iterator2<Entry> &it = iterator2();
         while (it.hasNext()) {
             Entry const &entry = it.next();
             action.accept(entry.key(), entry.value());
@@ -189,7 +178,7 @@ public:
      * \param action The action to be performed for each entry
      */
     virtual void forEach(BiConsumer<K const &, V &> const &action) {
-        Iterator<Entry> &&it = iterator();
+        Iterator<Entry> &it = iterator();
         while (it.hasNext()) {
             Entry &entry = it.next();
             action.accept(entry.key(), entry.value());
@@ -225,23 +214,20 @@ public:
      * \param key key to be search
      * \param value value to be search
      */
-    virtual gbool containsValue(K const &key, V const &value) const {
+    virtual gbool contains(K const &key, V const &value) const {
         if (!containsKey(key))
             return false;
         return get(key).equals(value);
     }
 
-    /**
-     * Return string representation of this map
-     */
-    String toString() const override = 0;
+    virtual Iterator2<Entry> &iterator2() const = 0;
 
-    virtual Iterator<Entry const> &&iterator() const = 0;
+    virtual Iterator2<Entry> &iterator2() = 0;
 
-    virtual Iterator<Entry> &&iterator() = 0;
+    virtual Iterator<Entry> &iterator() = 0;
 
     virtual void clear() {
-        Iterator<Entry const> &&it = iterator();
+        Iterator<Entry> &it = iterator();
         while (it.hasNext()) {
             it.next();
             it.remove();
@@ -265,5 +251,13 @@ public:
     }
 };
 
+#if __cpp_deduction_guides > 201565
+
+Map() -> Map<Object, Object>;
+
+template <class K, class V>
+Map(Map<K, V> const&) -> Map<K, V>;
+
+#endif
 
 #endif //CORE_MAP_H

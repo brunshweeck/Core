@@ -6,10 +6,11 @@
 #define CORE_LINKEDLIST_H
 
 
-#include "List.h"
-#include "../String.h"
 #include "../IndexError.h"
 #include "../MemoryError.h"
+#include "../String.h"
+#include "List.h"
+
 
 /**
  * Doubly linked-list
@@ -47,7 +48,9 @@ private:
     class Maker<U, true> {
     public:
         static U &copyOf(U const &obj) {
-            try { return (U &) ((Object &) obj).clone(); } catch (std::bad_alloc const &) { throw MemoryError(); }
+            try {
+                return (U &) ((Object const &) obj).clone();
+            } catch (std::bad_alloc const &) { throw MemoryError(); }
         }
     };
 
@@ -55,7 +58,9 @@ private:
     class Maker<U, false> {
     public:
         static U &copyOf(U const &obj) {
-            try { return *new U(obj); } catch (std::bad_alloc const &) { throw MemoryError(); }
+            try {
+                return *new U(obj);
+            } catch (std::bad_alloc const &) { throw MemoryError(); }
         }
     };
 
@@ -224,13 +229,17 @@ public:
     gbool addAll(const Collection<E> &c) override {
         gint size = c.size();
         if (size > 0) {
-            Iterator<E const> &&it = c.iterator();
+            Iterator2<E> &it = c.iterator2();
             if (Class<List<E>>::hasInstance(c))
-                while (it.hasNext() && size-- > 0)
+                while (it.hasNext() && size > 0) {
                     linkLast((E &) it.next());
+                    size -= 1;
+                }
             else
-                while (it.hasNext() && size-- > 0)
+                while (it.hasNext() && size > 0) {
                     linkLast(Maker<E>::copyOf(it.next()));
+                    size -= 1;
+                }
             return true;
         }
         return false;
@@ -248,12 +257,12 @@ public:
                 return addAll(c);
             Element prev = element->prev;
             for (Element node = first; node != prev->next; node = node->next)
-                linkBefore(node->item, element);
+                linkBefore(*node->item, element);
             for (Element node = element; node != nullptr; node = node->next)
-                linkBefore(node->item, element);
+                linkBefore(*node->item, element);
             return true;
         }
-        Iterator<E const> &&it = c.iterator();
+        Iterator2<E> &it = c.iterator2();
         if (Class<List<E>>::hasInstance(c))
             while (it.hasNext())
                 linkBefore((E &) it.next(), element);
@@ -266,7 +275,7 @@ public:
     gbool remove(const E &obj) override {
         Element element1 = nullptr;
         for (Element element = first; element != nullptr; element = element1)
-            if (obj.equals(element->item)) {
+            if (obj.equals(*element->item)) {
                 element1 = element->next;
                 unlink(element);
                 return true;
@@ -277,11 +286,10 @@ public:
     gbool remove(gint index, const E &obj) override {
         checkIndex(index, len);
         Element element = checkElement(index);
-        if (obj.equals(element->item)) {
-            unlink(element);
-            return true;
-        }
-        return false;
+        if (!obj.equals(*element->item))
+            return false;
+        unlink(element);
+        return true;
     }
 
     E &removeAt(gint index) override {
@@ -296,7 +304,7 @@ public:
         else {
             Element element1 = nullptr;
             for (Element element = first; element != nullptr; element = element1)
-                if (c.contains(element->item)) {
+                if (c.contains(*element->item)) {
                     element1 = element->next;
                     unlink(element);
                 }
@@ -308,7 +316,7 @@ public:
         gint oldSize = size();
         Element element1 = nullptr;
         for (Element element = first; element != nullptr; element = element1)
-            if (p.test(element->item)) {
+            if (p.test(*element->item)) {
                 element1 = element->next;
                 unlink(element);
             }
@@ -317,7 +325,7 @@ public:
 
     gbool contains(const E &obj) const override {
         for (Element element = first; element != nullptr; element = element->next)
-            if (obj.equals(element->item))
+            if (obj.equals(*element->item))
                 return true;
         return false;
     }
@@ -338,7 +346,7 @@ public:
         gint oldSize = size();
         Element element1 = nullptr;
         for (Element element = first; element != nullptr; element = element1)
-            if (!c.contains(element->item)) {
+            if (!c.contains(*element->item)) {
                 element1 = element->next;
                 unlink(element);
             }
@@ -361,7 +369,7 @@ public:
     void forEach(const Consumer<const E &> &action) const override {
         gint limit = size();
         for (Element element = first; element != nullptr; element = element->next) {
-            action.accept(element->item);
+            action.accept(*element->item);
             if (len != size())
                 throw MemoryError("Modification during each");
         }
@@ -370,7 +378,7 @@ public:
     void forEach(const Consumer<E &> &action) override {
         gint limit = size();
         for (Element element = first; element != nullptr; element = element->next) {
-            action.accept(element->item);
+            action.accept(*element->item);
             if (len != size())
                 throw MemoryError("Modification during each");
         }
@@ -378,12 +386,12 @@ public:
 
     E &get(gint index) override {
         checkIndex(index, len);
-        return checkElement(index)->item;
+        return *checkElement(index)->item;
     }
 
     const E &get(gint index) const override {
         checkIndex(index, len);
-        return checkElement(index)->item;
+        return *checkElement(index)->item;
     }
 
     E &set(gint index, const E &obj) override {
@@ -393,7 +401,7 @@ public:
     gint indexOf(const E &obj) const override {
         gint index = 0;
         for (Element element = first; element != nullptr; element = element->next) {
-            if (obj.equals(element->item))
+            if (obj.equals(*element->item))
                 return index;
             index = index + 1;
         }
@@ -403,7 +411,7 @@ public:
     gint lastIndexOf(const E &obj) const override {
         gint index = size() - 1;
         for (Element element = last; element != nullptr; element = element->prev) {
-            if (obj.equals(element->item))
+            if (obj.equals(*element->item))
                 return index;
             index = index - 1;
         }
@@ -433,16 +441,33 @@ public:
             return false;
         for (Element element = first, element1 = linkedList.first;
              element != nullptr && element1 != nullptr; element = element->next, element1 = element1->next)
-            if (!element->item->equals(element1->item))
+            if (!element->item->equals(*element1->item))
                 return false;
         return true;
     }
 
-    Object &clone() const override {
-        try { return *new LinkedList(*this); } catch (...) { throw MemoryError(); }
+    ListIterator2<E> &iterator2() const override {
+        Itr2 it = Itr2((LinkedList<E> &) *this, 0, true);
+        return Maker<Itr2>::copyOf(it);
     }
 
-    ~LinkedList() override {
+    ListIterator2<E> &iterator2() override {
+        Itr2 it = Itr2(*this, 0, false);
+        return Maker<Itr2>::copyOf(it);
+    }
+
+    ListIterator<E> &iterator() override {
+        Itr it = Itr(*this, 0);
+        return Maker<Itr>::copyOf(it);
+    }
+
+    Object &clone() const override {
+        try {
+            return *new LinkedList(*this);
+        } catch (...) { throw MemoryError(); }
+    }
+
+    virtual ~LinkedList() {
         while (first != nullptr)
             unlinkFirst();
         first = last = nullptr;
@@ -450,28 +475,28 @@ public:
     }
 
 private:
-    class ListIter : public ListIterator<E> {
+    class Itr : public ListIterator<E> {
     public:
         LinkedList<E> &self;
-        Node lastReturned = nullptr;
-        Node nextElement = nullptr;
+        Element lastReturned = nullptr;
+        Element nextElement = nullptr;
         gint index = 0;
 
-        CORE_EXPLICIT ListIter(LinkedList<E> &self) : self(self) {
-            nextElement = self.first;
+        CORE_EXPLICIT Itr(LinkedList<E> &src, gint srcBegin) : self(src), index(srcBegin) {
+            nextElement = srcBegin >= self.len ? nullptr : self.checkElement(srcBegin);
         }
 
         gbool hasNext() const override {
-            return 0 <= index && index <= self.len && nextElement != nullptr;
+            return index < self.len;
         }
 
         E &next() override {
             if (!hasNext())
                 throw StateError("No such item");
             lastReturned = nextElement;
-            nextElement = nextElement.next;
+            nextElement = nextElement->next;
             index += 1;
-            return *lastReturned.item;
+            return *lastReturned->item;
         }
 
         gbool hasPrevious() const override {
@@ -479,29 +504,26 @@ private:
         }
 
         E &previous() override {
-            if (!hasNext())
+            if (!hasPrevious())
                 throw StateError("No such item");
-            lastReturned = nextElement = (nextElement == nullptr) ? self.last : nextElement.prev;
+            lastReturned = nextElement = (nextElement == nullptr) ? self.last : nextElement->prev;
             index -= 1;
-            return *lastReturned.item;
+            return *lastReturned->item;
         }
 
-        gint nextIndex() const override {
+        gint nextIndex() override {
             return index;
         }
 
-        gint previousIndex() const override {
+        gint previousIndex() override {
             return index - 1;
         }
 
         void remove() override {
             if (lastReturned == nullptr)
                 throw StateError("No such item");
-            Element element = lastReturned.next;
-            if (lastReturned.prev == nullptr && lastReturned != self.first ||
-                lastReturned.next == nullptr && lastReturned != self.last)
-                throw MemoryError("Concurrent modification");
-            unlink(lastReturned);
+            Element element = lastReturned->next;
+            self.unlink(lastReturned);
             if (lastReturned == nextElement)
                 nextElement = element;
             else
@@ -512,7 +534,7 @@ private:
         void set(const E &obj) override {
             if (lastReturned == nullptr)
                 throw StateError("No such item");
-            lastReturned.item = &Maker<E>::copyOf(obj);
+            lastReturned->item = &Maker<E>::copyOf(obj);
         }
 
         void add(const E &obj) override {
@@ -524,21 +546,136 @@ private:
         }
 
         gbool equals(const Object &obj) const override {
-            if(this == &obj)
-                return true;
+            if (!Object::equals(obj))
+                return false;
+            if (!Class<Itr>::hasInstance(obj))
+                return false;
+            Itr const &itr = (Itr const &) obj;
+            return &self == &itr.self && index == itr.index;
+        }
 
+        void forEach(const Consumer<E &> &action) override {
+            for (; index < self.len; index++) {
+                action.accept(*nextElement->item);
+                lastReturned = nextElement;
+                nextElement = nextElement->next;
+            }
         }
 
         Object &clone() const override {
-            return ListIterator::clone();
+            try {
+                return *new Itr(self, index);
+            } catch (...) { throw MemoryError(); }
         }
     };
+
+    class Itr2 : public ListIterator2<E> {
+    public:
+        LinkedList<E> &self;
+        Element lastReturned = nullptr;
+        Element nextElement = nullptr;
+        gint index = 0;
+        gbool isReadOnly = false;
+
+        CORE_EXPLICIT Itr2(LinkedList<E> &src, gint srcBegin, gbool isReadOnly) : self(src), index(srcBegin), isReadOnly(isReadOnly) {
+            nextElement = srcBegin >= self.len ? nullptr : self.checkElement(srcBegin);
+        }
+
+        gbool hasNext() const override {
+            return index < self.len;
+        }
+
+        E &next() override {
+            if (!hasNext())
+                throw StateError("No such item");
+            lastReturned = nextElement;
+            nextElement = nextElement->next;
+            index += 1;
+            return *lastReturned->item;
+        }
+
+        gbool hasPrevious() const override {
+            return index > 0;
+        }
+
+        E &previous() override {
+            if (!hasPrevious())
+                throw StateError("No such item");
+            lastReturned = nextElement = (nextElement == nullptr) ? self.last : nextElement->prev;
+            index -= 1;
+            return *lastReturned->item;
+        }
+
+        gint nextIndex() const override {
+            return index;
+        }
+
+        gint previousIndex() const override {
+            return index - 1;
+        }
+
+        void remove() override {
+            if (isReadOnly)
+                throw StateError("Add operation is not supported by read-only LinkedList");
+            if (lastReturned == nullptr)
+                throw StateError("No such item");
+            Element element = lastReturned->next;
+            self.unlink(lastReturned);
+            if (lastReturned == nextElement)
+                nextElement = element;
+            else
+                index -= 1;
+            lastReturned = nullptr;
+        }
+
+        void set(const E &obj) override {
+            if (lastReturned == nullptr)
+                throw StateError("No such item");
+            lastReturned->item = &Maker<E>::copyOf(obj);
+        }
+
+        void add(const E &obj) override {
+            if (isReadOnly)
+                throw StateError("Remove operation is not supported by read-only LinkedList");
+            lastReturned = nullptr;
+            if (nextElement == nullptr)
+                self.linkLast(Maker<E>::copyOf(obj));
+            else
+                self.linkBefore(Maker<E>::copyOf(obj), nextElement);
+        }
+
+        gbool equals(const Object &obj) const override {
+            if (!Object::equals(obj))
+                return false;
+            if (!Class<Itr>::hasInstance(obj))
+                return false;
+            Itr const &itr = (Itr const &) obj;
+            return &self == &itr.self && index == itr.index;
+        }
+
+        void forEach(const Consumer<E const &> &action) override {
+            for (; index < self.len; index++) {
+                action.accept(*nextElement->item);
+                lastReturned = nextElement;
+                nextElement = nextElement->next;
+            }
+        }
+
+        Object &clone() const override {
+            try {
+                return *new Itr2(self, index, isReadOnly);
+            } catch (...) { throw MemoryError(); }
+        }
+    };
+
+    //
 };
 
 #if __cpp_deduction_guides > 201565
-LinkedList() -> LinkedList<Object>;
-template<class E> LinkedList(Collection<E> const&) -> LinkedList<E>;
-#endif //
+LinkedList()->LinkedList<Object>;
+template<class E>
+LinkedList(Collection<E> const &) -> LinkedList<E>;
+#endif//
 
 
-#endif //CORE_LINKEDLIST_H
+#endif//CORE_LINKEDLIST_H

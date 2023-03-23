@@ -497,6 +497,7 @@ static gint function() {
     String __str0000000000000345678912 = __var0000000000345678912.toString();
     String __str0000000000000456789123 = __var0000000000456789123.toString();
     String __str0000000000000567891234 = __var0000000000567891234.toString();
+    return 0;
 }
 
 static gint _ = function();

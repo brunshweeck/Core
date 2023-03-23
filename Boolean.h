@@ -27,7 +27,7 @@ public:
      * Construct new instance of Boolean and initialize with true/false
      * \param v literal true or false
      */
-    CORE_FAST Boolean(gbool v): value(v) {}
+    CORE_FAST Boolean(gbool v) : value(v) {}
 
     /**
      * Return value of this instance as boolean
@@ -88,7 +88,7 @@ public:
     /**
      * Return value of this instance as boolean
      */
-    operator gbool &() ;
+    operator gbool &();
 
     /**
      * Return copy of this instance
@@ -112,4 +112,4 @@ private:
 };
 
 
-#endif //CORE_BOOLEAN_H
+#endif//CORE_BOOLEAN_H

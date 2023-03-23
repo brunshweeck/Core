@@ -3,8 +3,8 @@
 //
 
 #include "MS1253.h"
-#include "../String.h"
 #include "../Character.h"
+
 static gchar bytesToChar[] =
         u"\u20AC\uFFFD\u201A\u0192\u201E\u2026\u2020\u2021"       // 0x80 - 0x87
         "\uFFFD\u2030\uFFFD\u2039\uFFFD\uFFFD\uFFFD\uFFFD"       // 0x88 - 0x8f
@@ -37,17 +37,16 @@ static gchar bytesToChar[] =
         "\u0060\u0061\u0062\u0063\u0064\u0065\u0066\u0067"       // 0x60 - 0x67
         "\u0068\u0069\u006A\u006B\u006C\u006D\u006E\u006F"       // 0x68 - 0x6f
         "\u0070\u0071\u0072\u0073\u0074\u0075\u0076\u0077"       // 0x70 - 0x77
-        "\u0078\u0079\u007A\u007B\u007C\u007D\u007E\u007F" ;      // 0x78 - 0x7f
+        "\u0078\u0079\u007A\u007B\u007C\u007D\u007E\u007F";      // 0x78 - 0x7f
 static gchar charToBytes[0x600] = u"";
 static gchar charToBytes_indexes[0x100] = u"";
-static gchar charToBytes_NR[0] = {};
 static CORE_FAST gchar UNMAPPABLE_DECODING = 0xFFFD;
 static CORE_FAST gint UNMAPPABLE_ENCODING = 0xFFFD;
 
 static gint initC2B() {
-    for (char16_t & charToBytes_index : charToBytes_indexes)
+    for (char16_t &charToBytes_index: charToBytes_indexes)
         charToBytes_index = 0xFFFD;
-    for (char16_t & charToByte : charToBytes)
+    for (char16_t &charToByte: charToBytes)
         charToByte = 0xFFFD;
     gint off = 0;
     for (gint i = 0; i < sizeof(bytesToChar) / 2; i++) {
@@ -67,8 +66,6 @@ static gint initC2B() {
 
 static gint _ = initC2B();
 
-MS1253::MS1253() : Charset("Windows-1251") {}
-
 MS1253 MS1253::INSTANCE{};
 
 String MS1253::name() const {
@@ -85,7 +82,7 @@ Charset::CoderResult MS1253::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
         while (src.hasRemaining()) {
             gchar c = decode(src.get());
             if (c == UNMAPPABLE_DECODING) {
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 return Charset::CoderResult::UNMAPPABLE;
             }
             if (!dst.hasRemaining())
@@ -121,21 +118,21 @@ Charset::CoderResult MS1253::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                                 cr = Charset::CoderResult::UNDERFLOW;
                             } else {
                                 uc = -1;
-                                errorLength = 1;
+                                CODING_ERROR_LENGTH = 1;
                                 cr = Charset::CoderResult::MALFORMED;
                             }
                         }
                     } else {
                         uc = -1;
-                        errorLength = 1;
+                        CODING_ERROR_LENGTH = 1;
                         cr = Charset::CoderResult::MALFORMED;
                     }
                     if (uc < 0)
                         return cr;
-                    errorLength = uc > 0xFFFF ? 2 : 1;
+                    CODING_ERROR_LENGTH = uc > 0xFFFF ? 2 : 1;
                     return Charset::CoderResult::UNMAPPABLE;
                 }
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 return CoderResult::UNMAPPABLE;
             }
             if (!dst.hasRemaining())
@@ -159,7 +156,7 @@ gfloat MS1253::averageBytesPerChar() const {
 }
 
 gbool MS1253::contains(const Charset &cs) const {
-    return dynamic_cast<MS1253 const *>(&cs) || name().equals("US-ASCII");
+    return Class<MS1253>::hasInstance(cs) || name().equals("US-ASCII");
 }
 
 Object &MS1253::clone() const {
@@ -173,24 +170,3 @@ gint MS1253::encode(gchar ch) {
         return UNMAPPABLE_ENCODING;
     return charToBytes[index + (ch & 0xff)];
 }
-
-Charset::ErrorAction MS1253::malformedAction() const {
-    return Charset::malformedAction();
-}
-
-Charset::ErrorAction MS1253::unmappableAction() const {
-    return Charset::unmappableAction();
-}
-
-CharBuffer MS1253::decode(ByteBuffer &in) {
-    return Charset::decode(in);
-}
-
-ByteBuffer MS1253::encode(CharBuffer &in) {
-    return Charset::encode(in);
-}
-
-String MS1253::toString() const {
-    return Charset::toString();
-}
-

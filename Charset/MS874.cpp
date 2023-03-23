@@ -3,8 +3,8 @@
 //
 
 #include "MS874.h"
-#include "../String.h"
 #include "../Character.h"
+
 static gchar bytesToChar[] =
         u"\u20AC\uFFFD\uFFFD\uFFFD\uFFFD\u2026\uFFFD\uFFFD"       // 0x80 - 0x87
         "\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD\uFFFD"       // 0x88 - 0x8f
@@ -38,9 +38,9 @@ static gchar bytesToChar[] =
         "\u0068\u0069\u006A\u006B\u006C\u006D\u006E\u006F"       // 0x68 - 0x6f
         "\u0070\u0071\u0072\u0073\u0074\u0075\u0076\u0077"       // 0x70 - 0x77
         "\u0078\u0079\u007A\u007B\u007C\u007D\u007E\u007F";      // 0x78 - 0x7f
+
 static gchar charToBytes[0x400] = u"";
 static gchar charToBytes_indexes[0x100] = u"";
-static gchar charToBytes_NR[0] = {};
 static CORE_FAST gchar UNMAPPABLE_DECODING = 0xFFFD;
 static CORE_FAST gint UNMAPPABLE_ENCODING = 0xFFFD;
 
@@ -62,24 +62,7 @@ static void initC2B() {
         index = charToBytes_indexes[index] + (c & 0xff);
         charToBytes[index] = (gchar) ((i >= 0x80) ? (i - 0x80) : (i + 0x80));
     }
-    if (sizeof(charToBytes_NR) / 2) {
-        // c-->b nr entries
-        gint i = 0;
-        while (i < sizeof(charToBytes_NR) / 2) {
-            gchar b = charToBytes_NR[i++];
-            gchar c = charToBytes_NR[i++];
-            gint index = (c >> 8);
-            if (bytesToChar[index] == 0xFFFD) {
-                bytesToChar[index] = (gchar) off;
-                off += 0x100;
-            }
-            index = bytesToChar[index] + (c & 0xff);
-            charToBytes[index] = b;
-        }
-    }
 }
-
-MS874::MS874() : Charset("Windows-874") {}
 
 MS874 MS874::INSTANCE{};
 
@@ -97,7 +80,7 @@ Charset::CoderResult MS874::decodeLoop(ByteBuffer &src, CharBuffer &dst) {
         while (src.hasRemaining()) {
             gchar c = decode(src.get());
             if (c == UNMAPPABLE_DECODING) {
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 return Charset::CoderResult::UNMAPPABLE;
             }
             if (!dst.hasRemaining())
@@ -120,7 +103,7 @@ Charset::CoderResult MS874::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
             gint b = encode(c);
             if (b == UNMAPPABLE_ENCODING) {
                 if (Character::isSurrogate(c)) {
-                    CoderResult cr = Charset::CoderResult::UNDERFLOW;
+                    CoderResult cr;
                     gint uc = 0;
                     if (Character::isHighSurrogate(c)) {
                         if (!src.hasRemaining()) {
@@ -133,21 +116,21 @@ Charset::CoderResult MS874::encodeLoop(CharBuffer &src, ByteBuffer &dst) {
                                 cr = Charset::CoderResult::UNDERFLOW;
                             } else {
                                 uc = -1;
-                                errorLength = 1;
+                                CODING_ERROR_LENGTH = 1;
                                 cr = Charset::CoderResult::MALFORMED;
                             }
                         }
                     } else if (Character::isLowSurrogate(c)) {
                         uc = -1;
-                        errorLength = 1;
+                        CODING_ERROR_LENGTH = 1;
                         cr = Charset::CoderResult::MALFORMED;
                     }
                     if (uc < 0)
                         return cr;
-                    errorLength = uc > 0xFFFF ? 2 : 1;
+                    CODING_ERROR_LENGTH = uc > 0xFFFF ? 2 : 1;
                     return Charset::CoderResult::UNMAPPABLE;
                 }
-                errorLength = 1;
+                CODING_ERROR_LENGTH = 1;
                 return CoderResult::UNMAPPABLE;
             }
             if (!dst.hasRemaining())
@@ -171,7 +154,7 @@ gfloat MS874::averageBytesPerChar() const {
 }
 
 gbool MS874::contains(const Charset &cs) const {
-    return dynamic_cast<MS874 const *>(&cs) || name().equals("US-ASCII");
+    return Class<MS874>::hasInstance(cs) || name().equals("US-ASCII");
 }
 
 Object &MS874::clone() const {
@@ -185,24 +168,3 @@ gint MS874::encode(gchar ch) {
         return UNMAPPABLE_ENCODING;
     return charToBytes[index + (ch & 0xff)];
 }
-
-Charset::ErrorAction MS874::malformedAction() const {
-    return Charset::malformedAction();
-}
-
-Charset::ErrorAction MS874::unmappableAction() const {
-    return Charset::unmappableAction();
-}
-
-CharBuffer MS874::decode(ByteBuffer &in) {
-    return Charset::decode(in);
-}
-
-ByteBuffer MS874::encode(CharBuffer &in) {
-    return Charset::encode(in);
-}
-
-String MS874::toString() const {
-    return Charset::toString();
-}
-

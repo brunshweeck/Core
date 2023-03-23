@@ -9,8 +9,7 @@
 #include "Charset.h"
 
 class MS874 : public Charset {
-private:
-    CORE_EXPLICIT MS874();
+    MS874() {}
 
 public:
     String name() const override;
@@ -24,16 +23,6 @@ public:
     gfloat averageBytesPerChar() const override;
 
     gbool contains(const Charset &cs) const override;
-
-    ErrorAction malformedAction() const override;
-
-    ErrorAction unmappableAction() const override;
-
-    CharBuffer decode(ByteBuffer &in) override;
-
-    ByteBuffer encode(CharBuffer &in) override;
-
-    String toString() const override;
 
     Object &clone() const override;
 

@@ -6,7 +6,7 @@
 #define CORE_BUFFER_H
 
 
-#include "../Object.h"
+#include "../String.h"
 
 class Buffer : public Object {
 protected:

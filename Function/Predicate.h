@@ -260,7 +260,7 @@ public:
         return p2;
     }
 
-    ~Predicate() override {
+    virtual ~Predicate() {
         if (tester && tester != &TRUE && tester != &FALSE) {
             delete tester;
             tester = &TRUE;
@@ -452,7 +452,7 @@ private:
             return "logical[type=(not), lhs=" + lhs->toString() + "]";
         }
 
-        ~ReverseTest() override {
+        ~ReverseTest() {
             if (lhs != &TRUE && lhs != &FALSE) {
                 delete lhs;
                 lhs = 0;
@@ -549,6 +549,23 @@ public:
     static const Predicate<T> ALWAYS_TRUE;
     static const Predicate<T> ALWAYS_FALSE;
 };
+
+#if __cpp_deduction_guides > 201565
+Predicate() -> Predicate<Object>;
+
+template<class T, class R>
+Predicate(Functional<T, R> const&) -> Predicate<T>;
+
+template<class T>
+Predicate(Predicate<T> const&) -> Predicate<T>;
+
+template<class T, class R>
+Predicate(R(*)(T)) -> Predicate<T>;
+
+template<class T, class R, class U>
+Predicate(R(U::*)(T), U) -> Predicate<T>;
+
+#endif //
 
 template<class T> typename Predicate<T>::Test Predicate<T>::TRUE = Test();
 template<class T> typename Predicate<T>::ReverseTest Predicate<T>::FALSE = ReverseTest(TRUE);
