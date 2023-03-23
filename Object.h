@@ -17,8 +17,16 @@ public:
     /**
      * Construct new Object
      */
-    CORE_FAST Object() {};
+    CORE_FAST Object() = default;
 
+    CORE_FAST Object(const Object &) = default;
+
+    CORE_FAST Object(Object &&) = default;
+    
+    Object &operator=(const Object &) = default;
+    
+    Object &operator=(Object &&) = default;
+    
     /**
      * Return true if this object equals to specified object
      * \param obj object to be compared
@@ -39,19 +47,8 @@ public:
      * Return true if this object equals to specified object
      * \param obj object to be compared
      */
-    virtual gbool operator==(Object const& obj) const;
-
-    /**
-     * Return true if this object not equals to specified object
-     * \param obj object to be compared
-     */
-    virtual gbool operator!=(Object const& obj) const;
-
-protected:
-    template<class T>
-    static gbool isPerfectlyInstanceOf(Object const& o) {
-        return typeid(T) == typeid(o);
-    }
+    gbool operator==(Object const& obj) const;
 };
+
 
 #endif //CORE_OBJECT_H

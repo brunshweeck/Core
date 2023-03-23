@@ -42,8 +42,8 @@ using glong = i64;
 using gfloat = f32;
 using gdouble = f64;
 #ifndef CORE_REQUIRE
-#define CORE_REQUIRE(simpleCondition, errorMessage) static_assert((gbool)(simpleCondition), errorMessage "")
-#endif //CORE_REQUIRE
+#define CORE_REQUIRE(simpleCondition, errorMessage) static_assert((gbool) (simpleCondition), errorMessage "")
+#endif//CORE_REQUIRE
 
 #ifndef CORE_TEMPLATE_REQUIREMENT
 #define CORE_TEMPLATE_REQUIRE_MUTABLE(E) CORE_REQUIRE(!Class<E>::isImmutable(), u"Immutable type not permitted")
@@ -51,13 +51,13 @@ using gdouble = f64;
 #define CORE_TEMPLATE_REQUIRE_NON_VOLATILE(E) CORE_REQUIRE(!Class<E>::isVolatile(), u"Volatile type not permitted")
 #define CORE_TEMPLATE_REQUIRE_OBJECT(E) CORE_REQUIRE(Class<Object>::template isSuper<E>(), u"Only type deriving from Object are supported")
 
-#define CORE_TEMPLATE_REQUIREMENT(E) \
-    CORE_TEMPLATE_REQUIRE_MUTABLE(E);     \
-    CORE_TEMPLATE_REQUIRE_UNREFERENCED(E);\
-    CORE_TEMPLATE_REQUIRE_NON_VOLATILE(E);\
+#define CORE_TEMPLATE_REQUIREMENT(E)       \
+    CORE_TEMPLATE_REQUIRE_MUTABLE(E);      \
+    CORE_TEMPLATE_REQUIRE_UNREFERENCED(E); \
+    CORE_TEMPLATE_REQUIRE_NON_VOLATILE(E); \
     CORE_TEMPLATE_REQUIRE_OBJECT(E);
 
-#endif //CORE_TEMPLATE_REQUIREMENT
+#endif//CORE_TEMPLATE_REQUIREMENT
 
 CORE_REQUIRE(sizeof(gbyte) << 3 == 8, u"This Compiler is not supported");
 CORE_REQUIRE(sizeof(gshort) << 3 == 16, u"This Compiler is not supported");
@@ -150,11 +150,11 @@ CORE_REQUIRE(sizeof(gbool) << 3 == 8, u"This Compiler is not supported");
 #define CORE_SYSTEM_MAKEDEPEND
 #else
 #define CORE_SYSTEM 0
-#endif //CORE_SYSTEM
+#endif//CORE_SYSTEM
 
 #ifndef CORE_SYSTEM
-#define CORE_SYSTEM 1
-#endif //CORE_SYSTEM
+#define CORE_SYSTEM
+#endif//CORE_SYSTEM
 
 #if defined(CORE_SYSTEM_WIN32) || defined(CORE_SYSTEM_WIN64)
 // pour les system windows
@@ -169,61 +169,80 @@ CORE_REQUIRE(sizeof(gbool) << 3 == 8, u"This Compiler is not supported");
 
 #elif !defined(CORE_SYSTEM_UNIX)
 #define CORE_SYSTEM_UNIX
-#endif //
+#endif//
 
 #endif
-#pragma endregion //PLATFORM MACRO LIST
+#pragma endregion//PLATFORM MACRO LIST
 
-#define CORE_CLASS_DECLARATIONS \
-    template <class E> class ArrayList;\
-    template <class T, class U> class BiConsumer;\
-    template <class T, class U, class R> class BiFunction;\
-    template <class T, class U> class BiPredicate;\
-    class Boolean;\
-    class Break;\
-    class Byte;\
-    class CastError;\
-    class Charater;\
-    class CharArray;\
-    class CharBuffer;\
-    class Charset;\
-    template <class T> class Class;\
-    class CodingError;\
-    template <class E> class Collection;\
-    template <class T> class Comparable;\
-    template <class T> class Consumer;\
-    class Double;\
-    template <class E> class Enum;\
-    class Error;\
-    class Float;\
-    template <class T, class R> class Function;\
-    class Hashable;\
-    template <class K, class V> class HashMap;\
-    template <class E> class HashSet;\
-    class IndexError;\
-    class Integer;\
-    class IOError;\
-    template <class E> class LinkedList;\
-    template <class E> class List;\
-    class Long;\
-    template <class K, class V> class Map;\
-    class MemoryError;\
-    class Number;\
-    class Object;\
-    template <class T> class Predicate;\
-    template <class E> class Set;\
-    class Short;\
-    class StateError;\
-    class String;\
-    template <class K, class V> class TreeMap;\
-    template <class E> class TreeSet;\
-    class ValueError;\
+#define CORE_CLASS_DECLARATIONS         \
+    template<class E>                   \
+    class ArrayList;                    \
+    template<class T, class U>          \
+    class BiConsumer;                   \
+    template<class T, class U, class R> \
+    class BiFunction;                   \
+    template<class T, class U>          \
+    class BiPredicate;                  \
+    class Boolean;                      \
+    class Break;                        \
+    class Byte;                         \
+    class CastError;                    \
+    class Charater;                     \
+    class CharArray;                    \
+    class CharBuffer;                   \
+    class Charset;                      \
+    template<class T>                   \
+    class Class;                        \
+    class CodingError;                  \
+    template<class E>                   \
+    class Collection;                   \
+    template<class T>                   \
+    class Comparable;                   \
+    template<class T>                   \
+    class Consumer;                     \
+    class Double;                       \
+    template<class E>                   \
+    class Enum;                         \
+    class Error;                        \
+    class Float;                        \
+    template<class T, class R>          \
+    class Function;                     \
+    class Hashable;                     \
+    template<class K, class V>          \
+    class HashMap;                      \
+    template<class E>                   \
+    class HashSet;                      \
+    class IndexError;                   \
+    class Integer;                      \
+    class IOError;                      \
+    template<class E>                   \
+    class LinkedList;                   \
+    template<class E>                   \
+    class List;                         \
+    class Long;                         \
+    template<class K, class V>          \
+    class Map;                          \
+    class MemoryError;                  \
+    class Number;                       \
+    class Object;                       \
+    template<class T>                   \
+    class Predicate;                    \
+    template<class E>                   \
+    class Set;                          \
+    class Short;                        \
+    class StateError;                   \
+    class String;                       \
+    template<class K, class V>          \
+    class TreeMap;                      \
+    template<class E>                   \
+    class TreeSet;                      \
+    class ValueError;                   \
     class Void;
 
-#define CORE_TEMPLATE_REQUIRE_PRIMITIVE(_Obj, _Prim, _Holder, _Mask) \
-    Class<gbool>::Require<!Class<_Prim>::isClass() && Class<_Prim>::isLiteral()> = true,                        \
-    class _Holder = typename Class<_Prim>::Object,                      \
-    Class<gbool>::Require<Class<_Obj>::template isSuper<_Holder>()> = true
+#define CORE_TEMPLATE_REQUIRE_PRIMITIVE(_Obj, _Prim, _Holder, _Mask)                                 \
+    Class<gbool>::Require<!Class<_Prim>::isClass() && Class<_Prim>::isLiteral()> = true,             \
+                                                      class _Holder = typename Class<_Prim>::Object, \
+                                                      Class<gbool>::Require<Class<_Obj>::template isSuper<_Holder>()> = true
 
 
-#endif //CORE_MACRO_H
+#endif//CORE_MACRO_H

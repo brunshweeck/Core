@@ -27,7 +27,3 @@ String Object::toString() const {
 gbool Object::operator==(const Object &obj) const {
     return equals(obj);
 }
-
-gbool Object::operator!=(const Object &obj) const {
-    return !equals(obj);
-}
